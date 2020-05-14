@@ -1,6 +1,12 @@
 import test from 'ava'
-import hello from '../'
+import request from 'supertest';
+import app from '../src/server';
 
-test('main', t => {
-  t.is(hello('rigwild'), 'hellow rigwild')
+test('Ping server', async t => {
+  let expectedBody = {
+    message: 'Hello'
+  }
+  const response = await request(app).get('/')
+  t.is(response.status, 200)
+  t.is(response.body.message, expectedBody.message)
 })
