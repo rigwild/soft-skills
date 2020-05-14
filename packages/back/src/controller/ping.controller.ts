@@ -1,12 +1,9 @@
-import { Request, Response } from "express";
-
+import { Request, Response } from 'express'
 
 export class PingController {
-
-    public ping (req: Request, res: Response) {
-        res.json({
-            message: 'Hello'
-        })
-    }
-
+  public ping(req: Request, res: Response): void {
+    res.json({
+      message: 'Hello'
+    })
+  }
 }
