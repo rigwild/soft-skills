@@ -7,6 +7,18 @@ export const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
+// Log requests
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+if (process.env.NODE_ENV !== 'test') app.use(require('morgan')('combined'))
+
+// Use gzip compression
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+app.use(require('compression')())
+
+// Set some HTTP security headers
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+app.use(require('helmet')())
+
 app.use(router)
 
 export const initServer = async (): Promise<Express> => {
