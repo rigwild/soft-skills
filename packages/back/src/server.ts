@@ -1,6 +1,7 @@
 import express, { Express } from 'express'
 import bodyParser from 'body-parser'
 import router from './router'
+import { SERVER_PORT } from './config'
 
 export const app = express()
 
@@ -23,10 +24,9 @@ app.use(router)
 
 export const initServer = async (): Promise<Express> => {
   // await initDb()
-  const port = process.env.SERVER_PORT || 3000
   return new Promise(resolve =>
-    app.listen(port, () => {
-      console.log(`Server listening on http://localhost:${port}`)
+    app.listen(SERVER_PORT, () => {
+      console.log(`Server is listening on http://localhost:${SERVER_PORT}`)
       resolve(app)
     })
   )
