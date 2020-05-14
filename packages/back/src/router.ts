@@ -1,10 +1,8 @@
-import * as express from 'express'
-import { PingController } from './controller/ping.controller'
+import { Router } from 'express'
+import pingController from './controllers/ping.controller'
 
-export class Router {
-  public pingController: PingController = new PingController()
+const router = Router()
 
-  public routes(app: express.Application): void {
-    app.route('/').get(this.pingController.ping)
-  }
-}
+router.get('/', pingController.ping)
+
+export default router

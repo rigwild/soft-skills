@@ -10,11 +10,10 @@
   },
   "scripts": {
     "build": "tsc",
-    "prepublishOnly": "tsc",
-    "test": "ava --verbose",
     "dev": "nodemon",
-    "start:dev": "node -r ts-node/register ./index.ts",
-    "lint" : "eslint --ext .ts ./src --fix"
+    "start:dev": "ts-node index.ts",
+    "lint": "eslint --ext .ts ./src --fix",
+    "test": "ava --verbose"
   },
   "files": [
     "dist"

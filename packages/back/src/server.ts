@@ -1,21 +1,21 @@
-import express from 'express'
-import { Router } from './router'
+import express, { Express } from 'express'
 import bodyParser from 'body-parser'
+import router from './router'
 
-class Server {
-  public app: express.Application
-  public router: Router = new Router()
+export const app = express()
 
-  constructor() {
-    this.app = express()
-    this.config()
-    this.router.routes(this.app)
-  }
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
-  private config(): void {
-    this.app.use(bodyParser.urlencoded({ extended: false }))
-    this.app.use(bodyParser.json())
-  }
+app.use(router)
+
+export const initServer = async (): Promise<Express> => {
+  // await initDb()
+  const port = process.env.SERVER_PORT || 3000
+  return new Promise(resolve =>
+    app.listen(port, () => {
+      console.log(`Server listening on http://localhost:${port}`)
+      resolve(app)
+    })
+  )
 }
-
-export default new Server().app
