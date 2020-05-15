@@ -12,4 +12,6 @@ test("renders app title", () => {
   const { getByText } = render(<App />);
   const appTitle = getByText("Soft skills");
   expect(appTitle).toBeInTheDocument();
+  const buttonText = getByText("Ant Design button");
+  expect(buttonText).toBeInTheDocument();
 });
