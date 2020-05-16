@@ -40,7 +40,9 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   next()
 }
 
-/** Check a request is authenticated. Will inject the Firebase session in `req.session`.  */
+/** Check a request is authenticated.
+ * Will inject the JWT content in `req.session`.
+ */
 export const authenticatedMiddleware = (): RequestHandler => async (req, res, next) => {
   try {
     const bearerToken = req.headers.authorization
