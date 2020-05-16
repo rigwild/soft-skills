@@ -3,7 +3,8 @@ import bodyParser from 'body-parser'
 
 import router from './router'
 import { SERVER_PORT } from './config'
-import { connectDb, closeDb } from './database'
+import { connectDb } from './database'
+import { errorHandler } from './middlewares'
 
 export const app = express()
 
@@ -24,6 +25,9 @@ app.use(require('helmet')())
 
 app.use(router)
 
+// Register the error handler
+app.use(errorHandler)
+
 export const initServer = async (): Promise<Express> => {
   console.log('Connecting to the database...')
   await connectDb()
@@ -37,6 +41,3 @@ export const initServer = async (): Promise<Express> => {
     })
   )
 }
-;['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'SIGTERM'].forEach(eventType =>
-  process.on(eventType as any, closeDb)
-)

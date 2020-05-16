@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import boom from '@hapi/boom'
 
 import { UserModel, UserDocument } from '../models/User'
 import { JWT_SECRET } from '../../config'
@@ -35,7 +36,7 @@ export const UserController = {
       return { username, name }
     } catch (err) {
       this.log(err.message)
-      throw new Error(`Could not create the user. ${err.message}`)
+      throw boom.internal(`Could not create the user. ${err.message}`)
     }
   },
 
@@ -46,7 +47,7 @@ export const UserController = {
   generateToken(user: UserDocument) {
     return jwt.sign(
       {
-        id: user._id,
+        _id: user._id,
         username: user.username,
         name: user.name
       },
@@ -64,11 +65,11 @@ export const UserController = {
   async login(username: string, password: string) {
     // Check username exists
     const user = await UserModel.findOne({ username }).select('+password')
-    if (!user) throw new Error('Invalid email or password.')
+    if (!user) throw boom.unauthorized('Invalid email or password.')
 
     // Check password is valid
     const isValidPassword = await bcrypt.compare(password, user.password)
-    if (!isValidPassword) throw new Error('Invalid email or password.')
+    if (!isValidPassword) throw boom.unauthorized('Invalid email or password.')
 
     // Sign a JWT and return it
     const token = this.generateToken(user)
@@ -89,7 +90,7 @@ export const UserController = {
    */
   async delete(userId: string) {
     const user = await UserModel.findByIdAndDelete(userId)
-    if (!user) throw new Error('User not found.')
+    if (!user) throw boom.notFound('User not found.')
 
     this.log(`A user was deleted. id=${user.id}`)
     return { id: user.id }
@@ -103,7 +104,7 @@ export const UserController = {
    */
   async find(userId: string) {
     const user = await UserModel.findById(userId)
-    if (!user) throw new Error('User not found.')
+    if (!user) throw boom.notFound('User not found.')
     return user
   }
 }
