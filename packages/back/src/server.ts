@@ -34,11 +34,10 @@ export const initServer = async () => {
   console.log('Database connection established.')
 
   console.log('Starting the server...')
-  if (process.env.NODE_ENV !== 'test')
-    return new Promise(resolve =>
-      app.listen(SERVER_PORT, () => {
-        console.log(`Server is listening on http://localhost:${SERVER_PORT}`)
-        resolve(app)
-      })
-    )
+  new Promise(resolve =>
+    app.listen(SERVER_PORT, () => {
+      console.log(`Server is listening on http://localhost:${SERVER_PORT}`)
+      resolve(app)
+    })
+  )
 }
