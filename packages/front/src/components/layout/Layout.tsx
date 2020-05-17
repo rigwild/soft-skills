@@ -42,7 +42,7 @@ const Layout = (props: Props) => (
       </div>
     </Content>
     <Footer style={{ textAlign: "center" }}>
-      Soft Skills ©2020 Created by Isuru Haupe, Maxime Gratens, Antoine Sauvage,
+      Soft Skills © 2020 Created by Isuru Haupe, Maxime Gratens, rigwild,
       Thomas Audo, Adrien Mazet
     </Footer>
   </AntLayout>
