@@ -51,3 +51,10 @@ yarn lint
 # or
 npm run lint
 ```
+
+### Database
+
+```sh
+docker pull mongo
+docker run -p 127.0.0.1:27017:27017 --name soft-skills-db mongo
+```

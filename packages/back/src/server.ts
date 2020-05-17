@@ -1,7 +1,10 @@
-import express, { Express } from 'express'
+import express from 'express'
 import bodyParser from 'body-parser'
+
 import router from './router'
 import { SERVER_PORT } from './config'
+import { connectDb } from './database'
+import { errorHandler } from './middlewares'
 
 export const app = express()
 
@@ -22,9 +25,16 @@ app.use(require('helmet')())
 
 app.use(router)
 
-export const initServer = async (): Promise<Express> => {
-  // await initDb()
-  return new Promise(resolve =>
+// Register the error handler
+app.use(errorHandler)
+
+export const initServer = async () => {
+  console.log('Connecting to the database...')
+  await connectDb()
+  console.log('Database connection established.')
+
+  console.log('Starting the server...')
+  new Promise(resolve =>
     app.listen(SERVER_PORT, () => {
       console.log(`Server is listening on http://localhost:${SERVER_PORT}`)
       resolve(app)
