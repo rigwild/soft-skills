@@ -1,4 +1,4 @@
-import express, { Express } from 'express'
+import express from 'express'
 import bodyParser from 'body-parser'
 
 import router from './router'
@@ -28,11 +28,11 @@ app.use(router)
 // Register the error handler
 app.use(errorHandler)
 
-export const initServer = async ()=> {
+export const initServer = async () => {
   console.log('Connecting to the database...')
   await connectDb()
   console.log('Database connection established.')
-  
+
   console.log('Starting the server...')
   if (process.env.NODE_ENV !== 'test')
     return new Promise(resolve =>
