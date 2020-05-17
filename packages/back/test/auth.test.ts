@@ -40,6 +40,7 @@ test.serial('Register succes', async t => {
             password: 'secret'
           })
     t.is(res.status, 500)
+    t.is(res.body.message, 'Could not create the user. User already exists.')
   })
   
   test.serial('Register failed (missing name)', async t => {

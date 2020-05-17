@@ -15,5 +15,11 @@ export const UserModel = mongoose.model<UserDocument>(
       type: Date,
       default: () => new Date()
     }
+  }).post('save', (error: any, doc: mongoose.Document, next: Function) => {
+    if (error.name === 'MongoError' && error.code === 11000) {
+      next(new Error('User already exists.'))
+    } else {
+      next(error)
+    }
   })
 )
