@@ -1,9 +1,11 @@
-import mongoose from 'mongoose'
+import mongoose, { mongo } from 'mongoose'
 
 import { MONGO_URI } from '../config'
 
 /** Connect to the MongoDB database */
 export const connectDb = async () => {
+
+
   await mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
     useFindAndModify: false,
