@@ -84,15 +84,13 @@ const Inscription = () => {
             required: true,
             message: "Please retype your password !",
           },
-          ({ getFieldValue } : any) => ({
+          ({ getFieldValue }: any) => ({
             validator(rule, value) {
               if (!value || getFieldValue("password") === value) {
                 return Promise.resolve();
               }
 
-              return Promise.reject(
-                "The password are not the same !"
-              );
+              return Promise.reject("The password are not the same !");
             },
           }),
         ]}

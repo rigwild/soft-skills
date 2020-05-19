@@ -10,7 +10,7 @@ const Login = () => {
   // handle remember me
   // store token
   const onFinish = (values: any) => {
-    if(values.remember) {
+    if (values.remember) {
       localStorage.setItem("username", values.username);
       localStorage.setItem("password", values.password);
       console.log("username : " + localStorage.getItem("username"));
@@ -18,11 +18,13 @@ const Login = () => {
     }
     console.log("Received values of form: ", values);
     const { username, password } = values;
-    login(username, password).then((res) => {
-      console.log(res.data);
-      localStorage.setItem("token", res.data.token); // type answer
-      console.log("token : " + localStorage.getItem("token"));
-    }).catch(error => console.log(error));
+    login(username, password)
+      .then((res) => {
+        console.log(res.data);
+        localStorage.setItem("token", res.data.token); // type answer
+        console.log("token : " + localStorage.getItem("token"));
+      })
+      .catch((error) => console.log(error));
   };
 
   return (
