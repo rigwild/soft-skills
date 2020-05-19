@@ -28,7 +28,7 @@ router.get('/', asyncMiddleware(pingController.ping))
  *   HTTP/1.1 200 OK
  *    {
  *      "data": {
- *          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZWM0M2E5YzhlODg1MmViMThmOWY3OGQiLCJ1c2VybmFtZSI6ImFwaWRvYyIsIm5hbWUiOiJzZWNyZXQiLCJpYXQiOjE1ODk5MTgzNjgsImV4cCI6MTU5MjUxMDM2OH0.XwEvz3LYczvNDfr5ggOwWvz8S00PPgbaksBMzZR_PJM",
+ *          "token": "jwtoken123456789",
  *          "username": "apidoc",
  *           "name": "secret"
  *      }
