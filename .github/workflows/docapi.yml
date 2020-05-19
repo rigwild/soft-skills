@@ -3,7 +3,7 @@ on:
   push:
     branches:
       #- master
-      - "*"
+      - '*'
 
 jobs:
   build-and-deploy:
@@ -16,8 +16,8 @@ jobs:
 
       - name: Install and build documentation
         run: cd packages/back && \
-          yarn && \
-          yarn doc
+          npm i -D && \
+          npm run doc
 
       - name: Clean docs repository
         run: mv packages/back/DOCUMENTATION.md . && \
