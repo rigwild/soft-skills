@@ -6,5 +6,8 @@
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "apidoc": "^0.22.1"
+  }
 }
