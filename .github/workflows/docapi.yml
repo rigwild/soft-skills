@@ -18,13 +18,14 @@ jobs:
         with:
           node-version: 14
 
-      - run: cd packages/back && \
-          npm i -D && \
-          npm run doc
+      - run: yarn --frozen-lockfile
+        working-directory: packages/back
+      - run: yarn doc
+        working-directory: packages/back
 
       - name: Clean docs repository
         run: mv packages/back/DOCUMENTATION.md . && \
-          rm -rf *.json yarn.lock packages README.md && \
+          rm -rf *.json yarn.lock packages README.md  && \
           mv DOCUMENTATION.md README.md
 
       - name: Deploy
