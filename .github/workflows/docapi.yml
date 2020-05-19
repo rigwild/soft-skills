@@ -2,8 +2,7 @@ name: Build and deploy API documentation
 on:
   push:
     branches:
-      #- master
-      - '*'
+      - master
 
 jobs:
   build-and-deploy:
