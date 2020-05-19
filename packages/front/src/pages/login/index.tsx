@@ -54,7 +54,7 @@ const Login = () => {
         <Button type="primary" htmlType="submit" className="login-form-button">
           Connection
         </Button>
-        ou <a href="../inscription/index.tsx">enregistrer vous !</a>
+        ou <a href="../inscription/index.tsx">enregistrez vous !</a>
       </Form.Item>
     </Form>
   );

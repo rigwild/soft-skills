@@ -137,13 +137,13 @@ const Inscription = () => {
         rules={[
           {
             validator: (_, value) =>
-              value ? Promise.resolve() : Promise.reject('Veuillez accepter les condition générales d\'utilisation !'),
+              value ? Promise.resolve() : Promise.reject('Veuillez accepter les conditions générales d\'utilisation !'),
           },
         ]}
         {...tailFormItemLayout}
       >
         <Checkbox>
-          J'ai lu et j'accepte les <a href="">condition générales d'utilisation</a>
+          J'ai lu et j'accepte les <a href="">conditions générales d'utilisation</a>
         </Checkbox>
       </Form.Item>
       <Form.Item {...tailFormItemLayout}>
@@ -151,7 +151,7 @@ const Inscription = () => {
           S'inscrire
         </Button>
       
-         ou <a href="../login/index.tsx">connecter vous !</a>
+         ou <a href="../login/index.tsx">connectez vous !</a>
       </Form.Item>
     </Form>
   );
