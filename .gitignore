@@ -37,8 +37,6 @@ bower_components
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
-apidoc-out
-
 # Dependency directories
 node_modules/
 jspm_packages/
@@ -116,4 +114,7 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
 package-lock.json
+apidoc-out
+DOCUMENTATION.md

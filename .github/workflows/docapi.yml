@@ -2,25 +2,31 @@ name: Build and deploy API documentation
 on:
   push:
     branches:
-      - master
+      #- master
+      - "*"
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 
-        uses: actions/checkout@v2 
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
           persist-credentials: false
 
-      - name: Install and Build
-        run: |
-          cd packages/back
-          npm install
-          npm run doc
+      - name: Install and build documentation
+        run: cd packages/back && \
+          yarn && \
+          yarn doc
 
-      - name: Deploy 
+      - name: Clean docs repository
+        run: mv packages/back/DOCUMENTATION.md . && \
+          rm -rf .git* *.json yarn.lock packages README.md && \
+          mv DOCUMENTATION.md README.md
+
+      - name: Deploy
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          BRANCH: gh-pages 
-          FOLDER: apidoc-out 
+          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: docs
+          FOLDER: packages/back/apidoc-out
