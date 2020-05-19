@@ -9,8 +9,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
         with:
           persist-credentials: false
 
@@ -19,10 +18,11 @@ jobs:
         with:
           node-version: 14
 
-      - name: Install and build documentation
-        run: cd packages/back && \
-          yarn && \
-          yarn doc
+      - run: cd packages/back
+      - run: yarn --frozen-lockfile
+      - run: yarn install
+      - run: yarn doc
+      - run: cd ../../
 
       - name: Clean docs repository
         run: mv packages/back/DOCUMENTATION.md . && \
@@ -34,4 +34,4 @@ jobs:
         with:
           ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: docs
-          FOLDER: packages/back/apidoc-out
+          FOLDER: ./
