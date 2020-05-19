@@ -29,7 +29,7 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   }
 
   const errPayload = err.output.payload
-  console.error(err)
+  if (process.env.NODE_ENV !== 'test') console.error(err)
 
   // Send the error to the client
   res.status(errPayload.statusCode).json({

@@ -35,8 +35,10 @@ export const UserController = {
       this.log(`New user was created. username=${username}, name=${name}, id=${doc._id}`)
       return { username, name }
     } catch (err) {
-      this.log(err.message)
-      throw boom.internal(`Could not create the user. ${err.message}`)
+      const msg = `Could not create the user. ${err.message}`
+      err.message = msg
+      this.log(msg)
+      throw boom.isBoom(err) ? err : boom.internal(msg)
     }
   },
 

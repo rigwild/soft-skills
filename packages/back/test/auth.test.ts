@@ -43,7 +43,7 @@ test.serial('Register success', async t => {
 test.serial('Register failed (username already used)', async t => {
   const { app, testData } = t.context
   const res = await request(app).post('/register').send(testData)
-  t.is(res.status, 500)
+  t.is(res.status, 409)
   t.is(res.body.message, 'Could not create the user. User already exists.')
 })
 
