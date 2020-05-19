@@ -4,6 +4,7 @@ import Dashboard from "pages/dashboard";
 import Home from "pages/home";
 import Login from "pages/login";
 import Record from "pages/record";
+import Test from "pages/inscription";
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -23,6 +24,9 @@ const App = () => (
         </Route>
         <Route path="/dashboard">
           <Dashboard />
+        </Route>
+        <Route path="/inscription">
+          <Test />
         </Route>
       </Switch>
     </Layout>

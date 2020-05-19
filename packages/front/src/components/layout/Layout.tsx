@@ -34,6 +34,9 @@ const Layout = (props: Props) => (
         <Menu.Item key="4">
           <Link to="/dashboard">Tableau de bord</Link>
         </Menu.Item>
+        <Menu.Item key="5">
+          <Link to="/inscription">Inscription</Link>
+        </Menu.Item>
       </Menu>
     </Header>
     <Content style={{ padding: "0 50px", marginTop: 100 }}>
