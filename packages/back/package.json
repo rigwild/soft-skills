@@ -14,7 +14,8 @@
     "dev": "nodemon",
     "start:dev": "ts-node src/index.ts",
     "lint": "eslint --ext .ts ./src --fix",
-    "test": "ava --verbose"
+    "test": "ava --verbose",
+    "doc": "apidoc -i src -o apidoc-out"
   },
   "files": [
     "dist"
@@ -42,6 +43,7 @@
     "@types/supertest": "^2.0.9",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
+    "apidoc": "^0.22.1",
     "ava": "^3.8.1",
     "eslint": "^7.0.0",
     "eslint-config-prettier": "^6.11.0",
@@ -50,8 +52,7 @@
     "prettier": "^2.0.5",
     "supertest": "^4.0.2",
     "ts-node": "^8.9.1",
-    "typescript": "^3.8.3",
-    "apidoc-markdown": "^5.1.0"
+    "typescript": "^3.8.3"
   },
   "ava": {
     "extensions": [
