@@ -19,8 +19,8 @@ jobs:
           node-version: 14
 
       - run: cd packages/back && \
-          yarn --frozen-lockfile && \
-          yarn doc
+          npm i -D && \
+          npm run doc
 
       - name: Clean docs repository
         run: mv packages/back/DOCUMENTATION.md . && \
