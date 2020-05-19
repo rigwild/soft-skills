@@ -14,10 +14,15 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Use Node.js 14
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
       - name: Install and build documentation
         run: cd packages/back && \
-          npm i -D && \
-          npm run doc
+          yarn && \
+          yarn doc
 
       - name: Clean docs repository
         run: mv packages/back/DOCUMENTATION.md . && \
