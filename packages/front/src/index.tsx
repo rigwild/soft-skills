@@ -4,7 +4,7 @@ import Dashboard from "pages/dashboard";
 import Home from "pages/home";
 import Login from "pages/login";
 import Record from "pages/record";
-import Test from "pages/inscription";
+import Inscription from "pages/inscription";
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -26,7 +26,7 @@ const App = () => (
           <Dashboard />
         </Route>
         <Route path="/inscription">
-          <Test />
+          <Inscription />
         </Route>
       </Switch>
     </Layout>
