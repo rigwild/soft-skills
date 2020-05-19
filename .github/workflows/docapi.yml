@@ -1,0 +1,41 @@
+name: Build and deploy API documentation
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 14
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - run: |
+          yarn --frozen-lockfile
+          yarn doc
+        working-directory: packages/back
+
+      - name: Clean docs repository
+        run: |
+          mv packages/back/DOCUMENTATION.md .
+          rm -rf *.json yarn.lock packages README.md
+          mv DOCUMENTATION.md README.md
+
+      - name: Commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -am "Generate documentation"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: docs-back

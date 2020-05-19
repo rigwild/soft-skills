@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose'
+import boom from '@hapi/boom'
 
 import { User } from '../../types'
 
@@ -18,7 +19,7 @@ export const UserSchema = new Schema({
 // Register DB hooks
 UserSchema.post('save', (error: any, doc: mongoose.Document, next: Function) => {
   if (error.name === 'MongoError' && error.code === 11000) {
-    next(new Error('User already exists.'))
+    next(boom.conflict('User already exists.'))
   } else {
     next(error)
   }
