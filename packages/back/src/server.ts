@@ -23,6 +23,18 @@ app.use(require('compression')())
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 app.use(require('helmet')())
 
+// Accept file uploads
+app.use(
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  require('express-fileupload')({
+    abortOnLimit: true,
+    limits: { fileSize: 20971520 },
+    safeFileNames: true,
+    preserveExtension: true,
+    createParentPath: './uploads'
+  })
+)
+
 app.use(router)
 
 // Register the error handler
