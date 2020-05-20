@@ -7,6 +7,27 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 const Login = () => {
   const onFinish = (values: any) => {
     console.log('Received values of form: ', values);
+    //launching fetch request
+    return fetch("http://localhost:3100/login", {
+      method: 'POST',
+      headers : { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+       },
+      body: JSON.stringify({
+        username: values.username,
+        password: values.password
+      })
+    })
+    .then(res => res.json()) 
+    .then(obj => {
+      //check if we can save token in local storage and retrieve it
+      console.log(obj);
+      console.log("saving token");
+      localStorage.setItem('token', obj.data.token);
+      console.log("fetching token");
+      console.log("token : " + localStorage.getItem('token'));
+    });
   };
 
   return (

@@ -1,6 +1,5 @@
 import React from 'react';
 import 'antd/dist/antd.css';
-import { Layout as AntLayout} from "antd";
 import {
   Form,
   Input,
@@ -46,6 +45,21 @@ const Inscription = () => {
 
   const onFinish = (values: any) => {
     console.log('Received values of form: ', values);
+    return fetch("http://localhost:3100/register", {
+      method: 'POST',
+      headers : { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+       },
+      body: JSON.stringify({
+        username: values.username,
+        name: values.email,
+        password: values.password
+
+      })
+    })
+    .then(res => res.text()) 
+    .then(answer => console.log(answer));
   };
   return (
     <Form
@@ -73,7 +87,7 @@ const Inscription = () => {
       </Form.Item>
       
       <Form.Item
-        name="nickname"
+        name="username"
         label={
           <span>
             Identifiant&nbsp;
