@@ -15,12 +15,12 @@ router.get('/', asyncMiddleware(pingController.ping))
  * @apiName Login
  * @apiGroup Authentification
  *
- * @apiParam {String} username username
+ * @apiParam {String} email email
  * @apiParam {String} password password
  *
  * @apiExample {json} Example usage:
  * {
- *   "username": "apidoctest",
+ *   "email": "apidoctest@example.com",
  *   "password": "secret"
  * }
  *
@@ -29,7 +29,7 @@ router.get('/', asyncMiddleware(pingController.ping))
  * {
  *   "data": {
  *      "token": "jwtoken123456789",
- *      "username": "apidoc",
+ *      "email": "apidoctest@example.com",
  *      "name": "secret"
  *   }
  * }
@@ -44,7 +44,8 @@ router.get('/', asyncMiddleware(pingController.ping))
  */
 router.post(
   '/login',
-  body(['username', 'password'], 'is missing.').exists({ checkFalsy: true }),
+  body(['email', 'password'], 'is missing.').exists({ checkFalsy: true }),
+  body('email', 'is not a valid email address.').isEmail(),
   asyncMiddleware(authController.login)
 )
 
@@ -54,13 +55,13 @@ router.post(
  * @apiName Register
  * @apiGroup Authentification
  *
- * @apiParam {String} username username
+ * @apiParam {String} email email
  * @apiParam {String} name name
  * @apiParam {String} password password
  *
  * @apiExample {json} Example usage:
  * {
- *   "username": "apidoctest",
+ *   "email": "apidoctest@example.com",
  *   "name": "apitest"
  *   "password": "secret"
  * }
@@ -69,22 +70,23 @@ router.post(
  *   HTTP/1.1 200 OK
  * {
  *   "data": {
- *     "username": "apidoctest",
+ *     "email": "apidoctest@example.com",
  *     "name": "apidoctest"
  *   }
  * }
  *
- * @apiError UserExist User already exists.
+ * @apiError UserExist Email already registered.
  *
  * @apiErrorExample Error-Response:
  * HTTP/1.1 409 Conflict
  * {
- *   "message": "Could not create the user. User already exists."
+ *   "message": "Could not create the user. Email already registered."
  * }
  */
 router.post(
   '/register',
-  body(['username', 'name'], 'is missing.').exists({ checkFalsy: true }),
+  body(['email', 'name'], 'is missing.').exists({ checkFalsy: true }),
+  body('email', 'is not a valid email address.').isEmail(),
   body('password', 'must be of 4 characters length minimum.').exists({ checkFalsy: true }).isLength({ min: 4 }),
   asyncMiddleware(authController.register)
 )

@@ -2,7 +2,7 @@ import { RequestHandler } from 'express-serve-static-core'
 
 export interface User {
   _id: string
-  username: string
+  email: string
   password: string
   name: string
   joinDate: Date
@@ -10,7 +10,7 @@ export interface User {
 
 // `express.Request` with user data
 export type RequestAuthed = Parameters<RequestHandler>[0] & {
-  session: Pick<User, '_id' | 'username' | 'name'>
+  session: Pick<User, '_id' | 'email' | 'name'>
   userDoc: Omit<User, 'password'>
 }
 // `express.RequestHandler` with user data
