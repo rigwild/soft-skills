@@ -108,5 +108,17 @@ export const UserController = {
     const user = await UserModel.findById(userId)
     if (!user) throw boom.notFound('User not found.')
     return user
+  },
+
+  /**
+   * Find data of a registered user
+   * @param username The username of the user
+   * @returns The user's data
+   * @throws Could not find the user
+   */
+  async findUsername(username: string) {
+    const user = await UserModel.findOne({ username })
+    if (!user) throw boom.notFound('User not found.')
+    return user
   }
 }

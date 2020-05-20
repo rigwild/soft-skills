@@ -3,7 +3,10 @@ import dotenvSafe from 'dotenv-safe'
 
 // Load environment configuration
 dotenvSafe.config({
-  path: path.resolve(__dirname, '..', '.env'),
+  path:
+    process.env.NODE_ENV === 'test'
+      ? path.resolve(__dirname, '..', 'test', '.env.test')
+      : path.resolve(__dirname, '..', '.env'),
   example: path.resolve(__dirname, '..', '.env.example')
 })
 
