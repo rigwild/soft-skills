@@ -31,7 +31,6 @@ const allowedMimeTypes = [
 export class UploadController {
   public async upload(reqRaw: RequestAuthed, res: Response) {
     const req = reqRaw as typeof reqRaw & { files: any }
-    console.log(req.files)
 
     // Check a file was uploaded
     const content = req?.files?.content
