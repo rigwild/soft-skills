@@ -1,4 +1,4 @@
-import { RedoOutlined } from "@ant-design/icons";
+import { RedoOutlined, VideoCameraTwoTone } from "@ant-design/icons";
 import { Alert, Button, Spin, Statistic } from "antd";
 import React, { MutableRefObject, RefObject, useRef, useState } from "react";
 import Webcam from "react-webcam";
@@ -14,6 +14,12 @@ enum RecorderState {
 }
 
 const FIVE_MINUTE_IN_MS = 5 * 60 * 1000;
+
+const centeredDivStyle = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+};
 
 const WebcamRecorder = () => {
   const webcamRef: RefObject<Webcam | null> &
@@ -94,14 +100,29 @@ const WebcamRecorder = () => {
         const deadline = Date.now() + FIVE_MINUTE_IN_MS;
         return (
           <>
-            <Button onClick={handleStopRecording} danger type="primary">
-              Stop
-            </Button>
+            <div style={centeredDivStyle}>
+              <div
+                style={{
+                  ...centeredDivStyle,
+                  flexDirection: "column",
+                  marginRight: 20,
+                }}
+              >
+                <VideoCameraTwoTone
+                  style={{ fontSize: 30 }}
+                  twoToneColor="red"
+                />
+                <p style={{ margin: 0 }}>Recording...</p>
+              </div>
+              <Button onClick={handleStopRecording} danger type="primary">
+                Stop
+              </Button>
+            </div>
             <Countdown
               title="Time remaining"
               value={deadline}
               onFinish={handleStopRecording}
-              style={{ marginTop: 25 }}
+              style={{ marginTop: 15 }}
             />
           </>
         );
@@ -145,11 +166,9 @@ const WebcamRecorder = () => {
       {displayMedia()}
       <div
         style={{
+          ...centeredDivStyle,
           marginTop: 25,
-          display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
         }}
       >
         {displayControlButtons()}
