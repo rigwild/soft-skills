@@ -1,6 +1,7 @@
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, Tooltip } from "antd";
 import React from "react";
+import { Link } from "react-router-dom";
 
 const { Item } = Form;
 
@@ -109,31 +110,11 @@ const Inscription = () => {
       >
         <Input.Password />
       </Item>
-
-      <Item
-        name="agreement"
-        valuePropName="checked"
-        rules={[
-          {
-            validator: (_, value) =>
-              value
-                ? Promise.resolve()
-                : Promise.reject(
-                    "Veuillez accepter les conditions générales d'utilisation !"
-                  ),
-          },
-        ]}
-      >
-        <Checkbox>
-          J'ai lu et j'accepte les{" "}
-          <a href="">conditions générales d'utilisation</a>
-        </Checkbox>
-      </Item>
       <Item>
         <Button type="primary" htmlType="submit">
           S'inscrire
         </Button>
-        ou <a href="../login/index.tsx">connectez vous !</a>
+        ou <Link to="/login">connectez vous !</Link>
       </Item>
     </Form>
   );

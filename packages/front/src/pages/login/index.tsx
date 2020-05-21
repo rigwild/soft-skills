@@ -6,6 +6,10 @@ import { Link } from "react-router-dom";
 const { Item } = Form;
 
 const Login = () => {
+  // use axios
+  // move api call
+  // handle remember me
+  // store token
   const onFinish = (values: any) => {
     console.log("Received values of form: ", values);
     //launching fetch request
@@ -30,8 +34,6 @@ const Login = () => {
         console.log("token : " + localStorage.getItem("token"));
       });
   };
-
-  // se souvenir de moi ça fait rien
 
   return (
     <Form
