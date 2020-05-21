@@ -67,10 +67,10 @@ export const injectUserDocMiddleware = (): RequestHandler => async (reqRaw, res,
   const req = reqRaw as RequestAuthed
 
   try {
-    const username = req.session?.username
-    if (!username) throw boom.unauthorized('You need to be logged in.')
+    const email = req.session?.email
+    if (!email) throw boom.unauthorized('You need to be logged in.')
 
-    const userDoc = await UserController.findUsername(username)
+    const userDoc = await UserController.findEmail(email)
 
     const userData = userDoc.toObject()
     delete userData.__v

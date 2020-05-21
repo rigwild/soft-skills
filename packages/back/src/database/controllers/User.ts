@@ -11,29 +11,29 @@ export const UserController = {
   },
 
   log(data: string | object) {
-    console.log(data)
+    if (process.env.NODE_ENV !== 'test') console.log(data)
   },
 
   /**
    * Register a new user.
    *
-   * @param username The email of the new user (unique)
+   * @param email The email of the new user (unique)
    * @param password The password of the new user (will be hashed), defaults to random
    * @param name The name of the new user
    * @returns The newly registered user data (without password)
-   * @throws The username is already taken
+   * @throws The email is already taken
    */
-  async register(username: string, password: string, name: string) {
+  async register(email: string, password: string, name: string) {
     try {
       const hash = await bcrypt.hash(password, 10)
       const doc = await UserModel.create({
-        username,
+        email,
         password: hash,
         name
       })
 
-      this.log(`New user was created. username=${username}, name=${name}, id=${doc._id}`)
-      return { username, name }
+      this.log(`New user was created. email=${email}, name=${name}, id=${doc._id}`)
+      return { email, name }
     } catch (err) {
       const msg = `Could not create the user. ${err.message}`
       err.message = msg
@@ -50,7 +50,7 @@ export const UserController = {
     return jwt.sign(
       {
         _id: user._id,
-        username: user.username,
+        email: user.email,
         name: user.name
       },
       JWT_SECRET,
@@ -60,13 +60,13 @@ export const UserController = {
 
   /**
    * Check a user login
-   * @param username The username of the user
+   * @param email The email of the user
    * @param password The password of the user
    * @returns A login object response
    */
-  async login(username: string, password: string) {
-    // Check username exists
-    const user = await UserModel.findOne({ username }).select('+password')
+  async login(email: string, password: string) {
+    // Check email exists
+    const user = await UserModel.findOne({ email }).select('+password')
     if (!user) throw boom.unauthorized('Invalid email or password.')
 
     // Check password is valid
@@ -76,10 +76,10 @@ export const UserController = {
     // Sign a JWT and return it
     const token = this.generateToken(user)
 
-    this.log(`User logged in. username=${user.username}, id=${user.id}`)
+    this.log(`User logged in. email=${user.email}, id=${user.id}`)
     return {
       token,
-      username: user.username,
+      email: user.email,
       name: user.name
     }
   },
@@ -112,12 +112,12 @@ export const UserController = {
 
   /**
    * Find data of a registered user
-   * @param username The username of the user
+   * @param email The email of the user
    * @returns The user's data
    * @throws Could not find the user
    */
-  async findUsername(username: string) {
-    const user = await UserModel.findOne({ username })
+  async findEmail(email: string) {
+    const user = await UserModel.findOne({ email })
     if (!user) throw boom.notFound('User not found.')
     return user
   }
