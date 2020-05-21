@@ -1,10 +1,17 @@
-import CustomComponent from "components/custom";
+import WebcamRecorder from "components/recorder";
 import React from "react";
 
 const Record = () => (
-  <>
-    <CustomComponent title="Record" />
-  </>
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <WebcamRecorder />
+  </div>
 );
 
 export default Record;
