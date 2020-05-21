@@ -1,92 +1,55 @@
-import React from 'react';
-import 'antd/dist/antd.css';
-import {
-  Form,
-  Input,
-  Tooltip,
-  Checkbox,
-  Button,
-} from 'antd';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { QuestionCircleOutlined } from "@ant-design/icons";
+import { Button, Checkbox, Form, Input, Tooltip } from "antd";
+import React from "react";
 
-const formItemLayout = {
-  labelCol: {
-    xs: {
-      span: 24,
-    },
-    sm: {
-      span: 8,
-    },
-  },
-  wrapperCol: {
-    xs: {
-      span: 24,
-    },
-    sm: {
-      span: 16,
-    },
-  },
-};
-const tailFormItemLayout = {
-  wrapperCol: {
-    xs: {
-      span: 24,
-      offset: 0,
-    },
-    sm: {
-      span: 16,
-      offset: 8,
-    },
-  },
-};
+const { Item } = Form;
 
 const Inscription = () => {
   const [form] = Form.useForm();
 
   const onFinish = (values: any) => {
-    console.log('Received values of form: ', values);
+    console.log("Received values of form: ", values);
     return fetch("http://localhost:3100/register", {
-      method: 'POST',
-      headers : { 
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-       },
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
       body: JSON.stringify({
         username: values.username,
         name: values.email,
-        password: values.password
-
-      })
+        password: values.password,
+      }),
     })
-    .then(res => res.text()) 
-    .then(answer => console.log(answer));
+      .then((res) => res.text())
+      .then((answer) => console.log(answer));
   };
   return (
     <Form
-      {...formItemLayout}
       form={form}
       name="inscription"
       onFinish={onFinish}
       scrollToFirstError
+      style={{ maxWidth: "500px", margin: "auto" }}
     >
-      <Form.Item
+      <Item
         name="email"
         label="adresse e-mail"
         rules={[
           {
-            type: 'email',
-            message: 'l\'adresse e-mail n\'est pas au bon format !',
+            type: "email",
+            message: "l'adresse e-mail n'est pas au bon format !",
           },
           {
             required: true,
-            message: 'Veuillez spécifier un email !',
+            message: "Veuillez spécifier un email !",
           },
         ]}
       >
         <Input />
-      </Form.Item>
-      
-      <Form.Item
+      </Item>
+
+      <Item
         name="username"
         label={
           <span>
@@ -99,74 +62,79 @@ const Inscription = () => {
         rules={[
           {
             required: true,
-            message: 'Veuiller spécifier un identifiant !',
+            message: "Veuiller spécifier un identifiant !",
             whitespace: true,
           },
         ]}
       >
         <Input />
-      </Form.Item>
+      </Item>
 
-      <Form.Item
+      <Item
         name="password"
         label="Mot de passe"
         rules={[
           {
             required: true,
-            message: 'Veuillez spécifier un mot de passe !',
+            message: "Veuillez spécifier un mot de passe !",
           },
         ]}
         hasFeedback
       >
         <Input.Password />
-      </Form.Item>
+      </Item>
 
-      <Form.Item
+      <Item
         name="confirm"
         label="confirmation du mot de passe"
-        dependencies={['password']}
+        dependencies={["password"]}
         hasFeedback
         rules={[
           {
             required: true,
-            message: 'Veuillez spécifier la confirmation du mot de passe',
+            message: "Veuillez spécifier la confirmation du mot de passe",
           },
           ({ getFieldValue }) => ({
             validator(rule, value) {
-              if (!value || getFieldValue('password') === value) {
+              if (!value || getFieldValue("password") === value) {
                 return Promise.resolve();
               }
 
-              return Promise.reject('Les deux mots de passe ne sont pas identiques !');
+              return Promise.reject(
+                "Les deux mots de passe ne sont pas identiques !"
+              );
             },
           }),
         ]}
       >
         <Input.Password />
-      </Form.Item>
+      </Item>
 
-      <Form.Item
+      <Item
         name="agreement"
         valuePropName="checked"
         rules={[
           {
             validator: (_, value) =>
-              value ? Promise.resolve() : Promise.reject('Veuillez accepter les conditions générales d\'utilisation !'),
+              value
+                ? Promise.resolve()
+                : Promise.reject(
+                    "Veuillez accepter les conditions générales d'utilisation !"
+                  ),
           },
         ]}
-        {...tailFormItemLayout}
       >
         <Checkbox>
-          J'ai lu et j'accepte les <a href="">conditions générales d'utilisation</a>
+          J'ai lu et j'accepte les{" "}
+          <a href="">conditions générales d'utilisation</a>
         </Checkbox>
-      </Form.Item>
-      <Form.Item {...tailFormItemLayout}>
+      </Item>
+      <Item>
         <Button type="primary" htmlType="submit">
           S'inscrire
         </Button>
-      
-         ou <a href="../login/index.tsx">connectez vous !</a>
-      </Form.Item>
+        ou <a href="../login/index.tsx">connectez vous !</a>
+      </Item>
     </Form>
   );
 };
