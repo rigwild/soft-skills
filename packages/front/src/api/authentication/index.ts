@@ -1,16 +1,15 @@
 import axiosInstance from "api";
 
-export const register = (username: string, email: string, password: string) => {
+export const register = (name: string, email: string, password: string) => {
   return axiosInstance.post("/register", {
-    username,
+    name,
     email,
     password,
   });
 };
-
-export const login = (username: string, password: string) => {
+export const login = (email: string, password: string) => {
   return axiosInstance.post("/login", {
-    username,
+    email,
     password,
   });
 };
