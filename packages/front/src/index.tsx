@@ -3,6 +3,7 @@ import Layout from "components/layout";
 import Dashboard from "pages/dashboard";
 import Home from "pages/home";
 import Login from "pages/login";
+import NoMatch from "pages/nomatch";
 import Record from "pages/record";
 import React from "react";
 import ReactDOM from "react-dom";
@@ -23,6 +24,9 @@ const App = () => (
         </Route>
         <Route path="/dashboard">
           <Dashboard />
+        </Route>
+        <Route path="*">
+          <NoMatch />
         </Route>
       </Switch>
     </Layout>
