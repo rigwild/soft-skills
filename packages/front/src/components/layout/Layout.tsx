@@ -14,15 +14,24 @@ const Layout = (props: Props) => {
     <AntLayout style={{ height: "100vh" }}>
       <Header style={{ position: "fixed", zIndex: 1, width: "100%" }}>
         <div
-          className="logo"
           style={{
-            width: "120px",
-            height: "31px",
-            background: "rgba(255, 255, 255, 0.2)",
-            margin: "16px 24px 16px 0",
+            marginRight: "60px",
             float: "left",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
-        />
+        >
+          <h1
+            style={{
+              color: "white",
+              width: "120x",
+              height: "53px",
+            }}
+          >
+            Soft skills
+          </h1>
+        </div>
         <Menu theme="dark" mode="horizontal" selectedKeys={[location.pathname]}>
           <Menu.Item key="/">
             <Link to="/">Accueil </Link>
