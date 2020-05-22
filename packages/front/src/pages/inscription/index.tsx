@@ -1,29 +1,20 @@
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Input, Tooltip } from "antd";
+import { Button, Form, Input, Tooltip } from "antd";
 import React from "react";
 import { Link } from "react-router-dom";
+import { register } from "api/authentication";
 
 const { Item } = Form;
 
 const Inscription = () => {
-  const [form] = Form.useForm();
+  const [form] = Form.useForm(); // why use a hook here and not in the other ?
 
   const onFinish = (values: any) => {
     console.log("Received values of form: ", values);
-    return fetch("http://localhost:3100/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        username: values.username,
-        name: values.email,
-        password: values.password,
-      }),
-    })
-      .then((res) => res.text())
-      .then((answer) => console.log(answer));
+    const { username, email, password } = values;
+    register(username, email, password)
+      .then((res) => console.log(res.data))
+      .catch((error) => console.log(error));
   };
   return (
     <Form
@@ -33,23 +24,6 @@ const Inscription = () => {
       scrollToFirstError
       style={{ maxWidth: "500px", margin: "auto" }}
     >
-      <Item
-        name="email"
-        label="adresse e-mail"
-        rules={[
-          {
-            type: "email",
-            message: "l'adresse e-mail n'est pas au bon format !",
-          },
-          {
-            required: true,
-            message: "Veuillez spécifier un email !",
-          },
-        ]}
-      >
-        <Input />
-      </Item>
-
       <Item
         name="username"
         label={
@@ -70,7 +44,22 @@ const Inscription = () => {
       >
         <Input />
       </Item>
-
+      <Item
+        name="email"
+        label="adresse e-mail"
+        rules={[
+          {
+            type: "email",
+            message: "l'adresse e-mail n'est pas au bon format !",
+          },
+          {
+            required: true,
+            message: "Veuillez spécifier un email !",
+          },
+        ]}
+      >
+        <Input />
+      </Item>
       <Item
         name="password"
         label="Mot de passe"

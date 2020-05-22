@@ -2,45 +2,29 @@ import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input } from "antd";
 import React from "react";
 import { Link } from "react-router-dom";
+import { login } from "api/authentication";
 
 const { Item } = Form;
 
 const Login = () => {
-  // use axios
-  // move api call
   // handle remember me
   // store token
   const onFinish = (values: any) => {
     console.log("Received values of form: ", values);
-    //launching fetch request
-    return fetch("http://localhost:3100/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        username: values.username,
-        password: values.password,
-      }),
-    })
-      .then((res) => res.json())
-      .then((obj) => {
-        //check if we can save token in local storage and retrieve it
-        console.log(obj);
-        console.log("saving token");
-        localStorage.setItem("token", obj.data.token);
-        console.log("fetching token");
-        console.log("token : " + localStorage.getItem("token"));
-      });
+    const { username, password } = values;
+    login(username, password).then((res) => {
+      console.log(res.data);
+      localStorage.setItem("token", res.data.token); // type answer
+      console.log("token : " + localStorage.getItem("token"));
+    });
   };
 
   return (
     <Form
-      name="normal_login"
+      name="login"
       style={{ maxWidth: "300px", margin: "auto" }}
       initialValues={{
-        remember: true,
+        remember: true, // what does it do ?
       }}
       onFinish={onFinish}
     >
