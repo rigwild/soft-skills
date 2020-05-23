@@ -1,10 +1,13 @@
-import { Layout as AntLayout, Menu } from "antd";
+import { LoginOutlined, LogoutOutlined } from "@ant-design/icons";
+import { Button, Layout as AntLayout, Menu } from "antd";
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const { Header, Content, Footer } = AntLayout;
 
 type Props = {
+  loggedIn: boolean;
+  setLoggedIn: (loggedIn: boolean) => void;
   children: JSX.Element | JSX.Element[];
 };
 
@@ -22,30 +25,54 @@ const Layout = (props: Props) => {
             justifyContent: "center",
           }}
         >
-          <h1
-            style={{
-              color: "white",
-              width: "120x",
-              height: "53px",
-            }}
-          >
-            Soft skills
-          </h1>
+          <Link to="/">
+            <h1
+              style={{
+                color: "white",
+                width: "120x",
+                height: "53px",
+              }}
+            >
+              Soft skills
+            </h1>
+          </Link>
         </div>
-        <Menu theme="dark" mode="horizontal" selectedKeys={[location.pathname]}>
-          <Menu.Item key="/">
-            <Link to="/">Accueil </Link>
-          </Menu.Item>
-          <Menu.Item key="/login">
-            <Link to="/login">Connection</Link>
-          </Menu.Item>
-          <Menu.Item key="/record">
-            <Link to="/record">Enregistrement</Link>
-          </Menu.Item>
-          <Menu.Item key="/dashboard">
-            <Link to="/dashboard">Tableau de bord</Link>
-          </Menu.Item>
-        </Menu>
+        {props.loggedIn ? (
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            selectedKeys={[location.pathname]}
+          >
+            <Menu.Item key="/record">
+              <Link to="/record">Record</Link>
+            </Menu.Item>
+            <Menu.Item key="/dashboard">
+              <Link to="/dashboard">Dashboard</Link>
+            </Menu.Item>
+            <Menu.Item style={{ position: "absolute", right: "30px" }}>
+              <Link to="/">
+                <Button
+                  type="primary"
+                  danger
+                  onClick={() => props.setLoggedIn(false)}
+                  icon={<LogoutOutlined />}
+                >
+                  Logout
+                </Button>
+              </Link>
+            </Menu.Item>
+          </Menu>
+        ) : (
+          <Menu theme="dark" mode="horizontal" selectable={false}>
+            <Menu.Item style={{ position: "absolute", right: "30px" }}>
+              <Link to="/login">
+                <Button type="primary" icon={<LoginOutlined />}>
+                  Login
+                </Button>
+              </Link>
+            </Menu.Item>
+          </Menu>
+        )}
       </Header>
       <Content style={{ padding: "0 50px", marginTop: 100 }}>
         <div
