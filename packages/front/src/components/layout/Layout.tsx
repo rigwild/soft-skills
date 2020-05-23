@@ -7,7 +7,7 @@ const { Header, Content, Footer } = AntLayout;
 
 type Props = {
   loggedIn: boolean;
-  setLoggedIn: (loggedIn: boolean) => void;
+  logout: () => void;
   children: JSX.Element | JSX.Element[];
 };
 
@@ -54,7 +54,7 @@ const Layout = (props: Props) => {
                 <Button
                   type="primary"
                   danger
-                  onClick={() => props.setLoggedIn(false)}
+                  onClick={() => props.logout()}
                   icon={<LogoutOutlined />}
                 >
                   Logout
