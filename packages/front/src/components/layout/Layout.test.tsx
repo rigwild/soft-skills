@@ -8,7 +8,10 @@ test("renders Layout correctly", () => {
   const content = "Hello World";
   const { getByText } = render(
     <BrowserRouter>
-      <Layout>
+      <Layout
+        loggedIn={true}
+        setLoggedIn={(loggedIn: boolean) => console.log(loggedIn)}
+      >
         <p>{content}</p>
       </Layout>
     </BrowserRouter>
