@@ -39,15 +39,15 @@ export class UploadController {
     // Check file mime type
     if (!allowedMimeTypes.includes(content.mimetype.toLowerCase()))
       throw boom.badRequest('You need to send an audio or video file.')
-    
+
     // Add a unique identifier to dodge filename collisions
     content.name = `${nanoid(6)}-${content.name}`
-    
+
     await content.mv(path.resolve(UPLOADS_DIR, content.name))
     await UserController.addUpload(req.session._id, content)
-    
+
     res.status(200).end()
   }
 }
 
-export default new UploadController()   
+export default new UploadController()

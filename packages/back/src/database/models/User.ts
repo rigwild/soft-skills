@@ -14,11 +14,13 @@ export const UserSchema = new Schema({
     type: Date,
     default: () => new Date()
   },
-  uploads: [{
-    mimeType: { type: String, required: true },
-    fileName: { type: String, required: true },
-    size: { type: Number, required: true }
-  }]
+  uploads: [
+    {
+      mimeType: { type: String, required: true },
+      fileName: { type: String, required: true },
+      size: { type: Number, required: true }
+    }
+  ]
 })
 
 // Register DB hooks
