@@ -6,24 +6,27 @@ import Home from "pages/home";
 import Login from "pages/login";
 import NoMatch from "pages/nomatch";
 import Record from "pages/record";
+import Signup from "pages/signup";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 const App = () => {
-  // should be in a context for further usage
-  // or passed as props is enough ?
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
     //const token = localStorage.getItem("token");
     // check token validity
-    setLoggedIn(true);
+    //setLoggedIn(true);
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     setLoggedIn(false);
+  };
+
+  const handleLogin = () => {
+    setLoggedIn(true);
   };
 
   return (
@@ -34,10 +37,10 @@ const App = () => {
             <Home />
           </Route>
           <Route path="/login">
-            <Login />
+            <Login login={handleLogin} />
           </Route>
           <Route path="/signup">
-            <Login />
+            <Signup />
           </Route>
           <PrivateRoute loggedIn={loggedIn} path="/record">
             <Record />

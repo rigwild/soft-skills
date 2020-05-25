@@ -1,87 +1,62 @@
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Input } from "antd";
-import React from "react";
-import { Link } from "react-router-dom";
+import { Alert } from "antd";
+import { Store } from "antd/lib/form/interface";
 import { login } from "api/authentication";
+import { AxiosError, AxiosResponse } from "axios";
+import LoginForm from "components/login";
+import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 
-const { Item } = Form;
+type Props = {
+  login: () => void;
+};
 
-const Login = () => {
-  // handle remember me
-  // store token
-  const onFinish = (values: any) => {
-    if (values.remember) {
-      localStorage.setItem("username", values.username);
-      localStorage.setItem("password", values.password);
-      console.log("username : " + localStorage.getItem("username"));
-      console.log("password : " + localStorage.getItem("password"));
+type LoginError = {
+  message: string;
+};
+
+type LoginResponse = {
+  data: { token: string };
+};
+
+const Record = (props: Props) => {
+  const history = useHistory();
+  const [error, setError] = useState<string | undefined>(undefined);
+
+  const handleLogin = (values: Store) => {
+    setError(undefined);
+    const { email, password, remember } = values;
+
+    if (remember) {
+      localStorage.setItem("email", values.email);
+    } else {
+      localStorage.removeItem("email");
     }
-    console.log("Received values of form: ", values);
-    const { username, password } = values;
-    login(username, password)
-      .then((res) => {
-        console.log(res.data);
-        localStorage.setItem("token", res.data.token); // type answer
-        console.log("token : " + localStorage.getItem("token"));
+
+    login(email, password)
+      .then((res: AxiosResponse<LoginResponse>) => {
+        const { data } = res.data;
+        localStorage.setItem("token", data.token);
+        props.login();
+        history.push("/");
       })
-      .catch((error) => console.log(error));
+      .catch((error: AxiosError<LoginError>) => {
+        setError(error.response?.data.message);
+      });
   };
 
   return (
-    <Form
-      name="login"
-      style={{ maxWidth: "300px", margin: "auto" }}
-      initialValues={{
-        remember: true, // what does it do ?
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
       }}
-      onFinish={onFinish}
     >
-      <Item
-        name="username"
-        rules={[
-          {
-            required: true,
-            message: "Please input an username !",
-          },
-        ]}
-      >
-        <Input prefix={<UserOutlined />} placeholder="Username" />
-      </Item>
-      <Item
-        name="password"
-        rules={[
-          {
-            required: true,
-            message: "Please input a password !",
-          },
-        ]}
-      >
-        <Input
-          prefix={<LockOutlined />}
-          type="password"
-          placeholder="Password"
-        />
-      </Item>
-      <Item>
-        <Item name="remember" valuePropName="checked" noStyle>
-          <Checkbox>Remember me</Checkbox>
-        </Item>
-      </Item>
-
-      <Item>
-        <Button
-          type="primary"
-          htmlType="submit"
-          style={{
-            width: " 100%",
-          }}
-        >
-          Login
-        </Button>
-        or <Link to="/inscription">Register</Link>
-      </Item>
-    </Form>
+      <LoginForm onFinish={handleLogin} />
+      {error && <Alert message={error} type="error" showIcon />}
+    </div>
   );
 };
 
-export default Login;
+export default Record;
