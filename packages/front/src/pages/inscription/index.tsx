@@ -3,13 +3,14 @@ import { Button, Form, Input, Tooltip } from "antd";
 import React from "react";
 import { Link } from "react-router-dom";
 import { register } from "api/authentication";
+import { Store } from "antd/lib/form/interface";
+import { Rule } from "antd/lib/form";
 
 const { Item } = Form;
 
 const Inscription = () => {
-  const [form] = Form.useForm(); // why use a hook here and not in the other ?
-
-  const onFinish = (values: any) => {
+  //const [form] = Form.useForm(); // why use a hook here and not in the other ?
+  const onFinish = (values: Store) => {
     console.log("Received values of form: ", values);
     const { username, email, password } = values;
     register(username, email, password)
@@ -18,18 +19,17 @@ const Inscription = () => {
   };
   return (
     <Form
-      form={form}
+      //form={form}
       name="inscription"
       onFinish={onFinish}
-      scrollToFirstError
       style={{ maxWidth: "500px", margin: "auto" }}
     >
       <Item
         name="username"
         label={
           <span>
-            Identifiant&nbsp;
-            <Tooltip title="l'identifiant utilisé pour vous connecter !">
+            Username&nbsp;
+            <Tooltip title="The username used to connect to your account !">
               <QuestionCircleOutlined />
             </Tooltip>
           </span>
@@ -37,7 +37,7 @@ const Inscription = () => {
         rules={[
           {
             required: true,
-            message: "Veuiller spécifier un identifiant !",
+            message: "Please specify an username !",
             whitespace: true,
           },
         ]}
@@ -46,15 +46,15 @@ const Inscription = () => {
       </Item>
       <Item
         name="email"
-        label="adresse e-mail"
+        label="Email adress"
         rules={[
           {
             type: "email",
-            message: "l'adresse e-mail n'est pas au bon format !",
+            message: "Please input a valid email adress !",
           },
           {
             required: true,
-            message: "Veuillez spécifier un email !",
+            message: "Please specify an email adress !",
           },
         ]}
       >
@@ -62,11 +62,11 @@ const Inscription = () => {
       </Item>
       <Item
         name="password"
-        label="Mot de passe"
+        label="Password"
         rules={[
           {
             required: true,
-            message: "Veuillez spécifier un mot de passe !",
+            message: "Please specify a password !",
           },
         ]}
         hasFeedback
@@ -76,22 +76,22 @@ const Inscription = () => {
 
       <Item
         name="confirm"
-        label="confirmation du mot de passe"
+        label="Password confirmation"
         dependencies={["password"]}
         hasFeedback
         rules={[
           {
             required: true,
-            message: "Veuillez spécifier la confirmation du mot de passe",
+            message: "Please retype your password !",
           },
-          ({ getFieldValue }) => ({
+          ({ getFieldValue } : any) => ({
             validator(rule, value) {
               if (!value || getFieldValue("password") === value) {
                 return Promise.resolve();
               }
 
               return Promise.reject(
-                "Les deux mots de passe ne sont pas identiques !"
+                "The password are not the same !"
               );
             },
           }),
@@ -101,9 +101,9 @@ const Inscription = () => {
       </Item>
       <Item>
         <Button type="primary" htmlType="submit">
-          S'inscrire
+          Register
         </Button>
-        ou <Link to="/login">connectez vous !</Link>
+        or <Link to="/login">login</Link>
       </Item>
     </Form>
   );

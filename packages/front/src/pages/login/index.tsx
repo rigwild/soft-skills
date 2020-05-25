@@ -10,13 +10,19 @@ const Login = () => {
   // handle remember me
   // store token
   const onFinish = (values: any) => {
+    if(values.remember) {
+      localStorage.setItem("username", values.username);
+      localStorage.setItem("password", values.password);
+      console.log("username : " + localStorage.getItem("username"));
+      console.log("password : " + localStorage.getItem("password"));
+    }
     console.log("Received values of form: ", values);
     const { username, password } = values;
     login(username, password).then((res) => {
       console.log(res.data);
       localStorage.setItem("token", res.data.token); // type answer
       console.log("token : " + localStorage.getItem("token"));
-    });
+    }).catch(error => console.log(error));
   };
 
   return (
@@ -33,7 +39,7 @@ const Login = () => {
         rules={[
           {
             required: true,
-            message: "Veuillez entrer un nom d'utilisateur !",
+            message: "Please input an username !",
           },
         ]}
       >
@@ -44,7 +50,7 @@ const Login = () => {
         rules={[
           {
             required: true,
-            message: "Veuillez entrer un mot de passe !",
+            message: "Please input a password !",
           },
         ]}
       >
@@ -56,7 +62,7 @@ const Login = () => {
       </Item>
       <Item>
         <Item name="remember" valuePropName="checked" noStyle>
-          <Checkbox>Se souvenir de moi</Checkbox>
+          <Checkbox>Remember me</Checkbox>
         </Item>
       </Item>
 
@@ -68,9 +74,9 @@ const Login = () => {
             width: " 100%",
           }}
         >
-          Connection
+          Login
         </Button>
-        ou <Link to="/inscription">enregistrez vous !</Link>
+        or <Link to="/inscription">Register</Link>
       </Item>
     </Form>
   );
