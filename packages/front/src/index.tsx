@@ -1,36 +1,54 @@
 import "antd/dist/antd.css";
 import Layout from "components/layout";
+import PrivateRoute from "components/route";
 import Dashboard from "pages/dashboard";
 import Home from "pages/home";
 import Login from "pages/login";
+import NoMatch from "pages/nomatch";
 import Record from "pages/record";
-import Inscription from "pages/inscription";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
-const App = () => (
-  <Router>
-    <Layout>
-      <Switch>
-        <Route exact path="/">
-          <Home />
-        </Route>
-        <Route path="/login">
-          <Login />
-        </Route>
-        <Route path="/record">
-          <Record />
-        </Route>
-        <Route path="/dashboard">
-          <Dashboard />
-        </Route>
-        <Route path="/inscription">
-          <Inscription />
-        </Route>
-      </Switch>
-    </Layout>
-  </Router>
-);
+const App = () => {
+  // should be in a context for further usage
+  // or passed as props is enough ?
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    //const token = localStorage.getItem("token");
+    // check token validity
+    setLoggedIn(true);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setLoggedIn(false);
+  };
+
+  return (
+    <Router>
+      <Layout loggedIn={loggedIn} logout={handleLogout}>
+        <Switch>
+          <Route exact path="/">
+            <Home />
+          </Route>
+          <Route path="/login">
+            <Login />
+          </Route>
+          <PrivateRoute loggedIn={loggedIn} path="/record">
+            <Record />
+          </PrivateRoute>
+          <PrivateRoute loggedIn={loggedIn} path="/dashboard">
+            <Dashboard />
+          </PrivateRoute>
+          <Route path="*">
+            <NoMatch />
+          </Route>
+        </Switch>
+      </Layout>
+    </Router>
+  );
+};
 
 ReactDOM.render(<App />, document.getElementById("root"));
