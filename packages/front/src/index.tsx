@@ -36,6 +36,9 @@ const App = () => {
           <Route path="/login">
             <Login />
           </Route>
+          <Route path="/signup">
+            <Login />
+          </Route>
           <PrivateRoute loggedIn={loggedIn} path="/record">
             <Record />
           </PrivateRoute>

@@ -107,4 +107,4 @@ const Inscription = () => {
   );
 };
 
-export default Inscription;
+export default Signup;
