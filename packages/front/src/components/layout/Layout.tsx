@@ -1,4 +1,8 @@
-import { LoginOutlined, LogoutOutlined } from "@ant-design/icons";
+import {
+  LoginOutlined,
+  LogoutOutlined,
+  UserAddOutlined,
+} from "@ant-design/icons";
 import { Button, Layout as AntLayout, Menu } from "antd";
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -69,6 +73,11 @@ const Layout = (props: Props) => {
                 <Button type="primary" icon={<LoginOutlined />}>
                   Login
                 </Button>
+              </Link>
+            </Menu.Item>
+            <Menu.Item style={{ position: "absolute", right: "170px" }}>
+              <Link to="/signup">
+                <Button icon={<UserAddOutlined />}>Signup</Button>
               </Link>
             </Menu.Item>
           </Menu>
