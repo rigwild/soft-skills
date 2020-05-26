@@ -93,37 +93,31 @@ const WebcamRecorder = () => {
       case RecorderState.READY:
         return (
           <Button onClick={handleStartRecording} type="primary">
-            Start (max : 5 minutes)
+            Start (5:00 maximum)
           </Button>
         );
       case RecorderState.RECORDING:
         const deadline = Date.now() + FIVE_MINUTE_IN_MS;
         return (
           <>
-            <div style={centeredDivStyle}>
-              <div
-                style={{
-                  ...centeredDivStyle,
-                  flexDirection: "column",
-                  marginRight: 20,
-                }}
-              >
-                <VideoCameraTwoTone
-                  style={{ fontSize: 30 }}
-                  twoToneColor="red"
-                />
-                <p style={{ margin: 0 }}>Recording...</p>
-              </div>
-              <Button onClick={handleStopRecording} danger type="primary">
-                Stop
-              </Button>
+            <div
+              style={centeredDivStyle}
+            >
+              <VideoCameraTwoTone
+                style={{ fontSize: 27 }}
+                twoToneColor="red"
+              />
+              <span style={{ fontSize: 25, marginLeft: 8 }}>Recording...</span>
             </div>
             <Countdown
-              title="Time remaining"
+              title="Time left"
               value={deadline}
               onFinish={handleStopRecording}
-              style={{ marginTop: 15 }}
+              style={{ margin: 15, textAlign: "center" }}
             />
+            <Button onClick={handleStopRecording} danger type="primary">
+              Stop recording
+            </Button>
           </>
         );
       case RecorderState.DISPLAY:
@@ -135,7 +129,7 @@ const WebcamRecorder = () => {
               style={{ marginBottom: 15 }}
               icon={<RedoOutlined />}
             >
-              Retry
+              Delete and start again
             </Button>
             <Button
               onClick={() => console.log("Analysing video...")}
