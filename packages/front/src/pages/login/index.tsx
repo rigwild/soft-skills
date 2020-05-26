@@ -1,4 +1,5 @@
-import { Alert } from "antd";
+import { UserOutlined } from "@ant-design/icons";
+import { Alert, Avatar, Typography } from "antd";
 import { Store } from "antd/lib/form/interface";
 import { login } from "api/authentication";
 import { AxiosError, AxiosResponse } from "axios";
@@ -17,6 +18,8 @@ type LoginError = {
 type LoginResponse = {
   data: { token: string };
 };
+
+const { Title } = Typography;
 
 const Record = (props: Props) => {
   const history = useHistory();
@@ -53,6 +56,8 @@ const Record = (props: Props) => {
         alignItems: "center",
       }}
     >
+      <Title>Login</Title>
+      <Avatar size={100} style={{ marginBottom: 35 }} icon={<UserOutlined />} />
       <LoginForm onFinish={handleLogin} />
       {error && <Alert message={error} type="error" showIcon />}
     </div>
