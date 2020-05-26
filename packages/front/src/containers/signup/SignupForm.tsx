@@ -46,22 +46,23 @@ const SignupContainer = () => {
   return success ? (
     <Result
       status="success"
-      title="Your account has been successfully created"
+      title={`Welcome ${success.name}!`}
       subTitle={
         <>
-          <p>Name : {success.name}</p>
-          <p>Email : {success.email}</p>
+          <p style={{ marginTop: 10 }}>
+            Your account has been created. You can now log in.
+          </p>
         </>
       }
       extra={[
         <Link to="/login" key="login">
-          <Button type="primary">Login</Button>
+          <Button type="primary">Log in</Button>
         </Link>,
       ]}
     />
   ) : (
     <>
-      <Title>Signup</Title>
+      <Title>Sign up</Title>
       <Avatar
         size={100}
         style={{ marginBottom: 35 }}

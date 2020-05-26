@@ -3,7 +3,7 @@ import { render } from "@testing-library/react";
 import React from "react";
 import CustomComponent from "./CustomComponent";
 
-// can be used for :
+// can be used for:
 // - unit test
 // - end to end test
 // - mocking api response

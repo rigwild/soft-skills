@@ -30,11 +30,11 @@ const SignupForm = (props: Props) => (
       rules={[
         {
           type: "email",
-          message: "Please enter a valid email adress",
+          message: "Enter a valid email address",
         },
         {
           required: true,
-          message: "Please enter your email",
+          message: "Enter an email address",
         },
       ]}
     >
@@ -45,12 +45,12 @@ const SignupForm = (props: Props) => (
       label="Password"
       rules={[
         {
-          required: true,
-          message: "Please enter a password",
+          min: 4,
+          message: "Your password must be 4 characters minimum",
         },
         {
-          min: 4,
-          message: "Please enter a password with more than 4 characters",
+          required: true,
+          message: "Enter a password",
         },
       ]}
       hasFeedback
@@ -66,7 +66,7 @@ const SignupForm = (props: Props) => (
       rules={[
         {
           required: true,
-          message: "Please confirm your password",
+          message: "Confirm your password",
         },
         ({ getFieldValue }) => ({
           validator(_, value) {
@@ -74,7 +74,7 @@ const SignupForm = (props: Props) => (
               return Promise.resolve();
             }
 
-            return Promise.reject("Passwords are different");
+            return Promise.reject("Passwords do not match");
           },
         }),
       ]}
@@ -91,9 +91,9 @@ const SignupForm = (props: Props) => (
           marginTop: 15,
         }}
       >
-        Register
+        Sign up
       </Button>
-      or <Link to="/login">Login</Link>
+      or <Link to="/login">Log in</Link>
     </Item>
   </Form>
 );

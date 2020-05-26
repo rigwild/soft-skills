@@ -18,7 +18,7 @@ const Login = (props: Props) => (
       alignItems: "center",
     }}
   >
-    <Title>Login</Title>
+    <Title>Log in</Title>
     <Avatar size={100} style={{ marginBottom: 35 }} icon={<UserOutlined />} />
     <LoginForm login={props.login} />
   </div>
