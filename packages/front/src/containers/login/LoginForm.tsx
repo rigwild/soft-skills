@@ -20,7 +20,7 @@ type LoginResponse = {
 
 const LoginContainer = (props: Props) => {
   const history = useHistory();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
   const handleLogin = (values: Store) => {
