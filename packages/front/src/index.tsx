@@ -12,6 +12,8 @@ import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 const App = () => {
+  // should be in a context for further usage
+  // or passed as props is enough ?
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
