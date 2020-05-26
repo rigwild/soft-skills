@@ -20,6 +20,7 @@ const LoginForm = (props: Props) => (
       remember: true,
     }}
     onFinish={props.onFinish}
+    size="large"
   >
     <Item
       name="email"
