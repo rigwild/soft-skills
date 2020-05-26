@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 
 type Props = {
   onFinish: (values: Store) => void;
+  loading: boolean;
 };
 
 const { Item } = Form;
@@ -63,6 +64,7 @@ const LoginForm = (props: Props) => {
           style={{
             width: "100%",
           }}
+          disabled={props.loading}
         >
           Login
         </Button>
