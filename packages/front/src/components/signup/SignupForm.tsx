@@ -13,12 +13,12 @@ type Props = {
 const SignupForm = (props: Props) => (
   <Form name="signup" onFinish={props.onFinish} size="large">
     <Item
-      name="username"
-      label="Username"
+      name="name"
+      label="Name"
       rules={[
         {
           required: true,
-          message: "Please enter your username",
+          message: "Please enter your name",
         },
       ]}
     >
