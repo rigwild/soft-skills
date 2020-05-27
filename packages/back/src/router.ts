@@ -114,6 +114,67 @@ router.post(
  *   "message": "No authorization bearer token header is set."
  * }
  */
-router.get('/profile', authenticatedMiddleware(), injectUserDocMiddleware(), asyncMiddleware(profileController.profile))
+router.get(
+  '/profile',
+  authenticatedMiddleware(),
+  injectUserDocMiddleware(),
+  asyncMiddleware(profileController.getProfile)
+)
+
+/**
+ * @api {patch} /profile Edit user profile
+ * @apiVersion 0.1.0
+ * @apiName EditProfile
+ * @apiGroup Profile
+ *
+ * @apiParam {String} [name] name
+ *
+ * @apiExample {json} Example usage:
+ * {
+ *   "name": "apidoctest2"
+ * }
+ *
+ * @apiSuccessExample {json} Success-Response:
+ * HTTP/1.1 200 OK
+ * {
+ *   "data": {
+ *     "_id": "5ece75285e8a084208e0b0c4",
+ *     "email": "apidoctest@apidoc.com",
+ *     "name": "apidoctest2",
+ *     "joinDate": "2020-05-27T14:11:52.580Z"
+ *   }
+ * }
+ *
+ * @apiError {Error} NotAuthenticated You need to be authenticated.
+ * @apiErrorExample {json} Error-Response:
+ * HTTP/1.1 401 Unauthorized
+ * {
+ *   "message": "No authorization bearer token header is set."
+ * }
+ *
+ * @apiError {Error} NothingToEdit None of the provided keys are editable.
+ * @apiErrorExample {json} Error-Response:
+ * HTTP/1.1 400 Bad Request
+ * {
+ *   "message": "No profile data to edit."
+ * }
+ */
+router.patch('/profile', authenticatedMiddleware(), asyncMiddleware(profileController.editProfile))
+
+/**
+ * @api {patch} /profile Delete user account
+ * @apiVersion 0.1.0
+ * @apiName DeleteAccount
+ * @apiGroup Profile
+ *
+ * @apiSuccessExample {json} Success-Response:
+ * HTTP/1.1 200 OK
+ * {
+ *   "data": {
+ *     "_id": "5ece75285e8a084208e0b0c4"
+ *   }
+ * }
+ */
+router.delete('/profile', authenticatedMiddleware(), asyncMiddleware(profileController.deleteAccount))
 
 export default router
