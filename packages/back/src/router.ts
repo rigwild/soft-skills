@@ -2,41 +2,39 @@ import { Router } from 'express'
 import { body } from 'express-validator'
 
 import { asyncMiddleware, authenticatedMiddleware, injectUserDocMiddleware } from './middlewares'
-import pingController from './controllers/ping.controller'
 import authController from './controllers/auth.controller'
+import profileController from './controllers/profile.controller'
 
 const router = Router()
-
-router.get('/', asyncMiddleware(pingController.ping))
 
 /**
  * @api {post} /login Login
  * @apiVersion 0.1.0
  * @apiName Login
- * @apiGroup Authentification
+ * @apiGroup Authentication
  *
  * @apiParam {String} email email
  * @apiParam {String} password password
  *
  * @apiExample {json} Example usage:
  * {
- *   "email": "apidoctest@example.com",
+ *   "email": "apidoctest@apidoc.com",
  *   "password": "secret"
  * }
  *
- * @apiSuccessExample Success-Response:
+ * @apiSuccessExample {json} Success-Response:
  * HTTP/1.1 200 OK
  * {
  *   "data": {
  *      "token": "jwtoken123456789",
- *      "email": "apidoctest@example.com",
+ *      "email": "apidoctest@apidoc.com",
  *      "name": "secret"
  *   }
  * }
  *
- * @apiError InvalidCredentials Invalid email or password.
+ * @apiError {Error} InvalidCredentials Invalid email or password.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample {json} Error-Response:
  * HTTP/1.1 401 Not Found
  * {
  *   "message": "Invalid email or password."
@@ -53,7 +51,7 @@ router.post(
  * @api {post} /register Register
  * @apiVersion 0.1.0
  * @apiName Register
- * @apiGroup Authentification
+ * @apiGroup Authentication
  *
  * @apiParam {String} email email
  * @apiParam {String} name name
@@ -61,23 +59,23 @@ router.post(
  *
  * @apiExample {json} Example usage:
  * {
- *   "email": "apidoctest@example.com",
- *   "name": "apitest"
+ *   "email": "apidoctest@apidoc.com",
+ *   "name": "apitest",
  *   "password": "secret"
  * }
  *
- * @apiSuccessExample Success-Response:
- *   HTTP/1.1 200 OK
+ * @apiSuccessExample {json} Success-Response:
+ * HTTP/1.1 200 OK
  * {
  *   "data": {
- *     "email": "apidoctest@example.com",
+ *     "email": "apidoctest@apidoc.com",
  *     "name": "apidoctest"
  *   }
  * }
  *
- * @apiError UserExist Email already registered.
+ * @apiError {Error} UserExist Email already registered.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample {json} Error-Response:
  * HTTP/1.1 409 Conflict
  * {
  *   "message": "Could not create the user. Email already registered."
@@ -91,17 +89,31 @@ router.post(
   asyncMiddleware(authController.register)
 )
 
-// Just some examples
-router.get(
-  '/authed',
-  authenticatedMiddleware(),
-  asyncMiddleware((req, res) => res.json({ session: req.session }))
-)
-router.get(
-  '/authed/user',
-  authenticatedMiddleware(),
-  injectUserDocMiddleware(),
-  asyncMiddleware((req, res) => res.json({ session: req.session, userDoc: req.userDoc }))
-)
+/**
+ * @api {get} /profile Get user profile
+ * @apiVersion 0.1.0
+ * @apiName GetProfile
+ * @apiGroup Profile
+ *
+ * @apiSuccessExample {json} Success-Response:
+ * HTTP/1.1 200 OK
+ * {
+ *   "data": {
+ *     "_id": "5ece75285e8a084208e0b0c4",
+ *     "email": "apidoctest@apidoc.com",
+ *     "name": "apidoctest",
+ *     "joinDate": "2020-05-27T14:11:52.580Z"
+ *   }
+ * }
+ *
+ * @apiError {Error} NotAuthenticated You need to be authenticated.
+ *
+ * @apiErrorExample {json} Error-Response:
+ * HTTP/1.1 401 Unauthorized
+ * {
+ *   "message": "No authorization bearer token header is set."
+ * }
+ */
+router.get('/profile', authenticatedMiddleware(), injectUserDocMiddleware(), asyncMiddleware(profileController.profile))
 
 export default router
