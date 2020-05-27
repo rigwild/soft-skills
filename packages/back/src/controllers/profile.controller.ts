@@ -19,7 +19,7 @@ export class ProfileController {
 
   public async deleteAccount(req: RequestAuthed, res: Response) {
     const { _id } = await UserController.delete(req.session._id)
-    res.json({ data: _id })
+    res.json({ data: { _id } })
   }
 }
 
