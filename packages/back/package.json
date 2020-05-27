@@ -13,7 +13,8 @@
     "build": "tsc",
     "dev": "nodemon",
     "start:dev": "ts-node src/index.ts",
-    "lint": "eslint --ext .ts ./src --fix",
+    "lint": "eslint --ext .ts ./src ./test --fix",
+    "lint:no-fix": "eslint --ext .ts ./src ./test",
     "test": "ava --verbose",
     "doc": "apidoc -i src -o apidoc-out && apidoc-markdown -p apidoc-out -o DOCUMENTATION.md && rm -rf apidoc-out"
   },

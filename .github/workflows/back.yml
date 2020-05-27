@@ -2,9 +2,9 @@ name: Build and test back-end
 
 on:
   push:
-    branches: "*"
+    branches: '*'
   pull_request:
-    branches: "*"
+    branches: '*'
 
 jobs:
   build:
@@ -31,7 +31,7 @@ jobs:
       - run: yarn test
         working-directory: packages/back
 
-      - run: yarn lint
+      - run: yarn lint:no-fix
         working-directory: packages/back
 
       - run: yarn doc
