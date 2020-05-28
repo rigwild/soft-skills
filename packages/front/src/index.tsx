@@ -5,6 +5,7 @@ import Dashboard from "pages/dashboard";
 import Home from "pages/home";
 import Login from "pages/login";
 import NoMatch from "pages/nomatch";
+import Profile from "pages/profile";
 import Record from "pages/record";
 import Signup from "pages/signup";
 import React, { useEffect, useState } from "react";
@@ -49,6 +50,9 @@ const App = () => {
           </PrivateRoute>
           <PrivateRoute loggedIn={loggedIn} path="/dashboard">
             <Dashboard />
+          </PrivateRoute>
+          <PrivateRoute loggedIn={loggedIn} path="/profile">
+            <Profile />
           </PrivateRoute>
           <Route path="*">
             <NoMatch />

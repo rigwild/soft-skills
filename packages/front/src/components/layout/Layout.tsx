@@ -2,6 +2,7 @@ import {
   LoginOutlined,
   LogoutOutlined,
   UserAddOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import { Button, Layout as AntLayout, Menu } from "antd";
 import React from "react";
@@ -63,6 +64,11 @@ const Layout = (props: Props) => {
                 >
                   Log out
                 </Button>
+              </Link>
+            </Menu.Item>
+            <Menu.Item style={{ position: "absolute", right: "170px" }}>
+              <Link to="/profile">
+                <Button icon={<UserOutlined />}>Profile</Button>
               </Link>
             </Menu.Item>
           </Menu>
