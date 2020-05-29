@@ -15,9 +15,14 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getProfile().then(() => setLoggedIn(true));
+    getProfile()
+      .then(() => {
+        setLoggedIn(true);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const handleLogout = () => {
@@ -42,13 +47,13 @@ const App = () => {
           <Route path="/signup">
             <Signup />
           </Route>
-          <PrivateRoute loggedIn={loggedIn} path="/record">
+          <PrivateRoute loading={loading} loggedIn={loggedIn} path="/record">
             <Record />
           </PrivateRoute>
-          <PrivateRoute loggedIn={loggedIn} path="/dashboard">
+          <PrivateRoute loading={loading} loggedIn={loggedIn} path="/dashboard">
             <Dashboard />
           </PrivateRoute>
-          <PrivateRoute loggedIn={loggedIn} path="/profile">
+          <PrivateRoute loading={loading} loggedIn={loggedIn} path="/profile">
             <Profile />
           </PrivateRoute>
           <Route path="*">
