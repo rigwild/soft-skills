@@ -4,17 +4,13 @@ import CenteredWrapper from "components/centeredwrapper";
 import LoginForm from "containers/login";
 import React from "react";
 
-type Props = {
-  login: () => void;
-};
-
 const { Title } = Typography;
 
-const Login = (props: Props) => (
+const Login = () => (
   <CenteredWrapper>
     <Title>Log in</Title>
     <Avatar size={100} style={{ marginBottom: 35 }} icon={<UserOutlined />} />
-    <LoginForm login={props.login} />
+    <LoginForm />
   </CenteredWrapper>
 );
 

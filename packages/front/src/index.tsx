@@ -1,7 +1,7 @@
 import "antd/dist/antd.css";
-import { getProfile } from "api/profile";
 import Layout from "components/layout";
 import PrivateRoute from "components/route";
+import { AuthContextProvider } from "context";
 import Dashboard from "pages/dashboard";
 import Home from "pages/home";
 import Login from "pages/login";
@@ -9,51 +9,31 @@ import NoMatch from "pages/nomatch";
 import Profile from "pages/profile";
 import Record from "pages/record";
 import Signup from "pages/signup";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
-const App = () => {
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getProfile()
-      .then(() => {
-        setLoggedIn(true);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setLoggedIn(false);
-  };
-
-  const handleLogin = () => {
-    setLoggedIn(true);
-  };
-
-  return (
-    <Router>
-      <Layout loggedIn={loggedIn} logout={handleLogout}>
+const App = () => (
+  <Router>
+    <AuthContextProvider>
+      <Layout>
         <Switch>
           <Route exact path="/">
             <Home />
           </Route>
           <Route path="/login">
-            <Login login={handleLogin} />
+            <Login />
           </Route>
           <Route path="/signup">
             <Signup />
           </Route>
-          <PrivateRoute loading={loading} loggedIn={loggedIn} path="/record">
+          <PrivateRoute path="/record">
             <Record />
           </PrivateRoute>
-          <PrivateRoute loading={loading} loggedIn={loggedIn} path="/dashboard">
+          <PrivateRoute path="/dashboard">
             <Dashboard />
           </PrivateRoute>
-          <PrivateRoute loading={loading} loggedIn={loggedIn} path="/profile">
+          <PrivateRoute path="/profile">
             <Profile />
           </PrivateRoute>
           <Route path="*">
@@ -61,8 +41,8 @@ const App = () => {
           </Route>
         </Switch>
       </Layout>
-    </Router>
-  );
-};
+    </AuthContextProvider>
+  </Router>
+);
 
 ReactDOM.render(<App />, document.getElementById("root"));

@@ -5,19 +5,19 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { Button, Layout as AntLayout, Menu } from "antd";
-import React from "react";
+import { AuthContext } from "context";
+import React, { useContext } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const { Header, Content, Footer } = AntLayout;
 
 type Props = {
-  loggedIn: boolean;
-  logout: () => void;
   children: JSX.Element | JSX.Element[];
 };
 
 const Layout = (props: Props) => {
   const location = useLocation();
+  const { loggedIn, logout } = useContext(AuthContext);
   return (
     <AntLayout style={{ height: "100vh" }}>
       <Header style={{ position: "fixed", zIndex: 1, width: "100%" }}>
@@ -42,7 +42,7 @@ const Layout = (props: Props) => {
             </h1>
           </Link>
         </div>
-        {props.loggedIn ? (
+        {loggedIn ? (
           <Menu
             theme="dark"
             mode="horizontal"
@@ -55,16 +55,14 @@ const Layout = (props: Props) => {
               <Link to="/dashboard">Dashboard</Link>
             </Menu.Item>
             <Menu.Item style={{ position: "absolute", right: "30px" }}>
-              <Link to="/">
-                <Button
-                  type="primary"
-                  danger
-                  onClick={() => props.logout()}
-                  icon={<LogoutOutlined />}
-                >
-                  Log out
-                </Button>
-              </Link>
+              <Button
+                type="primary"
+                danger
+                onClick={() => logout()}
+                icon={<LogoutOutlined />}
+              >
+                Log out
+              </Button>
             </Menu.Item>
             <Menu.Item style={{ position: "absolute", right: "170px" }}>
               <Link to="/profile">
