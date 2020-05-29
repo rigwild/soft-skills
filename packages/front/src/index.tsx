@@ -1,4 +1,5 @@
 import "antd/dist/antd.css";
+import { getProfile } from "api/profile";
 import Layout from "components/layout";
 import PrivateRoute from "components/route";
 import Dashboard from "pages/dashboard";
@@ -13,14 +14,10 @@ import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 const App = () => {
-  // should be in a context for further usage
-  // or passed as props is enough ?
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
-    //const token = localStorage.getItem("token");
-    // check token validity
-    //setLoggedIn(true);
+    getProfile().then(() => setLoggedIn(true));
   }, []);
 
   const handleLogout = () => {
