@@ -6,14 +6,12 @@ import React from "react";
 
 const { Title } = Typography;
 
-const Profile = () => {
-  return (
-    <CenteredWrapper>
-      <Title>My account</Title>
-      <Avatar size={100} style={{ marginBottom: 35 }} icon={<UserOutlined />} />
-      <ProfileForm />
-    </CenteredWrapper>
-  );
-};
+const Profile = () => (
+  <CenteredWrapper>
+    <Title>My account</Title>
+    <Avatar size={100} style={{ marginBottom: 35 }} icon={<UserOutlined />} />
+    <ProfileForm />
+  </CenteredWrapper>
+);
 
 export default Profile;
