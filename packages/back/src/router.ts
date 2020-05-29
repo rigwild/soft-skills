@@ -35,7 +35,7 @@ const router = Router()
  * @apiError {Error} InvalidCredentials Invalid email or password.
  *
  * @apiErrorExample {json} Error-Response:
- * HTTP/1.1 401 Not Found
+ * HTTP/1.1 401 Unauthorized
  * {
  *   "message": "Invalid email or password."
  * }
@@ -162,7 +162,7 @@ router.get(
 router.patch('/profile', authenticatedMiddleware(), asyncMiddleware(profileController.editProfile))
 
 /**
- * @api {patch} /profile Delete user account
+ * @api {delete} /profile Delete user account
  * @apiVersion 0.1.0
  * @apiName DeleteAccount
  * @apiGroup Profile
