@@ -1,8 +1,12 @@
 import axiosInstance from "api";
 
+const getHeaders = () => {
+  return { Authorization: `Bearer ${localStorage.getItem("token")}` };
+};
+
 export const getProfile = () => {
   return axiosInstance.get("/profile", {
-    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    headers: getHeaders(),
   });
 };
 
@@ -11,13 +15,13 @@ export const editProfile = (name: string) => {
     "/profile",
     { name },
     {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      headers: getHeaders(),
     }
   );
 };
 
 export const deleteProfile = () => {
   return axiosInstance.delete("/profile", {
-    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    headers: getHeaders(),
   });
 };
