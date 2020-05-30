@@ -57,7 +57,7 @@ const ProfileForm = (props: Props) => {
       <div style={labelContainerStyle}>
         <Text strong>Join date :</Text>
         <Paragraph style={{ marginLeft: 15 }}>
-          {new Date(props.joinDate).toLocaleDateString()}
+          {new Date(props.joinDate).toLocaleDateString("en-CA")}
         </Paragraph>
       </div>
       <Button
