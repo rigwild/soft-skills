@@ -16,6 +16,7 @@ type Props = {
   setName: (name: string) => void;
   editProfile: () => void;
   deleteProfile: () => void;
+  disabled: boolean;
 };
 
 const labelContainerStyle: CSSProperties = {
@@ -43,7 +44,7 @@ const ProfileForm = (props: Props) => {
       <div style={labelContainerStyle}>
         <Text strong>Name :</Text>
         <Paragraph
-          editable={{ onChange: props.setName }}
+          editable={!props.disabled && { onChange: props.setName }}
           style={{ marginLeft: 15, width: "80%" }}
         >
           {props.name}
@@ -63,6 +64,7 @@ const ProfileForm = (props: Props) => {
         type="primary"
         onClick={props.editProfile}
         style={{ width: WIDTH, marginTop: 15 }}
+        disabled={props.disabled}
       >
         Apply changes
       </Button>
@@ -72,6 +74,7 @@ const ProfileForm = (props: Props) => {
         onClick={showDeleteModal}
         icon={<UserDeleteOutlined />}
         style={{ width: WIDTH, marginTop: 15 }}
+        disabled={props.disabled}
       >
         Delete profile
       </Button>
