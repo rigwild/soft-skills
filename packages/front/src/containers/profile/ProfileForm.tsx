@@ -17,44 +17,59 @@ type Profile = {
 
 const ProfileContainer = () => {
   const { logout } = useContext(AuthContext);
-  const [loading, setLoading] = useState(true);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [formDisabled, setFormDisabled] = useState(false);
   const [profile, setProfile] = useState<Profile | undefined>(undefined);
   const [name, setName] = useState("");
   const [error, setError] = useState<string | undefined>(undefined);
 
+  const handleError = (error: AxiosError) => {
+    let errorMessage: string = error.response?.data.message;
+    if (error.response?.status === 401) {
+      errorMessage = errorMessage
+        .concat(" ")
+        .concat("Please, log out and log in again.");
+    }
+    setError(errorMessage);
+  };
+
+  const handleProfileResponse = (res: AxiosResponse<ProfileResponse>) => {
+    const { data } = res.data;
+    setProfile(data);
+    setName(data.name);
+  };
+
   useEffect(() => {
     getProfile()
-      .then((res: AxiosResponse<ProfileResponse>) => {
-        const { data } = res.data;
-        setProfile(data);
-        setName(data.name);
-      })
-      .catch((error) => setError(error.response?.data.message))
-      .finally(() => setLoading(false));
+      .then((res: AxiosResponse<ProfileResponse>) => handleProfileResponse(res))
+      .catch((error: AxiosError) => handleError(error))
+      .finally(() => setLoadingProfile(false));
   }, []);
 
   const handleEditProfile = () => {
     setError(undefined);
+    setFormDisabled(true);
     editProfile(name)
-      .then((res: AxiosResponse<ProfileResponse>) => {
-        const { data } = res.data;
-        setProfile(data);
-        setName(data.name);
-      })
+      .then((res: AxiosResponse<ProfileResponse>) => handleProfileResponse(res))
       .catch((error: AxiosError) => {
-        setError(error.response?.data.message);
+        handleError(error);
         setName(profile!.name);
-      });
+      })
+      .finally(() => setFormDisabled(false));
   };
 
   const handleDeleteProfile = () => {
     setError(undefined);
+    setFormDisabled(true);
     deleteProfile()
       .then(() => logout())
-      .catch((error: AxiosError) => setError(error.response?.data.message));
+      .catch((error: AxiosError) => {
+        handleError(error);
+        setFormDisabled(false);
+      });
   };
 
-  if (loading) {
+  if (loadingProfile) {
     return (
       <Spin
         tip="Retrieving your profile..."
@@ -74,6 +89,7 @@ const ProfileContainer = () => {
           joinDate={profile.joinDate}
           editProfile={handleEditProfile}
           deleteProfile={handleDeleteProfile}
+          disabled={formDisabled}
         />
       )}
       {error && (
