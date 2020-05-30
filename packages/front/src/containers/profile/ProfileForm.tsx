@@ -94,7 +94,7 @@ const ProfileContainer = () => {
       )}
       {error && (
         <Alert
-          message="An error occured"
+          message="An error occurred"
           description={error}
           type="error"
           showIcon
