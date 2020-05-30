@@ -100,13 +100,8 @@ const WebcamRecorder = () => {
         const deadline = Date.now() + FIVE_MINUTE_IN_MS;
         return (
           <>
-            <div
-              style={centeredDivStyle}
-            >
-              <VideoCameraTwoTone
-                style={{ fontSize: 27 }}
-                twoToneColor="red"
-              />
+            <div style={centeredDivStyle}>
+              <VideoCameraTwoTone style={{ fontSize: 27 }} twoToneColor="red" />
               <span style={{ fontSize: 25, marginLeft: 8 }}>Recording...</span>
             </div>
             <Countdown
@@ -146,7 +141,7 @@ const WebcamRecorder = () => {
   const displayError = () => {
     return (
       <Alert
-        message="An error occured with the webcam recorder"
+        message="An error occurred with the webcam recorder"
         description={error}
         type="error"
         showIcon

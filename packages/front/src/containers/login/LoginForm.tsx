@@ -1,14 +1,10 @@
 import { Alert } from "antd";
 import { Store } from "antd/lib/form/interface";
-import { login } from "api/authentication";
+import { login as apiLogin } from "api/authentication";
 import { AxiosError, AxiosResponse } from "axios";
 import LoginForm from "components/login";
-import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
-
-type Props = {
-  login: () => void;
-};
+import { AuthContext } from "context";
+import React, { useContext, useState } from "react";
 
 type LoginError = {
   message: string;
@@ -18,8 +14,8 @@ type LoginResponse = {
   data: { token: string };
 };
 
-const LoginContainer = (props: Props) => {
-  const history = useHistory();
+const LoginContainer = () => {
+  const { login } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
@@ -34,12 +30,11 @@ const LoginContainer = (props: Props) => {
       localStorage.removeItem("email");
     }
 
-    login(email, password)
+    apiLogin(email, password)
       .then((res: AxiosResponse<LoginResponse>) => {
         const { data } = res.data;
         localStorage.setItem("token", data.token);
-        props.login();
-        history.push("/");
+        login();
       })
       .catch((error: AxiosError<LoginError>) => {
         setError(error.response?.data.message);
