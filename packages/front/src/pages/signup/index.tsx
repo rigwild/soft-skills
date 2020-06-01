@@ -1,11 +1,11 @@
 import CenteredWrapper from "components/centeredwrapper";
-import WebcamRecorder from "components/recorder";
+import SignupForm from "containers/signup";
 import React from "react";
 
-const Record = () => (
+const Signup = () => (
   <CenteredWrapper>
-    <WebcamRecorder />
+    <SignupForm />
   </CenteredWrapper>
 );
 
-export default Record;
+export default Signup;

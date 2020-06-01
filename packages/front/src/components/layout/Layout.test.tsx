@@ -8,7 +8,7 @@ test("renders Layout correctly", () => {
   const content = "Hello World";
   const { getByText } = render(
     <BrowserRouter>
-      <Layout>
+      <Layout loggedIn={true} logout={() => console.log("logout")}>
         <p>{content}</p>
       </Layout>
     </BrowserRouter>

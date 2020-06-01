@@ -1,4 +1,11 @@
-import { RequestHandler } from 'express-serve-static-core'
+import type { RequestHandler, Params, ParamsDictionary } from 'express-serve-static-core'
+import type { ParsedQs } from 'qs'
+
+export interface Upload {
+  mimeType: string
+  name: string
+  size: number
+}
 
 export interface User {
   _id: string
@@ -6,10 +13,16 @@ export interface User {
   password: string
   name: string
   joinDate: Date
+  uploads: Upload[]
 }
 
 // `express.Request` with user data
-export type RequestAuthed = Parameters<RequestHandler>[0] & {
+export type RequestAuthed<
+  P extends Params = ParamsDictionary,
+  ResBody = any,
+  ReqBody = any,
+  ReqQuery = ParsedQs
+> = Parameters<RequestHandler<P, ResBody, ReqBody, ReqQuery>>[0] & {
   session: Pick<User, '_id' | 'email' | 'name'>
   userDoc: Omit<User, 'password'>
 }

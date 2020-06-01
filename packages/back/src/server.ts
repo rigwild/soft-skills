@@ -19,9 +19,25 @@ if (process.env.NODE_ENV !== 'test') app.use(require('morgan')('combined'))
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 app.use(require('compression')())
 
+// Open CORS FIXME: Restrict when going in production
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+app.use(require('cors')({ origin: true }))
+
 // Set some HTTP security headers
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 app.use(require('helmet')())
+
+// Accept file uploads
+app.use(
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  require('express-fileupload')({
+    abortOnLimit: true,
+    limits: { fileSize: 20971520 },
+    safeFileNames: true,
+    preserveExtension: true,
+    createParentPath: './uploads'
+  })
+)
 
 app.use(router)
 
