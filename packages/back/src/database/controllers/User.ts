@@ -4,7 +4,7 @@ import boom from '@hapi/boom'
 
 import { UserModel, UserDocument } from '../models/User'
 import { JWT_SECRET } from '../../config'
-import { Upload } from '../../types'
+import type { User, Upload } from '../../types'
 
 export const UserController = {
   get Model() {
@@ -77,7 +77,7 @@ export const UserController = {
     // Sign a JWT and return it
     const token = this.generateToken(user)
 
-    this.log(`User logged in. email=${user.email}, id=${user.id}`)
+    this.log(`User logged in. email=${user.email}, id=${user._id}`)
     return {
       token,
       email: user.email,
@@ -95,8 +95,33 @@ export const UserController = {
     const user = await UserModel.findByIdAndDelete(userId)
     if (!user) throw boom.notFound('User not found.')
 
-    this.log(`A user was deleted. id=${user.id}`)
-    return { id: user.id }
+    this.log(`A user was deleted. id=${user._id}`)
+    return { _id: user._id }
+  },
+
+  /**
+   * Edit a registered user's profile
+   * @param userId The user id of the user to edit
+   * @param newProfileData New user profile data
+   * @returns New user profile
+   * @throws Could not find the user to delete
+   */
+  async edit(userId: string, _newProfileData: Partial<Pick<User, 'name'>>) {
+    const newProfileData = {} as Pick<User, 'name'>
+    if (_newProfileData.name) newProfileData.name = _newProfileData.name
+
+    if (Object.keys(newProfileData).length === 0) throw boom.badRequest('No profile data to edit.')
+
+    const userDoc = await UserModel.findByIdAndUpdate(userId, newProfileData, { new: true })
+    if (!userDoc) throw boom.notFound('User not found.')
+
+    this.log(`A user profile was edited. id=${userDoc._id}`)
+
+    const userData = userDoc.toObject({ versionKey: false }) as User
+    // FIXME: Remove ts-ignore when #8 is merged
+    // @ts-ignore
+    delete userData.uploads
+    return userData
   },
 
   /**

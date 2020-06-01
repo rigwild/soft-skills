@@ -2,14 +2,14 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Architecture
 
-Source files are in the `src` folder :
+Source files are in the `src` folder:
 
-`src/api` : methods used for data fetching, can be tested or mocked with jest.  
-`src/components` : simple components that render a view, with its own state management.  
-`src/containers` : containers do the data fetching and then render data by passing it to a component.  
-`src/functions` : functions used to process data, must be tested.  
-`src/pages` : pages of the app corresponding to a url endpoint.  
-`src/types` : typescript types used in the app.
+`src/api`: methods used for data fetching, can be tested or mocked with jest.  
+`src/components`: simple components that render a view, with its own state management.  
+`src/containers`: containers do the data fetching and then render data by passing it to a component.  
+`src/functions`: functions used to process data, must be tested.  
+`src/pages`: pages of the app corresponding to a url endpoint.  
+`src/types`: typescript types used in the app.
 
 Create a subfolder for each different components / containers / pages / ..., a file with the entity name, index.ts(x) that export it (for clean imports) and a test.
 

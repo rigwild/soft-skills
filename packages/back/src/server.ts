@@ -19,6 +19,10 @@ if (process.env.NODE_ENV !== 'test') app.use(require('morgan')('combined'))
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 app.use(require('compression')())
 
+// Open CORS FIXME: Restrict when going in production
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+app.use(require('cors')({ origin: true }))
+
 // Set some HTTP security headers
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 app.use(require('helmet')())

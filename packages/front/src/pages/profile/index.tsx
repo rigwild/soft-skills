@@ -1,17 +1,17 @@
 import { UserOutlined } from "@ant-design/icons";
 import { Avatar, Typography } from "antd";
 import CenteredWrapper from "components/centeredwrapper";
-import LoginForm from "containers/login";
+import ProfileForm from "containers/profile";
 import React from "react";
 
 const { Title } = Typography;
 
-const Login = () => (
+const Profile = () => (
   <CenteredWrapper>
-    <Title>Log in</Title>
+    <Title>My account</Title>
     <Avatar size={100} style={{ marginBottom: 35 }} icon={<UserOutlined />} />
-    <LoginForm />
+    <ProfileForm />
   </CenteredWrapper>
 );
 
-export default Login;
+export default Profile;
