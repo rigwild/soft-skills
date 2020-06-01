@@ -7,10 +7,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-audio_file = sys.argv[1]
-# output_path = sys.argv[2]
-sns.set()  # Use seaborn's default style to make attractive graphs
-snd = parselmouth.Sound(audio_file)
+# Usage:
+#     python3 audio_analyzis.py <audio_file_path> generate_plot_file <amplitude|intensity|pitch> <output_file>
+#     python3 audio_analyzis.py <audio_file_path> print_raw_data <amplitude|intensity|pitch>
 
 
 def draw_spectrogram(spectrogram, dynamic_range=70):
@@ -31,7 +30,7 @@ def draw_intensity(intensity):
     plt.ylabel("intensity [dB]")
 
 
-def plot_amplitude_graphe(output_path):
+def plot_amplitude_graph(output_path):
     plt.figure()
     plt.plot(snd.xs(), snd.values.T)
     plt.xlim([snd.xmin, snd.xmax])
@@ -78,7 +77,38 @@ def print_pitch_data():
     dataframe = pd.DataFrame(data, columns=['pitch_x', 'pitch_y'])
     np.savetxt(sys.stdout.buffer, dataframe, fmt='%.2f')
 
+# FIXME: Exception: Data must be 1-dimensional
+# def print_intensity_data():
+#     intensity = snd.to_intensity()
+#     data = {"intensity_x": intensity.xs(),
+#             "intensity_y": intensity.values.T}
+#     dataframe = pd.DataFrame(data, columns=['intensity_x', 'intensity_y'])
+#     np.savetxt(sys.stdout.buffer, intensity.values.T, fmt='%.2f')
 
-plot_amplitude_graphe("output.png")
-plot_intensity_spectogram("output_spectogram.png")
-plot_pitch("spectrogram_0.03.png")
+
+if len(sys.argv) < 2 or sys.argv[1] == '-h' or sys.argv[1] == '--help' or sys.argv[1] == 'help':
+    print("""Usage:
+    python3 audio_analyzis.py <audio_file_path> generate_plot_file <amplitude|intensity|pitch> <output_file>
+    python3 audio_analyzis.py <audio_file_path> print_raw_data <amplitude|intensity|pitch>""")
+else:
+    audio_file = sys.argv[1]
+    command = sys.argv[2]
+    sns.set()  # Use seaborn's default style to make attractive graphs
+    snd = parselmouth.Sound(audio_file)
+    if command == 'generate_plot_file':
+        needed_data = sys.argv[3]
+        output_path = sys.argv[4]
+        if needed_data == 'amplitude':
+            plot_amplitude_graph(output_path)
+        elif needed_data == 'intensity':
+            plot_intensity_spectogram(output_path)
+        elif needed_data == 'pitch':
+            plot_pitch(output_path)
+    elif command == 'print_raw_data':
+        needed_data = sys.argv[3]
+        # if needed_data == 'amplitude':
+        #     print_amplitude_data()
+        # elif needed_data == 'intensity':
+        #     print_intensity_data()
+        if needed_data == 'pitch':
+            print_pitch_data()

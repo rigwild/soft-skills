@@ -1,10 +1,23 @@
 import type { RequestHandler, Params, ParamsDictionary } from 'express-serve-static-core'
 import type { ParsedQs } from 'qs'
 
+export interface AudioAnalyzis {
+  amplitude: number[][]
+  intensity: number[][]
+  pitch: number[][]
+  amplitudePlotFilePath: string
+  intensityPlotFilePath: string
+  pitchPlotFilePath: string
+}
+
 export interface Upload {
-  mimeType: string
   name: string
+  mimeType: string
   size: number
+}
+
+export interface UploadAudioAnalyzed extends Upload {
+  analyzis: AudioAnalyzis
 }
 
 export interface User {
