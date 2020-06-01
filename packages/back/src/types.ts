@@ -14,11 +14,16 @@ export interface Upload {
   name: string
   mimeType: string
   size: number
+  state: 'pending' | 'finished' | 'error'
 }
 
-export interface UploadAudioAnalyzed extends Upload {
-  analyzis: AudioAnalyzis
+export interface UploadAnalyzed extends Upload {
+  _id: string
+  userId: string
+  analyzisDate: Date
 }
+
+export interface UploadAnalyzedAudio extends UploadAnalyzed, AudioAnalyzis {}
 
 export interface User {
   _id: string

@@ -1,5 +1,4 @@
 import { resolve as r } from 'path'
-import { nanoid } from 'nanoid'
 
 import { spawn, Worker, Pool } from 'threads'
 import type { WorkerMethods } from './worker'
@@ -14,10 +13,8 @@ import type { AudioAnalyzis } from '../types'
  *
  * @param audioFile Path to audio file to analyze
  */
-export const analyzeAudio = async (audioFile: string) => {
+export const analyzeAudio = async (audioFile: string, uniqueId: string) => {
   const pool = Pool(() => spawn<WorkerMethods>(new Worker('./worker')), { concurrency: 1 })
-
-  const uniqueId = nanoid()
 
   const data: AudioAnalyzis = {
     amplitude: [],
@@ -45,7 +42,7 @@ const setup = async () => {
   const audioFile = r(__dirname, '../../test/_NW001.wav')
   console.log('Starting worker')
   console.time('aaa')
-  const analyzis = await analyzeAudio(audioFile)
+  const analyzis = await analyzeAudio(audioFile, '1234')
   console.timeEnd('aaa')
   console.log(analyzis)
 }

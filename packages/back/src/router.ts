@@ -90,7 +90,15 @@ router.post(
   asyncMiddleware(authController.register)
 )
 
-router.post('/upload', authenticatedMiddleware(), asyncMiddleware(uploadController.upload))
+router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadController.upload))
+router.get('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadController.getUploads))
+
+router.get<{ analyzisId: string }>(
+  '/analyzis/:analyzisId',
+  authenticatedMiddleware(),
+  // @ts-ignore
+  asyncMiddleware(uploadController.getAnalyzis)
+)
 
 /**
  * @api {get} /profile Get user profile

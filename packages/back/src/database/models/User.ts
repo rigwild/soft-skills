@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose'
 import boom from '@hapi/boom'
 
-import { User } from '../../types'
+import type { User } from '../../types'
 
 export type UserDocument = User & mongoose.Document
 
@@ -18,6 +18,7 @@ export const UserSchema = new Schema({
     {
       mimeType: { type: String, required: true },
       fileName: { type: String, required: true },
+      state: { type: String, enum: ['pending', 'finished', 'error'], default: 'pending', required: true },
       size: { type: Number, required: true }
     }
   ]

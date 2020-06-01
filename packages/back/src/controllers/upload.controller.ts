@@ -1,32 +1,14 @@
 import path from 'path'
 import { Response } from 'express'
 import boom from '@hapi/boom'
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const nanoid = require('nanoid').nanoid
+import { nanoid } from 'nanoid'
 
 import { UPLOADS_DIR } from '../config'
-import { RequestAuthed } from '../types'
 import { UserController } from '../database/controllers/User'
-
-const allowedMimeTypes = [
-  'application/ogg',
-  'application/x-mpegurl',
-  'audio/ogg',
-  'audio/wav',
-  'audio/wave',
-  'audio/webm',
-  'audio/x-pn-wav',
-  'audio/x-wav',
-  'video/3gpp',
-  'video/mp2t',
-  'video/mp4',
-  'video/ogg',
-  'video/quicktime',
-  'video/webm',
-  'video/x-flv',
-  'video/x-ms-wmv',
-  'video/x-msvideo'
-]
+import { analyzeAudio } from '../scripts/runner'
+import { isAllowedMimeType } from '../utils'
+import { AnalyzisController } from '../database/controllers/Analyzis'
+import type { RequestAuthed } from '../types'
 
 export class UploadController {
   public async upload(reqRaw: RequestAuthed, res: Response) {
@@ -37,17 +19,43 @@ export class UploadController {
     if (!req.files || !content) throw boom.badRequest('You need to send a file.')
 
     // Check file mime type
-    if (!allowedMimeTypes.includes(content.mimetype.toLowerCase()))
-      throw boom.badRequest('You need to send an audio or video file.')
+    if (!isAllowedMimeType(content.mimetype)) throw boom.badRequest('You need to send an audio or video file.')
 
     // Add a unique identifier to dodge filename collisions
-    content.name = `${nanoid(6)}-${content.name}`
+    const uniqueId = nanoid(8)
 
-    await content.mv(path.resolve(UPLOADS_DIR, content.name))
+    content.name = `${uniqueId}-${content.name}`
+    const file = path.resolve(UPLOADS_DIR, content.name)
+
+    await content.mv(file)
     await UserController.addUpload(req.session._id, content)
 
     res.status(200).end()
+
+    // Start a background analyzis
+    try {
+      // TODO: Support video analyzis
+      const analyzis = await analyzeAudio(file, uniqueId)
+      await AnalyzisController.addAnalyzis(req.session._id, content, analyzis)
+    } catch (error) {
+      // We catch the error as a response was already sent
+      // Set the file state as error in the user uploads list
+      await UserController.setUploadState(req.session._id, content.name, 'error').catch(console.error)
+      console.error(error)
+    }
   }
+
+  public async getUploads(req: RequestAuthed, res: Response) {
+    const profile = await UserController.find(req.session._id)
+    res.json({ data: profile.uploads })
+  }
+
+  public async getAnalyzis(req: RequestAuthed<{ analyzisId: string }>, res: Response) {
+    const analyzis = await AnalyzisController.find(req.params.analyzisId)
+    res.json({ data: analyzis.toObject({ versionKey: false }) })
+  }
+
+  // TODO: Add errored-out analyzis retry
 }
 
 export default new UploadController()

@@ -118,15 +118,13 @@ export const UserController = {
     this.log(`A user profile was edited. id=${userDoc._id}`)
 
     const userData = userDoc.toObject({ versionKey: false }) as User
-    // FIXME: Remove ts-ignore when #8 is merged
-    // @ts-ignore
     delete userData.uploads
     return userData
   },
 
   /**
    * Link a file to a user
-   * @param userId The user id of the user to delete
+   * @param userId The user id of the user
    * @param file Uploaded file to link to a user
    */
   async addUpload(userId: string, file: Upload) {
@@ -141,7 +139,24 @@ export const UserController = {
 
     if (!userDoc) throw boom.internal('Unexpected error when adding file.')
 
-    this.log(`Added a file. user=${userDoc.email}, id=${userDoc._id}, file-name=${file.name}`)
+    this.log(`Added a file. user=${userDoc.email}, id=${userDoc._id}, fileName=${file.name}`)
+  },
+
+  /**
+   * Edit a file upload state
+   * @param userId The user id of the user to delete
+   * @param fileName Uploaded file to edit state from
+   * @param newState New state of the upload
+   */
+  async setUploadState(userId: string, fileName: Upload['name'], newState: Upload['state']) {
+    // Add the upload to the user uploads list
+    const userDoc = await UserModel.findOneAndUpdate({ _id: userId }, { 'uploads.$.state': newState }, { new: true })
+
+    if (!userDoc) throw boom.internal('Unexpected error when setting analyzis state.')
+
+    this.log(
+      `Edited an upload state. user=${userDoc.email}, id=${userDoc._id}, fileName=${fileName}, newState=${newState}`
+    )
   },
 
   /**
