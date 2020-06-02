@@ -29,6 +29,9 @@ jobs:
         with:
           python-version: "3.x"
 
+      - run: pip3 install -r requirements.txt
+        working-directory: packages/back
+
       - run: yarn --frozen-lockfile
         working-directory: packages/back
 
