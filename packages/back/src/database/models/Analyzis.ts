@@ -14,9 +14,9 @@ export const AnalyzisSchema = new Schema({
   amplitude: { type: [[Number]], required: true },
   intensity: { type: [[Number]], required: true },
   pitch: { type: [[Number]], required: true },
-  amplitudePlotFilePath: { type: String, required: true },
-  intensityPlotFilePath: { type: String, required: true },
-  pitchPlotFilePath: { type: String, required: true },
+  amplitudePlotFile: { type: String, required: true },
+  intensityPlotFile: { type: String, required: true },
+  pitchPlotFile: { type: String, required: true },
 
   analyzisDate: {
     type: Date,

@@ -5,6 +5,7 @@ import { asyncMiddleware, authenticatedMiddleware, injectUserDocMiddleware } fro
 import authController from './controllers/auth.controller'
 import analyzisController from './controllers/analyzis.controller'
 import profileController from './controllers/profile.controller'
+import type { AudioAnalyzisData } from './types'
 
 const router = Router()
 
@@ -98,6 +99,13 @@ router.get<{ analyzisId: string }>(
   authenticatedMiddleware(),
   // @ts-ignore
   asyncMiddleware(analyzisController.getAnalyzis)
+)
+
+router.get<{ analyzisId: string; dataName: AudioAnalyzisData | 'file' }>(
+  '/analyzis/:analyzisId/:dataName',
+  authenticatedMiddleware(),
+  // @ts-ignore
+  asyncMiddleware(analyzisController.getAnalyzisPlotFile)
 )
 
 /**

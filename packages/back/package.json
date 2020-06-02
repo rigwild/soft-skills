@@ -15,7 +15,7 @@
     "start:dev": "ts-node src/index.ts",
     "lint": "eslint --ext .ts ./src ./test --fix",
     "lint:no-fix": "eslint --ext .ts ./src ./test",
-    "test": "ava --verbose",
+    "test": "ava",
     "doc": "apidoc -i src -o apidoc-out && apidoc-markdown -p apidoc-out -o DOCUMENTATION.md && rm -rf apidoc-out"
   },
   "files": [
@@ -68,6 +68,8 @@
     }
   },
   "ava": {
+    "verbose": true,
+    "timeout": "60000",
     "extensions": [
       "ts"
     ],

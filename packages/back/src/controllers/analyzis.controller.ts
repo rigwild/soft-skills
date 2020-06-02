@@ -8,7 +8,7 @@ import { UserController } from '../database/controllers/User'
 import { analyzeAudio } from '../scripts/runner'
 import { isAllowedMimeType } from '../utils'
 import { AnalyzisController } from '../database/controllers/Analyzis'
-import type { RequestAuthed, Upload, UploadDB } from '../types'
+import type { RequestAuthed, Upload, UploadDB, AudioAnalyzisData } from '../types'
 
 export class UploadController {
   public async upload(reqRaw: RequestAuthed, res: Response) {
@@ -42,19 +42,21 @@ export class UploadController {
     // Start a background analyzis
     try {
       // TODO: Support video analyzis
-      console.log(
-        `${new Date().toJSON()} - Starting analyzis for file "${content.name}" from user=${req.session.email}`
-      )
+      if (process.env.NODE_ENV !== 'test')
+        console.log(
+          `${new Date().toJSON()} - Starting analyzis for file "${content.name}" from user=${req.session.email}`
+        )
       const analyzis = await analyzeAudio(file, uniqueId)
 
       // Convert file paths to only file names
-      analyzis.amplitudePlotFilePath = path.basename(analyzis.amplitudePlotFilePath)
-      analyzis.intensityPlotFilePath = path.basename(analyzis.intensityPlotFilePath)
-      analyzis.pitchPlotFilePath = path.basename(analyzis.pitchPlotFilePath)
+      analyzis.amplitudePlotFile = path.basename(analyzis.amplitudePlotFile)
+      analyzis.intensityPlotFile = path.basename(analyzis.intensityPlotFile)
+      analyzis.pitchPlotFile = path.basename(analyzis.pitchPlotFile)
 
-      console.log(
-        `${new Date().toJSON()} - Successful analyzis for file "${content.name}" from user=${req.session.email}`
-      )
+      if (process.env.NODE_ENV !== 'test')
+        console.log(
+          `${new Date().toJSON()} - Successful analyzis for file "${content.name}" from user=${req.session.email}`
+        )
       await AnalyzisController.addAnalyzis(req.session._id, uploadedData, analyzis)
     } catch (error) {
       // We catch all errors as a response was already sent
@@ -75,6 +77,43 @@ export class UploadController {
   public async getAnalyzis(req: RequestAuthed<{ analyzisId: string }>, res: Response) {
     const analyzis = await AnalyzisController.find(req.params.analyzisId)
     res.json({ data: analyzis.toObject({ versionKey: false }) })
+  }
+
+  public async getAnalyzisPlotFile(
+    req: RequestAuthed<{ analyzisId: string; dataName: AudioAnalyzisData | 'file' }>,
+    res: Response
+  ) {
+    const dataName = req.params.dataName
+    const dataType = (`${dataName}PlotFile` as any) as 'amplitudePlotFile' | 'intensityPlotFile' | 'pitchPlotFile'
+
+    // Check the user asked for a valid data type
+    if (!['file', 'amplitude', 'intensity', 'pitch'].some(x => x === dataName))
+      throw boom.badRequest('Invalid plot data type.')
+
+    // Get analyzis data
+    const analyzis = await AnalyzisController.Model.findOne(
+      { _id: req.params.analyzisId, userId: req.session._id },
+      {
+        name: 1,
+        amplitudePlotFile: 1,
+        intensityPlotFile: 1,
+        pitchPlotFile: 1
+      }
+    )
+    if (!analyzis) throw boom.notFound('Analyzis not found.')
+
+    if (dataName === 'file') {
+      // Send the original file
+      res.sendFile(path.resolve(UPLOADS_DIR, analyzis.name))
+      return
+    } else if (!!analyzis[dataType]) {
+      // Send the plot image
+      res.sendFile(path.resolve(UPLOADS_DIR, analyzis[dataType]))
+      return
+    }
+
+    // Can be thrown if asked for a data type not available (i.e. an audio data type for a video analyzis)
+    throw boom.conflict('Asked data type is not available in this analyzis.')
   }
 
   // TODO: Add errored-out analyzis retry

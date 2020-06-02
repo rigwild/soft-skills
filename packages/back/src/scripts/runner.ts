@@ -20,17 +20,17 @@ export const analyzeAudio = async (audioFile: string, uniqueId: string) => {
     amplitude: [],
     intensity: [],
     pitch: [],
-    amplitudePlotFilePath: r(UPLOADS_DIR, `${uniqueId}_amplitude.png`),
-    intensityPlotFilePath: r(UPLOADS_DIR, `${uniqueId}_intensity.png`),
-    pitchPlotFilePath: r(UPLOADS_DIR, `${uniqueId}_pitch.png`)
+    amplitudePlotFile: r(UPLOADS_DIR, `${uniqueId}_amplitude.png`),
+    intensityPlotFile: r(UPLOADS_DIR, `${uniqueId}_intensity.png`),
+    pitchPlotFile: r(UPLOADS_DIR, `${uniqueId}_pitch.png`)
   }
 
   pool.queue(async ({ getAmplitude }: WorkerMethods) => (data.amplitude = await getAmplitude(audioFile)))
   pool.queue(async ({ getIntensity }: WorkerMethods) => (data.intensity = await getIntensity(audioFile)))
   pool.queue(async ({ getPitch }: WorkerMethods) => (data.pitch = await getPitch(audioFile)))
-  pool.queue(async ({ getAmplitudePlot }: WorkerMethods) => getAmplitudePlot(audioFile, data.amplitudePlotFilePath))
-  pool.queue(async ({ getIntensityPlot }: WorkerMethods) => getIntensityPlot(audioFile, data.intensityPlotFilePath))
-  pool.queue(async ({ getPitchPlot }: WorkerMethods) => getPitchPlot(audioFile, data.pitchPlotFilePath))
+  pool.queue(async ({ getAmplitudePlot }: WorkerMethods) => getAmplitudePlot(audioFile, data.amplitudePlotFile))
+  pool.queue(async ({ getIntensityPlot }: WorkerMethods) => getIntensityPlot(audioFile, data.intensityPlotFile))
+  pool.queue(async ({ getPitchPlot }: WorkerMethods) => getPitchPlot(audioFile, data.pitchPlotFile))
 
   await pool.completed()
   await pool.terminate()

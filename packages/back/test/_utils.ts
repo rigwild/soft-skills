@@ -16,7 +16,7 @@ export type TestContext = {
   app: Express
   testUserData: User
   testFilePath: string
-  testFileData: UploadAnalyzedAudio & { uniqueId: string }
+  testAnalyzisData: UploadAnalyzedAudio & { uniqueId: string }
   token: string
 }
 export const test = _test as TestInterface<TestContext>
@@ -54,15 +54,15 @@ export const beforeEach: Implementation<TestContext> = async t => {
     joinDate: new Date('2020-06-02T12:15:04.853Z')
   }
   t.context.testFilePath = path.resolve(__dirname, '_NW001.mp3')
-  t.context.testFileData = {
+  t.context.testAnalyzisData = {
     uniqueId: 'PtCLcgRs',
     amplitude: [[0]],
     intensity: [[0]],
     pitch: [[0]],
     _id: '5ece960cfe6ce42d24ef6bec',
-    amplitudePlotFilePath: 'PtCLcgRs_amplitude.png',
-    intensityPlotFilePath: 'PtCLcgRs_intensity.png',
-    pitchPlotFilePath: 'PtCLcgRs_pitch.png',
+    amplitudePlotFile: 'PtCLcgRs_amplitude.png',
+    intensityPlotFile: 'PtCLcgRs_intensity.png',
+    pitchPlotFile: 'PtCLcgRs_pitch.png',
     name: 'PtCLcgRs__NW001.mp3',
     size: 339216,
     mimeType: 'audio/mpeg',
@@ -77,14 +77,14 @@ export const beforeEach: Implementation<TestContext> = async t => {
     ...t.context.testUserData,
     password: await bcrypt.hash(t.context.testUserData.password, 1)
   })
-  await AnalyzisModel.create({ ...t.context.testFileData })
+  await AnalyzisModel.create({ ...t.context.testAnalyzisData })
 }
 
 // Clean up database after every test
 export const afterEachAlways: Implementation<TestContext> = async () => {
   await UserModel.deleteMany({})
   await AnalyzisModel.deleteMany({})
-  await fs.promises.rmdir(UPLOADS_DIR, { recursive: true })
+  // await fs.promises.rmdir(UPLOADS_DIR, { recursive: true })
 }
 
 // Disconnect MongoDB and mongoose after all tests are done
