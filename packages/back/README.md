@@ -1,12 +1,14 @@
 # soft-skills back-end
 
+## Requirements
+ - Node.js v10+
+ - Python v3+
+
 ## Install
-**Note:** Node.js v10+ is required.
 
 ```sh
-yarn
-# or
-npm i -D
+yarn # or npm i -D
+pip3 install -r requirements.txt
 ```
 
 ## Build

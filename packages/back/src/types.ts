@@ -1,11 +1,40 @@
 import type { RequestHandler, Params, ParamsDictionary } from 'express-serve-static-core'
 import type { ParsedQs } from 'qs'
 
+export type AudioAnalyzisData = 'amplitude' | 'intensity' | 'pitch'
+
 export interface Upload {
-  mimeType: string
   name: string
+  mimeType: string
   size: number
+  state: 'pending' | 'finished' | 'error'
+  analyzisId?: string
 }
+
+export interface UploadDB extends Upload {
+  _id: string
+}
+
+export interface Analyzis extends Omit<Upload, 'analyzisId' | 'state'> {
+  _id: string
+  userId: string
+  analyzisDate: Date
+}
+
+export interface AudioAnalyzis {
+  amplitude: number[][]
+  intensity: number[][]
+  pitch: number[][]
+  amplitudePlotFile: string
+  intensityPlotFile: string
+  pitchPlotFile: string
+}
+
+export interface AnalyzisDB extends Analyzis {
+  _id: string
+}
+
+export interface UploadAnalyzedAudio extends Analyzis, AudioAnalyzis {}
 
 export interface User {
   _id: string
@@ -13,7 +42,7 @@ export interface User {
   password: string
   name: string
   joinDate: Date
-  uploads: Upload[]
+  uploads: UploadDB[]
 }
 
 // `express.Request` with user data

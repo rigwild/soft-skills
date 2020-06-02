@@ -3,8 +3,9 @@ import { body } from 'express-validator'
 
 import { asyncMiddleware, authenticatedMiddleware, injectUserDocMiddleware } from './middlewares'
 import authController from './controllers/auth.controller'
-import uploadController from './controllers/upload.controller'
+import analyzisController from './controllers/analyzis.controller'
 import profileController from './controllers/profile.controller'
+import type { AudioAnalyzisData } from './types'
 
 const router = Router()
 
@@ -17,7 +18,7 @@ const router = Router()
  * @apiParam {String} email email
  * @apiParam {String} password password
  *
- * @apiExample {json} Example usage:
+ * @apiParamExample {json} Example usage:
  * {
  *   "email": "apidoctest@apidoc.com",
  *   "password": "secret"
@@ -34,7 +35,6 @@ const router = Router()
  * }
  *
  * @apiError {Error} InvalidCredentials Invalid email or password.
- *
  * @apiErrorExample {json} Error-Response:
  * HTTP/1.1 401 Unauthorized
  * {
@@ -58,7 +58,7 @@ router.post(
  * @apiParam {String} name name
  * @apiParam {String} password password
  *
- * @apiExample {json} Example usage:
+ * @apiParamExample {json} Example usage:
  * {
  *   "email": "apidoctest@apidoc.com",
  *   "name": "apitest",
@@ -75,7 +75,6 @@ router.post(
  * }
  *
  * @apiError {Error} UserExist Email already registered.
- *
  * @apiErrorExample {json} Error-Response:
  * HTTP/1.1 409 Conflict
  * {
@@ -90,7 +89,173 @@ router.post(
   asyncMiddleware(authController.register)
 )
 
-router.post('/upload', authenticatedMiddleware(), asyncMiddleware(uploadController.upload))
+router.post('/upload', authenticatedMiddleware(), asyncMiddleware(analyzisController.upload))
+
+/**
+ * @api {post} /uploads Upload a file for analyzis
+ * @apiVersion 0.1.0
+ * @apiName UploadFile
+ * @apiGroup Uploads
+ *
+ * @apiParam {Blob} content File to upload (audio or video)
+ *
+ * @apiParamExample {Blob} Example usage:
+ * FormData(content: Blob)
+ *
+ * @apiSuccessExample {json} Success-Response:
+ * HTTP/1.1 200 OK
+ * {
+ *   "data": {
+ *     "name": "yh_662tF__NW001.mp3",
+ *     "mimeType": "audio/mpeg",
+ *     "size": 339216
+ *   }
+ * }
+ *
+ * @apiError {Error} FileMissing You need to send a file.
+ * @apiErrorExample {json} Error-Response:
+ * HTTP/1.1 400 Bad Request
+ * {
+ *   "message": "You need to send a file."
+ * }
+ *
+ * @apiError {Error} BadMimeType You need to send an audio or video file.
+ * @apiErrorExample {json} Error-Response:
+ * HTTP/1.1 400 Bad Request
+ * {
+ *   "message": "You need to send an audio or video file."
+ * }
+ */
+router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(analyzisController.upload))
+
+/**
+ * @api {get} /uploads Get the list of all files sent for analyzis
+ * @apiVersion 0.1.0
+ * @apiName UploadedFiles
+ * @apiGroup Uploads
+ *
+ * @apiSuccessExample {json} Success-Response:
+ * HTTP/1.1 200 OK
+ * {
+ *   "data": [
+ *     {
+ *       "state": "pending",
+ *       "_id": "5ed66cc0dbaee47acd2c1063",
+ *       "name": "ah_662tF__NW001.mp3",
+ *       "size": 339216,
+ *       "mimeType": "audio/mpeg"
+ *     },
+ *     {
+ *       "state": "error",
+ *       "_id": "5ed66cc0dbaee47acd2c1064",
+ *       "name": "bh_662tF__NW001.mp3",
+ *       "size": 339216,
+ *       "mimeType": "audio/mpeg"
+ *     },
+ *     {
+ *       "state": "finished",
+ *       "analyzisId": "5ed66cc0dbaee47acd2c1063",
+ *       "_id": "5ed66cc0dbaee47acd2c1065",
+ *       "name": "ch_662tF__NW001.mp3",
+ *       "size": 339216,
+ *       "mimeType": "audio/mpeg"
+ *     }
+ *   ]
+ * }
+ */
+router.get('/uploads', authenticatedMiddleware(), asyncMiddleware(analyzisController.getUploads))
+
+/**
+ * @api {get} /analyzis/:analyzis Load an analyzis data
+ * @apiVersion 0.1.0
+ * @apiName AnalyzisData
+ * @apiGroup Analyzis
+ *
+ * @apiParam {String} analyzisId Analyzis id
+ *
+ * @apiSuccessExample {json} Success-Response:
+ * HTTP/1.1 200 OK
+ * {
+ *   "data": {
+ *     "amplitude": [
+ *       [0]
+ *     ],
+ *     "intensity": [
+ *       [0]
+ *     ],
+ *     "pitch": [
+ *       [0.02, 0],
+ *       [0.03, 0]
+ *     ],
+ *     "_id": "5ed66cc0dbaee47acd2c1063",
+ *     "amplitudePlotFile": "yh_662tF_amplitude.png",
+ *     "intensityPlotFile": "yh_662tF_intensity.png",
+ *     "pitchPlotFile": "yh_662tF_pitch.png",
+ *     "name": "yh_662tF__NW001.mp3",
+ *     "size": 339216,
+ *     "mimeType": "audio/mpeg",
+ *     "userId": "5ece75285e8a084208e0b0c4",
+ *     "analyzisDate": "2020-06-02T15:14:24.182Z"
+ *   }
+ * }
+ *
+ * @apiError {Error} NotFound Analyzis not found.
+ * @apiErrorExample {json} Error-Response:
+ * HTTP/1.1 404 Not Found
+ * {
+ *   "message": "Analyzis not found."
+ * }
+ */
+router.get<{ analyzisId: string }>(
+  '/analyzis/:analyzisId',
+  authenticatedMiddleware(),
+  // @ts-ignore
+  asyncMiddleware(analyzisController.getAnalyzis)
+)
+
+/**
+ * @api {get} /analyzis/:analyzis/:dataType Load an analyzis data file
+ * @apiVersion 0.1.0
+ * @apiName AnalyzisData
+ * @apiGroup Analyzis
+ *
+ * @apiParam {String} analyzisId Analyzis id
+ * @apiParam {String} dataType Type of data to load - { `file` } = original analyzed file, { `amplitude` | `intensity` | `pitch` } = plot image file
+ *
+ * @apiExample Example-usage:
+ * GET /analyzis/5ed66cc0dbaee47acd2c1063/amplitude
+ *
+ * @apiSuccessExample {File} Success-Response:
+ * HTTP/1.1 200 OK
+ * BinaryData
+ *
+ * @apiError {Error} NotFound Analyzis not found.
+ * @apiErrorExample {json} Error-Response:
+ * HTTP/1.1 404 Not Found
+ * {
+ *   "message": "Analyzis not found."
+ * }
+ *
+ * @apiError {Error} BadDataType Invalid data type
+ * @apiErrorExample {json} Error-Response:
+ * HTTP/1.1 400 Bad Request
+ * {
+ *   "message": "Invalid plot data type."
+ * }
+ *
+ * @apiError {Error} DataTypeNotAvailable Data type not available for this analyzis (i.e. you ask for a video-specific analyzis data type on an audio analyzis)
+ * @apiErrorExample {json} Error-Response:
+ * HTTP/1.1 409 Conflict
+ * {
+ *   "message": "Asked data type is not available in this analyzis."
+ * }
+ */
+router.get<{ analyzisId: string; dataType: AudioAnalyzisData | 'file' }>(
+  '/analyzis/:analyzisId/:dataType',
+  authenticatedMiddleware(),
+  // @ts-ignore
+  asyncMiddleware(analyzisController.getAnalyzisPlotFile)
+)
 
 /**
  * @api {get} /profile Get user profile
@@ -108,14 +273,6 @@ router.post('/upload', authenticatedMiddleware(), asyncMiddleware(uploadControll
  *     "joinDate": "2020-05-27T14:11:52.580Z"
  *   }
  * }
- *
- * @apiError {Error} NotAuthenticated You need to be authenticated.
- *
- * @apiErrorExample {json} Error-Response:
- * HTTP/1.1 401 Unauthorized
- * {
- *   "message": "No authorization bearer token header is set."
- * }
  */
 router.get(
   '/profile',
@@ -132,7 +289,7 @@ router.get(
  *
  * @apiParam {String} [name] name
  *
- * @apiExample {json} Example usage:
+ * @apiParamExample {json} Example usage:
  * {
  *   "name": "apidoctest2"
  * }
@@ -146,13 +303,6 @@ router.get(
  *     "name": "apidoctest2",
  *     "joinDate": "2020-05-27T14:11:52.580Z"
  *   }
- * }
- *
- * @apiError {Error} NotAuthenticated You need to be authenticated.
- * @apiErrorExample {json} Error-Response:
- * HTTP/1.1 401 Unauthorized
- * {
- *   "message": "No authorization bearer token header is set."
  * }
  *
  * @apiError {Error} NothingToEdit None of the provided keys are editable.

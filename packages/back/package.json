@@ -15,7 +15,7 @@
     "start:dev": "ts-node src/index.ts",
     "lint": "eslint --ext .ts ./src ./test --fix",
     "lint:no-fix": "eslint --ext .ts ./src ./test",
-    "test": "ava --verbose",
+    "test": "ava",
     "doc": "apidoc -i src -o apidoc-out && apidoc-markdown -p apidoc-out -o DOCUMENTATION.md && rm -rf apidoc-out"
   },
   "files": [
@@ -28,6 +28,7 @@
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv-safe": "^8.2.0",
+    "execa": "^4.0.1",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.7-alpha.3",
     "express-validator": "^6.4.1",
@@ -35,7 +36,8 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.14",
     "morgan": "^1.10.0",
-    "nanoid": "^3.1.9"
+    "nanoid": "^3.1.9",
+    "threads": "^1.4.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
@@ -66,6 +68,8 @@
     }
   },
   "ava": {
+    "verbose": true,
+    "timeout": "60000",
     "extensions": [
       "ts"
     ],

@@ -118,3 +118,4 @@ package-lock.json
 apidoc-out
 uploads
 DOCUMENTATION.md
+__pycache__

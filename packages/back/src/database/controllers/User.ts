@@ -4,7 +4,7 @@ import boom from '@hapi/boom'
 
 import { UserModel, UserDocument } from '../models/User'
 import { JWT_SECRET } from '../../config'
-import type { User, Upload } from '../../types'
+import type { User, Upload, UploadDB } from '../../types'
 
 export const UserController = {
   get Model() {
@@ -118,15 +118,13 @@ export const UserController = {
     this.log(`A user profile was edited. id=${userDoc._id}`)
 
     const userData = userDoc.toObject({ versionKey: false }) as User
-    // FIXME: Remove ts-ignore when #8 is merged
-    // @ts-ignore
     delete userData.uploads
     return userData
   },
 
   /**
    * Link a file to a user
-   * @param userId The user id of the user to delete
+   * @param userId The user id of the user
    * @param file Uploaded file to link to a user
    */
   async addUpload(userId: string, file: Upload) {
@@ -134,14 +132,44 @@ export const UserController = {
     const userDoc = await UserModel.findOneAndUpdate(
       { _id: userId },
       {
-        $push: { uploads: file }
+        $push: { uploads: file as UploadDB }
       },
       { new: true }
     )
 
     if (!userDoc) throw boom.internal('Unexpected error when adding file.')
 
-    this.log(`Added a file. user=${userDoc.email}, id=${userDoc._id}, file-name=${file.name}`)
+    this.log(`Added a file. user=${userDoc.email}, id=${userDoc._id}, fileName=${file.name}`)
+    return (userDoc.toObject({ versionKey: false }) as User).uploads.find(x => x.name === file.name) as Upload
+  },
+
+  /**
+   * Edit a file upload state
+   * @param userId The user id of the user to delete
+   * @param uploadId The state of an upload
+   * @param fileName Uploaded file to edit state from
+   * @param newState New state of the upload
+   * @param analyzisId ID of analyzis if state = finished
+   */
+  async setUploadState(
+    userId: string,
+    uploadId: string,
+    fileName: Upload['name'],
+    newState: Upload['state'],
+    analyzisId?: string
+  ) {
+    // Add the upload to the user uploads list
+    const userDoc = await UserModel.findOneAndUpdate(
+      { _id: userId, 'uploads._id': uploadId },
+      { 'uploads.$.state': newState, 'uploads.$.analyzisId': analyzisId },
+      { new: true }
+    )
+
+    if (!userDoc) throw boom.internal('Unexpected error when setting analyzis state.')
+
+    this.log(
+      `Edited an upload state. user=${userDoc.email}, id=${userDoc._id}, fileName=${fileName}, newState=${newState}`
+    )
   },
 
   /**
