@@ -1,5 +1,5 @@
 import CenteredWrapper from "components/centeredwrapper";
-import WebcamRecorder from "components/recorder";
+import WebcamRecorder from "containers/recorder";
 import React from "react";
 
 const Record = () => (

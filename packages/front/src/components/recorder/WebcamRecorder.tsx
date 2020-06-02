@@ -1,8 +1,5 @@
 import { RedoOutlined, VideoCameraTwoTone } from "@ant-design/icons";
-import { Alert, Button, Spin, Statistic } from "antd";
-import { upload } from "api/upload";
-import { AxiosError } from "axios";
-import Success from "components/success";
+import { Button, Spin, Statistic } from "antd";
 import React, { MutableRefObject, RefObject, useRef, useState } from "react";
 import Webcam from "react-webcam";
 
@@ -13,9 +10,6 @@ enum RecorderState {
   READY,
   RECORDING,
   DISPLAY,
-  ERROR,
-  UPLOAD_ERROR,
-  UPLOAD_SUCCESS,
 }
 
 const FIVE_MINUTE_IN_MS = 5 * 60 * 1000;
@@ -26,15 +20,19 @@ const centeredDivStyle = {
   alignItems: "center",
 };
 
-const WebcamRecorder = () => {
+type Props = {
+  uploading: boolean;
+  setError: (error: string) => void;
+  uploadVideo: (video: Blob) => void;
+};
+
+const WebcamRecorder = (props: Props) => {
   const webcamRef: RefObject<Webcam | null> &
     RefObject<HTMLVideoElement | null> = useRef(null);
   const mediaRecorderRef: MutableRefObject<MediaRecorder | null> = useRef(null);
 
   const [video, setVideo] = useState<Blob | undefined>(undefined);
-  const [uploading, setUploading] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
-  const [error, setError] = useState("");
   const [state, setState] = useState(RecorderState.LOADING);
 
   const handleStartRecording = () => {
@@ -75,23 +73,6 @@ const WebcamRecorder = () => {
     setState(RecorderState.LOADING);
   };
 
-  const handleUploadVideo = () => {
-    setUploading(true);
-    upload(video!)
-      .then(() => setState(RecorderState.UPLOAD_SUCCESS))
-      .catch((error: AxiosError) => {
-        let errorMessage: string = error.response?.data.message;
-        if (error.response?.status === 401) {
-          errorMessage = errorMessage
-            .concat(" ")
-            .concat("Please, log out and log in again.");
-        }
-        setState(RecorderState.UPLOAD_ERROR);
-        setError(errorMessage);
-      })
-      .finally(() => setUploading(false));
-  };
-
   const displayMedia = () => {
     if (state === RecorderState.DISPLAY) {
       return <video controls src={videoUrl} preload="auto" />;
@@ -102,8 +83,7 @@ const WebcamRecorder = () => {
             ref={webcamRef}
             onUserMedia={() => setState(RecorderState.READY)}
             onUserMediaError={(mediaError) => {
-              setState(RecorderState.ERROR);
-              setError(`Webcam recorder ${mediaError.toString()}`);
+              props.setError(`Webcam recorder ${mediaError.toString()}`);
             }}
           />
           {state === RecorderState.LOADING && (
@@ -149,15 +129,15 @@ const WebcamRecorder = () => {
               type="primary"
               style={{ marginBottom: 15 }}
               icon={<RedoOutlined />}
-              disabled={uploading}
+              disabled={props.uploading}
             >
               Delete and start again
             </Button>
             <Button
-              onClick={handleUploadVideo}
+              onClick={() => props.uploadVideo(video!)}
               type="primary"
               danger
-              disabled={uploading}
+              disabled={props.uploading}
             >
               Send video for analysis
             </Button>
@@ -166,65 +146,18 @@ const WebcamRecorder = () => {
     }
   };
 
-  const displayError = () => {
-    return (
-      <Alert
-        message="An error occurred"
-        description={error}
-        type="error"
-        showIcon
-        style={{ marginTop: "25vh" }}
-      />
-    );
-  };
-
-  const isInErrorState = () => {
-    return (
-      state === RecorderState.ERROR || state === RecorderState.UPLOAD_ERROR
-    );
-  };
-
-  const displaySuccessMessage = () => {
-    return (
-      <Success
-        title="Your video has been successfully uploaded!"
-        subtitle="It has been sent for analysis. You will be able to see the result in your dashboard soon."
-        buttonText="Go to dashboard"
-        linkTo="dashboard"
-      />
-    );
-  };
-
-  return !isInErrorState() ? (
-    state === RecorderState.UPLOAD_SUCCESS ? (
-      displaySuccessMessage()
-    ) : (
-      <>
-        {displayMedia()}
-        <div
-          style={{
-            ...centeredDivStyle,
-            marginTop: 25,
-            flexDirection: "column",
-          }}
-        >
-          {displayControlButtons()}
-        </div>
-      </>
-    )
-  ) : (
+  return (
     <>
-      {displayError()}
-      {state === RecorderState.UPLOAD_ERROR && (
-        <Button
-          onClick={handleResetVideo}
-          type="primary"
-          style={{ marginTop: 25 }}
-          icon={<RedoOutlined />}
-        >
-          Try again
-        </Button>
-      )}
+      {displayMedia()}
+      <div
+        style={{
+          ...centeredDivStyle,
+          marginTop: 25,
+          flexDirection: "column",
+        }}
+      >
+        {displayControlButtons()}
+      </div>
     </>
   );
 };
