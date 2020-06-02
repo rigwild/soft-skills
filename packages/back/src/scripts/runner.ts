@@ -37,14 +37,3 @@ export const analyzeAudio = async (audioFile: string, uniqueId: string) => {
 
   return data
 }
-
-const setup = async () => {
-  const audioFile = r(__dirname, '../../test/_NW001.wav')
-  console.log('Starting worker')
-  console.time('aaa')
-  const analyzis = await analyzeAudio(audioFile, '1234')
-  console.timeEnd('aaa')
-  console.log(analyzis)
-}
-
-setup()

@@ -17,9 +17,10 @@ export const UserSchema = new Schema({
   uploads: [
     {
       mimeType: { type: String, required: true },
-      fileName: { type: String, required: true },
+      name: { type: String, required: true },
       state: { type: String, enum: ['pending', 'finished', 'error'], default: 'pending', required: true },
-      size: { type: Number, required: true }
+      size: { type: Number, required: true },
+      analyzisId: { type: String, required: true, default: null }
     }
   ]
 })

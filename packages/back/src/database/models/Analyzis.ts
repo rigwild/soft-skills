@@ -7,7 +7,7 @@ export type AnalyzisDocument = UploadAnalyzedAudio & mongoose.Document
 export const AnalyzisSchema = new Schema({
   userId: { type: String, required: true },
 
-  name: { type: String, required: true },
+  name: { type: String, required: true, unique: true },
   mimeType: { type: String, required: true },
   size: { type: Number, required: true },
 

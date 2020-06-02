@@ -2,7 +2,6 @@ import { expose } from 'threads/worker'
 
 import { resolve as r } from 'path'
 import execa from 'execa'
-import { nanoid } from 'nanoid'
 
 const scripts = {
   audioAnalyzis: r(__dirname, 'audio_analyzis.py')
@@ -16,7 +15,6 @@ const pyCsv = async (script: string, ...args: string[]) => csv(await py(script, 
 
 const audioAnalyzis = async (audioFile: string, data: 'amplitude' | 'intensity' | 'pitch') =>
   pyCsv(scripts.audioAnalyzis, audioFile, 'print_raw_data', data)
-
 const audioAnalyzisPlot = (audioFile: string, outputFile: string, data: 'amplitude' | 'intensity' | 'pitch') =>
   py(scripts.audioAnalyzis, audioFile, 'generate_plot_file', data, outputFile)
 

@@ -3,7 +3,7 @@ import { body } from 'express-validator'
 
 import { asyncMiddleware, authenticatedMiddleware, injectUserDocMiddleware } from './middlewares'
 import authController from './controllers/auth.controller'
-import uploadController from './controllers/upload.controller'
+import analyzisController from './controllers/analyzis.controller'
 import profileController from './controllers/profile.controller'
 
 const router = Router()
@@ -90,14 +90,14 @@ router.post(
   asyncMiddleware(authController.register)
 )
 
-router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadController.upload))
-router.get('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadController.getUploads))
+router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(analyzisController.upload))
+router.get('/uploads', authenticatedMiddleware(), asyncMiddleware(analyzisController.getUploads))
 
 router.get<{ analyzisId: string }>(
   '/analyzis/:analyzisId',
   authenticatedMiddleware(),
   // @ts-ignore
-  asyncMiddleware(uploadController.getAnalyzis)
+  asyncMiddleware(analyzisController.getAnalyzis)
 )
 
 /**

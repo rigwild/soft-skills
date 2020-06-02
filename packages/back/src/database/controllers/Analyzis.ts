@@ -2,7 +2,7 @@ import boom from '@hapi/boom'
 
 import { AnalyzisModel } from '../models/Analyzis'
 import { UserController } from './User'
-import type { Upload, AudioAnalyzis } from '../../types'
+import type { AudioAnalyzis, UploadDB } from '../../types'
 
 export const AnalyzisController = {
   get Model() {
@@ -18,18 +18,18 @@ export const AnalyzisController = {
    * @param userId The user id of the user who requested the analyzis
    * @param analyzis Analyzis data
    */
-  async addAnalyzis(userId: string, file: Upload, analyzis: AudioAnalyzis) {
+  async addAnalyzis(userId: string, file: UploadDB, analyzis: AudioAnalyzis) {
     // Add the upload to the user uploads list
-    const userDoc = await AnalyzisModel.create({
+    const analyzisDoc = await AnalyzisModel.create({
       ...analyzis,
       ...file,
       userId
     })
 
-    if (!userDoc) throw boom.internal('Unexpected error when adding analyzis.')
+    if (!analyzisDoc) throw boom.internal('Unexpected error when adding analyzis.')
 
     // Set the file state as finished in the user uploads list
-    await UserController.setUploadState(userId, file.name, 'finished')
+    await UserController.setUploadState(userId, file._id, file.name, 'finished', analyzisDoc._id)
     this.log(`Added an analyzis. userId=${userId}, fileName=${file.name}`)
   },
 
