@@ -1,6 +1,9 @@
 import { RedoOutlined, VideoCameraTwoTone } from "@ant-design/icons";
-import { Alert, Button, Spin, Statistic } from "antd";
+import { Alert, Button, Result, Spin, Statistic } from "antd";
+import { upload } from "api/upload";
+import { AxiosError } from "axios";
 import React, { MutableRefObject, RefObject, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import Webcam from "react-webcam";
 
 const { Countdown } = Statistic;
@@ -11,6 +14,8 @@ enum RecorderState {
   RECORDING,
   DISPLAY,
   ERROR,
+  UPLOAD_ERROR,
+  UPLOAD_SUCCESS,
 }
 
 const FIVE_MINUTE_IN_MS = 5 * 60 * 1000;
@@ -26,6 +31,8 @@ const WebcamRecorder = () => {
     RefObject<HTMLVideoElement | null> = useRef(null);
   const mediaRecorderRef: MutableRefObject<MediaRecorder | null> = useRef(null);
 
+  const [video, setVideo] = useState<Blob | undefined>(undefined);
+  const [uploading, setUploading] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
   const [error, setError] = useState("");
   const [state, setState] = useState(RecorderState.LOADING);
@@ -50,6 +57,7 @@ const WebcamRecorder = () => {
       type: "video/webm",
     });
     const url = URL.createObjectURL(blob);
+    setVideo(blob);
     setVideoUrl(url);
     setState(RecorderState.DISPLAY);
   };
@@ -62,8 +70,26 @@ const WebcamRecorder = () => {
 
   const handleResetVideo = () => {
     window.URL.revokeObjectURL(videoUrl);
+    setVideo(undefined);
     setVideoUrl("");
     setState(RecorderState.LOADING);
+  };
+
+  const handleUploadVideo = () => {
+    setUploading(true);
+    upload(video!)
+      .then(() => setState(RecorderState.UPLOAD_SUCCESS))
+      .catch((error: AxiosError) => {
+        let errorMessage: string = error.response?.data.message;
+        if (error.response?.status === 401) {
+          errorMessage = errorMessage
+            .concat(" ")
+            .concat("Please, log out and log in again.");
+        }
+        setState(RecorderState.UPLOAD_ERROR);
+        setError(errorMessage);
+      })
+      .finally(() => setUploading(false));
   };
 
   const displayMedia = () => {
@@ -77,7 +103,7 @@ const WebcamRecorder = () => {
             onUserMedia={() => setState(RecorderState.READY)}
             onUserMediaError={(mediaError) => {
               setState(RecorderState.ERROR);
-              setError(mediaError.toString());
+              setError(`Webcam recorder ${mediaError.toString()}`);
             }}
           />
           {state === RecorderState.LOADING && (
@@ -123,13 +149,15 @@ const WebcamRecorder = () => {
               type="primary"
               style={{ marginBottom: 15 }}
               icon={<RedoOutlined />}
+              disabled={uploading}
             >
               Delete and start again
             </Button>
             <Button
-              onClick={() => console.log("Analysing video...")}
+              onClick={handleUploadVideo}
               type="primary"
               danger
+              disabled={uploading}
             >
               Send video for analysis
             </Button>
@@ -141,7 +169,7 @@ const WebcamRecorder = () => {
   const displayError = () => {
     return (
       <Alert
-        message="An error occurred with the webcam recorder"
+        message="An error occurred"
         description={error}
         type="error"
         showIcon
@@ -150,21 +178,65 @@ const WebcamRecorder = () => {
     );
   };
 
-  return state !== RecorderState.ERROR ? (
-    <>
-      {displayMedia()}
-      <div
-        style={{
-          ...centeredDivStyle,
-          marginTop: 25,
-          flexDirection: "column",
-        }}
-      >
-        {displayControlButtons()}
-      </div>
-    </>
+  const isInErrorState = () => {
+    return (
+      state === RecorderState.ERROR || state === RecorderState.UPLOAD_ERROR
+    );
+  };
+
+  const displaySuccessMessage = () => {
+    return (
+      <Result
+        status="success"
+        title="Your video has been successfully uploaded !"
+        subTitle={
+          <>
+            <p style={{ marginTop: 10 }}>
+              It has been sent for analysis. You will be able to see the result
+              in your dashboard soon.
+            </p>
+          </>
+        }
+        extra={[
+          <Link to="/dashboard" key="dashnoard">
+            <Button type="primary">Go to dashboard</Button>
+          </Link>,
+        ]}
+      />
+    );
+  };
+
+  return !isInErrorState() ? (
+    state === RecorderState.UPLOAD_SUCCESS ? (
+      displaySuccessMessage()
+    ) : (
+      <>
+        {displayMedia()}
+        <div
+          style={{
+            ...centeredDivStyle,
+            marginTop: 25,
+            flexDirection: "column",
+          }}
+        >
+          {displayControlButtons()}
+        </div>
+      </>
+    )
   ) : (
-    displayError()
+    <>
+      {displayError()}
+      {state === RecorderState.UPLOAD_ERROR && (
+        <Button
+          onClick={handleResetVideo}
+          type="primary"
+          style={{ marginTop: 25 }}
+          icon={<RedoOutlined />}
+        >
+          Try again
+        </Button>
+      )}
+    </>
   );
 };
 
