@@ -89,6 +89,8 @@ router.post(
   asyncMiddleware(authController.register)
 )
 
+router.post('/upload', authenticatedMiddleware(), asyncMiddleware(analyzisController.upload))
+
 /**
  * @api {post} /uploads Upload a file for analyzis
  * @apiVersion 0.1.0
