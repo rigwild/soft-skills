@@ -56,9 +56,9 @@ export const beforeEach: Implementation<TestContext> = async t => {
   t.context.testFilePath = path.resolve(__dirname, '_NW001.mp3')
   t.context.testAnalyzisData = {
     uniqueId: 'PtCLcgRs',
-    amplitude: [[0]],
-    intensity: [[0]],
-    pitch: [[0]],
+    amplitude: [[0, 0]],
+    intensity: [[0, 0]],
+    pitch: [[0, 0]],
     _id: '5ece960cfe6ce42d24ef6bec',
     amplitudePlotFile: 'PtCLcgRs_amplitude.png',
     intensityPlotFile: 'PtCLcgRs_intensity.png',

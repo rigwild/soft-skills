@@ -107,10 +107,10 @@ else:
     elif command == 'print_raw_data':
         needed_data = sys.argv[3]
         if needed_data == 'amplitude':
-            print('0.0')
+            print('0.0 0.0')
             # print_amplitude_data() FIXME: Get real raw data
         elif needed_data == 'intensity':
-            print('0.0')
+            print('0.0 0.0')
             # print_intensity_data() FIXME: Get real raw data
         if needed_data == 'pitch':
             print_pitch_data()

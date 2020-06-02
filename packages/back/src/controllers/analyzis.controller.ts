@@ -80,14 +80,14 @@ export class UploadController {
   }
 
   public async getAnalyzisPlotFile(
-    req: RequestAuthed<{ analyzisId: string; dataName: AudioAnalyzisData | 'file' }>,
+    req: RequestAuthed<{ analyzisId: string; dataType: AudioAnalyzisData | 'file' }>,
     res: Response
   ) {
-    const dataName = req.params.dataName
-    const dataType = (`${dataName}PlotFile` as any) as 'amplitudePlotFile' | 'intensityPlotFile' | 'pitchPlotFile'
+    const dataType = req.params.dataType
+    const dataTypeKey = (`${dataType}PlotFile` as any) as 'amplitudePlotFile' | 'intensityPlotFile' | 'pitchPlotFile'
 
     // Check the user asked for a valid data type
-    if (!['file', 'amplitude', 'intensity', 'pitch'].some(x => x === dataName))
+    if (!['file', 'amplitude', 'intensity', 'pitch'].some(x => x === dataType))
       throw boom.badRequest('Invalid plot data type.')
 
     // Get analyzis data
@@ -102,17 +102,17 @@ export class UploadController {
     )
     if (!analyzis) throw boom.notFound('Analyzis not found.')
 
-    if (dataName === 'file') {
+    if (dataType === 'file') {
       // Send the original file
       res.sendFile(path.resolve(UPLOADS_DIR, analyzis.name))
       return
-    } else if (!!analyzis[dataType]) {
+    } else if (!!analyzis[dataTypeKey]) {
       // Send the plot image
-      res.sendFile(path.resolve(UPLOADS_DIR, analyzis[dataType]))
+      res.sendFile(path.resolve(UPLOADS_DIR, analyzis[dataTypeKey]))
       return
     }
 
-    // Can be thrown if asked for a data type not available (i.e. an audio data type for a video analyzis)
+    // Can be thrown if asked for a data type not available (i.e. a video data type for an audio analyzis)
     throw boom.conflict('Asked data type is not available in this analyzis.')
   }
 
