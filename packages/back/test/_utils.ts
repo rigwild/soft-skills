@@ -43,8 +43,8 @@ export const beforeEach: Implementation<TestContext> = async t => {
     password: 'secret',
     uploads: [
       {
-        _id: '5ece960cfe6ce42d24ef6beb',
-        name: 'PtCLcgRs-_NW001.mp3',
+        _id: '5ed65e7142905c4a917be028',
+        name: 'PtCLcgRs__NW001.mp3',
         mimeType: 'audio/mpeg',
         size: 339216,
         state: 'finished',
@@ -63,7 +63,7 @@ export const beforeEach: Implementation<TestContext> = async t => {
     amplitudePlotFilePath: 'PtCLcgRs_amplitude.png',
     intensityPlotFilePath: 'PtCLcgRs_intensity.png',
     pitchPlotFilePath: 'PtCLcgRs_pitch.png',
-    name: 'PtCLcgRs-_NW001.mp3',
+    name: 'PtCLcgRs__NW001.mp3',
     size: 339216,
     mimeType: 'audio/mpeg',
     userId: '5ece75285e8a084208e0b0c4',
@@ -72,6 +72,7 @@ export const beforeEach: Implementation<TestContext> = async t => {
   t.context.token =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZWNlOTYwY2ZlNmNlNDJkMjRlZjZiZWEiLCJlbWFpbCI6InRlc3R1c2VyXzEyMzRAZXhhbXBsZS5jb20iLCJuYW1lIjoidGVzdCIsImlhdCI6MTU5MDU5NzE1NX0.4kxSkN5z4H37X7c4SzeQnG16X_qJFe0uc_L6L-wFkgM'
 
+  await fs.promises.mkdir(UPLOADS_DIR, { recursive: true })
   await UserModel.create({
     ...t.context.testUserData,
     password: await bcrypt.hash(t.context.testUserData.password, 1)

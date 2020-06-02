@@ -31,7 +31,13 @@ export class UploadController {
     await content.mv(file)
     const uploadedData = (await UserController.addUpload(req.session._id, content)) as UploadDB
 
-    res.status(200).end()
+    res.json({
+      data: {
+        name: content.name,
+        mimeType: content.mimeType,
+        size: content.size
+      }
+    })
 
     // Start a background analyzis
     try {

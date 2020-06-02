@@ -2,6 +2,8 @@ import { resolve as r } from 'path'
 import request from 'supertest'
 
 import { test, before, beforeEach, afterEachAlways, afterAlways } from './_utils'
+import { UserController } from '../src/database'
+import { User } from '../src/types'
 
 test.before(before)
 test.beforeEach(beforeEach)
@@ -14,7 +16,6 @@ test.serial('Fetch uploads list', async t => {
 
   t.is(res.status, 200)
   t.deepEqual(res.body.data, testUserData.uploads)
-  t.log(res.body)
 })
 
 test.serial('Upload an invalid file', async t => {
@@ -29,11 +30,22 @@ test.serial('Upload an invalid file', async t => {
 })
 
 test.serial('Upload a file for analyzis', async t => {
-  const { app, testFilePath, token } = t.context
+  const { app, testUserData, testFilePath, token } = t.context
+
+  // Delete pre-injected upload test data
+  await UserController.Model.findOneAndUpdate({ _id: testUserData._id }, { uploads: [] })
+
   const res = await request(app)
     .post('/uploads')
     .set('Authorization', `Bearer ${token}`)
     .attach('content', testFilePath)
 
   t.is(res.status, 200)
+
+  const upload = ((await UserController.find(testUserData._id)).toObject({ versionKey: false }) as User).uploads[0]
+
+  t.true(upload.name.endsWith(testUserData.uploads[0].name.split('_')[2]))
+  t.is(upload.mimeType, testUserData.uploads[0].mimeType)
+  t.is(upload.size, testUserData.uploads[0].size)
+  t.is(upload.state, 'pending')
 })
