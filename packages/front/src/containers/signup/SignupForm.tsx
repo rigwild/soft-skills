@@ -44,14 +44,12 @@ const SignupContainer = () => {
   };
 
   return success ? (
-    <>
-      <Success
-        title={`Welcome ${success.name}!`}
-        subtitle="Your account has been created. You can now log in."
-        buttonText="Log in"
-        linkTo="login"
-      />
-    </>
+    <Success
+      title={`Welcome ${success.name}!`}
+      subtitle="Your account has been created. You can now log in."
+      buttonText="Log in"
+      linkTo="login"
+    />
   ) : (
     <>
       <Title>Sign up</Title>
