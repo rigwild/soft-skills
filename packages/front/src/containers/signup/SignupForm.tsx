@@ -1,11 +1,11 @@
 import { UserAddOutlined } from "@ant-design/icons";
-import { Alert, Avatar, Button, Result, Typography } from "antd";
+import { Alert, Avatar, Typography } from "antd";
 import { Store } from "antd/lib/form/interface";
 import { register } from "api/authentication";
 import { AxiosError, AxiosResponse } from "axios";
 import SignupForm from "components/signup";
+import Success from "components/success";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 
 type SignupError = {
   message: string;
@@ -44,22 +44,14 @@ const SignupContainer = () => {
   };
 
   return success ? (
-    <Result
-      status="success"
-      title={`Welcome ${success.name}!`}
-      subTitle={
-        <>
-          <p style={{ marginTop: 10 }}>
-            Your account has been created. You can now log in.
-          </p>
-        </>
-      }
-      extra={[
-        <Link to="/login" key="login">
-          <Button type="primary">Log in</Button>
-        </Link>,
-      ]}
-    />
+    <>
+      <Success
+        title={`Welcome ${success.name}!`}
+        subtitle="Your account has been created. You can now log in."
+        buttonText="Log in"
+        linkTo="login"
+      />
+    </>
   ) : (
     <>
       <Title>Sign up</Title>

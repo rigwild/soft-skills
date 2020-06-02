@@ -1,9 +1,9 @@
 import { RedoOutlined, VideoCameraTwoTone } from "@ant-design/icons";
-import { Alert, Button, Result, Spin, Statistic } from "antd";
+import { Alert, Button, Spin, Statistic } from "antd";
 import { upload } from "api/upload";
 import { AxiosError } from "axios";
+import Success from "components/success";
 import React, { MutableRefObject, RefObject, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import Webcam from "react-webcam";
 
 const { Countdown } = Statistic;
@@ -186,22 +186,11 @@ const WebcamRecorder = () => {
 
   const displaySuccessMessage = () => {
     return (
-      <Result
-        status="success"
-        title="Your video has been successfully uploaded !"
-        subTitle={
-          <>
-            <p style={{ marginTop: 10 }}>
-              It has been sent for analysis. You will be able to see the result
-              in your dashboard soon.
-            </p>
-          </>
-        }
-        extra={[
-          <Link to="/dashboard" key="dashnoard">
-            <Button type="primary">Go to dashboard</Button>
-          </Link>,
-        ]}
+      <Success
+        title="Your video has been successfully uploaded!"
+        subtitle="It has been sent for analysis. You will be able to see the result in your dashboard soon."
+        buttonText="Go to dashboard"
+        linkTo="dashboard"
       />
     );
   };
