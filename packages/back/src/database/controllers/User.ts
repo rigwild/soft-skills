@@ -4,7 +4,7 @@ import boom from '@hapi/boom'
 
 import { UserModel, UserDocument } from '../models/User'
 import { JWT_SECRET } from '../../config'
-import type { User } from '../../types'
+import type { User, Upload } from '../../types'
 
 export const UserController = {
   get Model() {
@@ -122,6 +122,26 @@ export const UserController = {
     // @ts-ignore
     delete userData.uploads
     return userData
+  },
+
+  /**
+   * Link a file to a user
+   * @param userId The user id of the user to delete
+   * @param file Uploaded file to link to a user
+   */
+  async addUpload(userId: string, file: Upload) {
+    // Add the upload to the user uploads list
+    const userDoc = await UserModel.findOneAndUpdate(
+      { _id: userId },
+      {
+        $push: { uploads: file }
+      },
+      { new: true }
+    )
+
+    if (!userDoc) throw boom.internal('Unexpected error when adding file.')
+
+    this.log(`Added a file. user=${userDoc.email}, id=${userDoc._id}, file-name=${file.name}`)
   },
 
   /**

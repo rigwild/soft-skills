@@ -1,12 +1,19 @@
 import type { RequestHandler, Params, ParamsDictionary } from 'express-serve-static-core'
 import type { ParsedQs } from 'qs'
 
+export interface Upload {
+  mimeType: string
+  name: string
+  size: number
+}
+
 export interface User {
   _id: string
   email: string
   password: string
   name: string
   joinDate: Date
+  uploads: Upload[]
 }
 
 // `express.Request` with user data

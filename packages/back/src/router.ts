@@ -3,6 +3,7 @@ import { body } from 'express-validator'
 
 import { asyncMiddleware, authenticatedMiddleware, injectUserDocMiddleware } from './middlewares'
 import authController from './controllers/auth.controller'
+import uploadController from './controllers/upload.controller'
 import profileController from './controllers/profile.controller'
 
 const router = Router()
@@ -88,6 +89,8 @@ router.post(
   body('password', 'must be of 4 characters length minimum.').exists({ checkFalsy: true }).isLength({ min: 4 }),
   asyncMiddleware(authController.register)
 )
+
+router.post('/upload', authenticatedMiddleware(), asyncMiddleware(uploadController.upload))
 
 /**
  * @api {get} /profile Get user profile

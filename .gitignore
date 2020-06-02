@@ -116,4 +116,5 @@ dist
 
 package-lock.json
 apidoc-out
+uploads
 DOCUMENTATION.md
