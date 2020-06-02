@@ -4,6 +4,7 @@ import { upload } from "api/upload";
 import { AxiosError } from "axios";
 import WebcamRecorder from "components/recorder";
 import Success from "components/success";
+import { getErrorMessage } from "functions/error";
 import React, { useState } from "react";
 
 const RecorderContainer = () => {
@@ -16,12 +17,7 @@ const RecorderContainer = () => {
     upload(video)
       .then(() => setSuccess(true))
       .catch((error: AxiosError) => {
-        let errorMessage: string = error.response?.data.message;
-        if (error.response?.status === 401) {
-          errorMessage = errorMessage
-            .concat(" ")
-            .concat("Please, log out and log in again.");
-        }
+        const errorMessage = getErrorMessage(error);
         setError(errorMessage);
       })
       .finally(() => setUploading(false));
