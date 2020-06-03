@@ -1,4 +1,4 @@
-import { Card, Spin, Alert, Typography, Button } from "antd";
+import { Card, Spin, Alert, Typography, Button, Empty } from "antd";
 import { getUploads } from "api/upload";
 import CenteredWrapper from "components/centeredwrapper";
 import React, { useEffect, useState } from "react";
@@ -6,10 +6,21 @@ import { Link } from "react-router-dom";
 
 const { Title } = Typography;
 
+enum AnalysisState {
+  PENDING = "pending",
+  ERROR = "error",
+  SUCCESS = "finished",
+}
+
+type Analysis = {
+  _id: string;
+  name: string;
+  state: AnalysisState;
+};
+
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<any[]>([]);
-  console.log(data);
+  const [data, setData] = useState<Analysis[]>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -19,27 +30,28 @@ const Dashboard = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const getContent = (state: string) => {
-    if (state === "error") {
-      return <Alert message="Analysis state : error" type="error" showIcon />;
+  const getContent = (state: AnalysisState) => {
+    type AlertType = "warning" | "error" | "success" | undefined;
+    let type: AlertType = undefined;
+    switch (state) {
+      case AnalysisState.PENDING:
+        type = "warning";
+        break;
+      case AnalysisState.ERROR:
+        type = "error";
+        break;
+      case AnalysisState.SUCCESS:
+        type = "success";
+        break;
     }
-    if (state === "pending") {
-      return (
-        <Alert message="Analysis state : pending" type="warning" showIcon />
-      );
-    }
-    if (state === "finished") {
-      return (
-        <Alert message="Analysis state : finished" type="success" showIcon />
-      );
-    }
+    return <Alert message={`Analysis state : ${state}`} type={type} showIcon />;
   };
 
   if (loading) {
     return (
       <CenteredWrapper>
         <Spin
-          tip="Retrieving your videos..."
+          tip="Retrieving your analysis..."
           size="large"
           style={{ marginTop: "25vh" }}
         />
@@ -50,9 +62,10 @@ const Dashboard = () => {
   if (data.length === 0) {
     return (
       <CenteredWrapper>
-        <Title style={{ marginTop: "25vh" }}>No analysis to display</Title>
+        <Empty description={false} style={{ marginTop: "15vh" }} />
+        <Title style={{ marginTop: 15 }}>No analysis to display</Title>
         <Link to="/record">
-          <Button type="primary" style={{ marginTop: 15 }}>
+          <Button type="primary" style={{ marginTop: 25 }}>
             Record a video
           </Button>
         </Link>
@@ -66,6 +79,8 @@ const Dashboard = () => {
         display: "flex",
         flexDirection: "row",
         flexWrap: "wrap",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
       {data.map((analysis) => (
