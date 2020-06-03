@@ -81,12 +81,19 @@ def plot_pitch(output_path):
     plt.savefig(output_path)
 
 
+def reduce_size_amplitude(amplitude, step=1000):
+    abscisse = np.array_split(amplitude.xs(), step)
+    ordonnee = np.array_split(list(snd.values.T), step)
+    moyenne_abscisse = [np.mean(x) for x in abscisse]
+    moyenne_ordonnee = [np.mean(x) for x in ordonnee]
+    data = {"amplitude_x": moyenne_abscisse,
+            "amplitude_y": moyenne_ordonnee}
+    return(pd.DataFrame(data, columns=['amplitude_x', 'amplitude_y']))
+
+
 def print_amplitude_data():
-    np.savetxt(sys.stdout.buffer, [0.0], fmt='%.2f')
-    # data = {"amplitude_x": snd.xs(),
-    #         "amplitude_y": list(snd.values.T)}
-    # dataframe = pd.DataFrame(data, columns=['amplitude_x', 'amplitude_y'])
-    # np.savetxt(sys.stdout.buffer, snd.values.T, fmt='%.2f')
+    dataframe = reduce_size_amplitude(snd, step=1000)
+    np.savetxt(sys.stdout.buffer, dataframe, fmt='%.2f')
 
 
 def print_intensity_data():

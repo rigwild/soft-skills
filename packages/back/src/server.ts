@@ -2,7 +2,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 
 import router from './router'
-import { SERVER_PORT } from './config'
+import { SERVER_PORT, UPLOADS_DIR } from './config'
 import { connectDb } from './database'
 import { errorHandler } from './middlewares'
 
@@ -34,8 +34,8 @@ app.use(
     abortOnLimit: true,
     limits: { fileSize: 20971520 },
     safeFileNames: true,
-    preserveExtension: true,
-    createParentPath: './uploads'
+    preserveExtension: 4, // 4 to support `.webm`
+    createParentPath: UPLOADS_DIR
   })
 )
 

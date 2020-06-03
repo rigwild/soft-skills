@@ -25,7 +25,11 @@ export const analyzeAudio = async (audioFile: string, uniqueId: string) => {
     pitchPlotFile: r(UPLOADS_DIR, `${uniqueId}_pitch.png`)
   }
 
-  pool.queue(async ({ getAmplitude }: WorkerMethods) => (data.amplitude = await getAmplitude(audioFile)))
+  // Repair video metadatas with ffmpeg to make sure it is correct
+  pool.queue(async ({ ffmpegRepair }: WorkerMethods) => ffmpegRepair(audioFile))
+  await pool.completed()
+
+  // Parallelized audio analyzis
   pool.queue(async ({ getIntensity }: WorkerMethods) => (data.intensity = await getIntensity(audioFile)))
   pool.queue(async ({ getPitch }: WorkerMethods) => (data.pitch = await getPitch(audioFile)))
   pool.queue(async ({ getAmplitudePlot }: WorkerMethods) => getAmplitudePlot(audioFile, data.amplitudePlotFile))

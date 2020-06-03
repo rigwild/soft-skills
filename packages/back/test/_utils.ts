@@ -1,5 +1,4 @@
 import path from 'path'
-import fs from 'fs'
 import _test, { TestInterface, Implementation } from 'ava'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
@@ -10,7 +9,6 @@ import { app } from '../src/server'
 import { UserModel } from '../src/database/models/User'
 import { AnalyzisModel } from '../src/database/models/Analyzis'
 import type { User, UploadAnalyzedAudio } from '../src/types'
-import { UPLOADS_DIR } from '../src/config'
 
 export type TestContext = {
   app: Express

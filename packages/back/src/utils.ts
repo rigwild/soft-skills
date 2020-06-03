@@ -50,6 +50,7 @@ export const videoMimeTypes = new Set([
   'video/webm',
   'video/x-flv',
   'video/x-m4v',
+  'video/x-matroska',
   'video/x-ms-wmv',
   'video/x-msvideo'
 ])
