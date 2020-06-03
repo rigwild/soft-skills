@@ -44,16 +44,16 @@ export const beforeEach: Implementation<TestContext> = async t => {
     uploads: [
       {
         _id: '5ed65e7142905c4a917be028',
-        name: 'PtCLcgRs__NW001.mp3',
-        mimeType: 'audio/mpeg',
-        size: 339216,
+        name: 'PtCLcgRs__VIDEO.mp4',
+        mimeType: 'video/mp4',
+        size: 383631,
         state: 'finished',
         analyzisId: '5ece960cfe6ce42d24ef6bec'
       }
     ],
     joinDate: new Date('2020-06-02T12:15:04.853Z')
   }
-  t.context.testFilePath = path.resolve(__dirname, '_NW001.mp3')
+  t.context.testFilePath = path.resolve(__dirname, '_VIDEO.mp4')
   t.context.testAnalyzisData = {
     uniqueId: 'PtCLcgRs',
     amplitude: [[0, 0]],
@@ -63,16 +63,15 @@ export const beforeEach: Implementation<TestContext> = async t => {
     amplitudePlotFile: 'PtCLcgRs_amplitude.png',
     intensityPlotFile: 'PtCLcgRs_intensity.png',
     pitchPlotFile: 'PtCLcgRs_pitch.png',
-    name: 'PtCLcgRs__NW001.mp3',
-    size: 339216,
-    mimeType: 'audio/mpeg',
+    name: 'PtCLcgRs__VIDEO.mp4',
+    size: 383631,
+    mimeType: 'video/mp4',
     userId: '5ece75285e8a084208e0b0c4',
     analyzisDate: new Date('2020-06-02T12:24:04.853Z')
   }
   t.context.token =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZWNlOTYwY2ZlNmNlNDJkMjRlZjZiZWEiLCJlbWFpbCI6InRlc3R1c2VyXzEyMzRAZXhhbXBsZS5jb20iLCJuYW1lIjoidGVzdCIsImlhdCI6MTU5MDU5NzE1NX0.4kxSkN5z4H37X7c4SzeQnG16X_qJFe0uc_L6L-wFkgM'
 
-  await fs.promises.mkdir(UPLOADS_DIR, { recursive: true })
   await UserModel.create({
     ...t.context.testUserData,
     password: await bcrypt.hash(t.context.testUserData.password, 1)
@@ -84,7 +83,6 @@ export const beforeEach: Implementation<TestContext> = async t => {
 export const afterEachAlways: Implementation<TestContext> = async () => {
   await UserModel.deleteMany({})
   await AnalyzisModel.deleteMany({})
-  // await fs.promises.rmdir(UPLOADS_DIR, { recursive: true })
 }
 
 // Disconnect MongoDB and mongoose after all tests are done
