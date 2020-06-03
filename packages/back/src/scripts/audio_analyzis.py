@@ -7,9 +7,20 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+from moviepy.editor import *
+
 # Usage:
 #     python3 audio_analyzis.py <audio_file_path> generate_plot_file <amplitude|intensity|pitch> <output_file>
 #     python3 audio_analyzis.py <audio_file_path> print_raw_data <amplitude|intensity|pitch>
+
+
+def convert_video_to_audio(video):
+    file_path = video
+    video = VideoFileClip(video)
+    audio = video.audio
+    audio_file_name = file_path + ".mp3"
+    audio.write_audiofile(audio_file_name, verbose=False, logger=None)
+    return(audio_file_name)
 
 
 def draw_spectrogram(spectrogram, dynamic_range=70):
@@ -70,6 +81,22 @@ def plot_pitch(output_path):
     plt.savefig(output_path)
 
 
+def print_amplitude_data():
+    np.savetxt(sys.stdout.buffer, [0.0], fmt='%.2f')
+    # data = {"amplitude_x": snd.xs(),
+    #         "amplitude_y": list(snd.values.T)}
+    # dataframe = pd.DataFrame(data, columns=['amplitude_x', 'amplitude_y'])
+    # np.savetxt(sys.stdout.buffer, snd.values.T, fmt='%.2f')
+
+
+def print_intensity_data():
+    intensity = snd.to_intensity()
+    data = {"intensity_x": intensity.xs(),
+            "intensity_y": list(intensity.values.T)}
+    dataframe = pd.DataFrame(data, columns=['intensity_x', 'intensity_y'])
+    np.savetxt(sys.stdout.buffer, intensity.values.T, fmt='%.2f')
+
+
 def print_pitch_data():
     pitch = snd.to_pitch()
     data = {"pitch_x": pitch.xs(),
@@ -77,21 +104,13 @@ def print_pitch_data():
     dataframe = pd.DataFrame(data, columns=['pitch_x', 'pitch_y'])
     np.savetxt(sys.stdout.buffer, dataframe, fmt='%.2f')
 
-# FIXME: Exception: Data must be 1-dimensional
-# def print_intensity_data():
-#     intensity = snd.to_intensity()
-#     data = {"intensity_x": intensity.xs(),
-#             "intensity_y": intensity.values.T}
-#     dataframe = pd.DataFrame(data, columns=['intensity_x', 'intensity_y'])
-#     np.savetxt(sys.stdout.buffer, intensity.values.T, fmt='%.2f')
-
 
 if len(sys.argv) < 2 or sys.argv[1] == '-h' or sys.argv[1] == '--help' or sys.argv[1] == 'help':
     print("""Usage:
     python3 audio_analyzis.py <audio_file_path> generate_plot_file <amplitude|intensity|pitch> <output_file>
     python3 audio_analyzis.py <audio_file_path> print_raw_data <amplitude|intensity|pitch>""")
 else:
-    audio_file = sys.argv[1]
+    audio_file = convert_video_to_audio(sys.argv[1])
     command = sys.argv[2]
     sns.set()  # Use seaborn's default style to make attractive graphs
     snd = parselmouth.Sound(audio_file)
@@ -107,10 +126,8 @@ else:
     elif command == 'print_raw_data':
         needed_data = sys.argv[3]
         if needed_data == 'amplitude':
-            print('0.0 0.0')
-            # print_amplitude_data() FIXME: Get real raw data
+            print_amplitude_data()
         elif needed_data == 'intensity':
-            print('0.0 0.0')
-            # print_intensity_data() FIXME: Get real raw data
+            print_intensity_data()
         if needed_data == 'pitch':
             print_pitch_data()

@@ -2,3 +2,4 @@ praat-parselmouth
 matplotlib
 seaborn
 pandas
+moviepy
