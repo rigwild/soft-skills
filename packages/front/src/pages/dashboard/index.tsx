@@ -1,10 +1,14 @@
-import { Card, Spin, Alert, Typography, Button, Empty } from "antd";
+import { Alert, Button, Card, Empty, Spin, Typography } from "antd";
 import { getUploads } from "api/upload";
+import { AxiosError, AxiosResponse } from "axios";
 import CenteredWrapper from "components/centeredwrapper";
-import React, { useEffect, useState } from "react";
+import { getErrorMessage } from "functions/error";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const { Title } = Typography;
+
+const POLLING_INTERVAL = 10000;
 
 enum AnalysisState {
   PENDING = "pending",
@@ -18,17 +22,38 @@ type Analysis = {
   state: AnalysisState;
 };
 
+type AnalysisResponse = {
+  data: Analysis[];
+};
+
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<Analysis[]>([]);
+  const [analyses, setAnalyses] = useState<Analysis[]>([]);
+  const [error, setError] = useState<string | undefined>(undefined);
+
+  const fetchAnalyses = useCallback(() => {
+    getUploads()
+      .then((res: AxiosResponse<AnalysisResponse>) => {
+        const analyses: Analysis[] = res.data.data;
+        const hasPending = analyses.find(
+          (analysis) => analysis.state === AnalysisState.PENDING
+        );
+        if (hasPending) {
+          setTimeout(() => fetchAnalyses(), POLLING_INTERVAL);
+        }
+        setAnalyses(analyses);
+      })
+      .catch((error: AxiosError) => {
+        const errorMessage = getErrorMessage(error);
+        setError(errorMessage);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
     setLoading(true);
-    getUploads()
-      .then((res) => setData(res.data.data))
-      .catch((err) => console.log(err))
-      .finally(() => setLoading(false));
-  }, []);
+    fetchAnalyses();
+  }, [fetchAnalyses]);
 
   const getContent = (state: AnalysisState) => {
     type AlertType = "warning" | "error" | "success" | undefined;
@@ -51,7 +76,7 @@ const Dashboard = () => {
     return (
       <CenteredWrapper>
         <Spin
-          tip="Retrieving your analysis..."
+          tip="Retrieving your analyses..."
           size="large"
           style={{ marginTop: "25vh" }}
         />
@@ -59,7 +84,21 @@ const Dashboard = () => {
     );
   }
 
-  if (data.length === 0) {
+  if (error) {
+    return (
+      <CenteredWrapper>
+        <Alert
+          message="An error occurred"
+          description={error}
+          type="error"
+          showIcon
+          style={{ marginTop: 50 }}
+        />
+      </CenteredWrapper>
+    );
+  }
+
+  if (analyses.length === 0) {
     return (
       <CenteredWrapper>
         <Empty description={false} style={{ marginTop: "15vh" }} />
@@ -83,13 +122,13 @@ const Dashboard = () => {
         alignItems: "center",
       }}
     >
-      {data.map((analysis) => (
+      {analyses.map((analysis) => (
         <Card
           key={analysis._id}
           title={analysis.name}
           extra={
             <Link to={`/analysis/${analysis._id}`} style={{ marginTop: 25 }}>
-              Analysis
+              Details
             </Link>
           }
           style={{ width: 300, margin: 15 }}
