@@ -2,6 +2,7 @@ import "antd/dist/antd.css";
 import Layout from "components/layout";
 import PrivateRoute from "components/route";
 import { AuthContextProvider } from "context";
+import Analysis from "pages/analysis";
 import Dashboard from "pages/dashboard";
 import Home from "pages/home";
 import Login from "pages/login";
@@ -35,6 +36,9 @@ const App = () => (
           </PrivateRoute>
           <PrivateRoute path="/profile">
             <Profile />
+          </PrivateRoute>
+          <PrivateRoute path="/analysis/:id">
+            <Analysis />
           </PrivateRoute>
           <Route path="*">
             <NoMatch />
