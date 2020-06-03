@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start": "node dist/index.js",
-    "build": "tsc",
+    "build": "tsc && cp src/scripts/audio_analyzis.py dist/scripts/audio_analyzis.py",
     "dev": "nodemon",
     "start:dev": "ts-node src/index.ts",
     "lint": "eslint --ext .ts ./src ./test --fix",
