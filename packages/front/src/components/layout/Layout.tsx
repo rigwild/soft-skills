@@ -19,7 +19,7 @@ const Layout = (props: Props) => {
   const location = useLocation();
   const { loggedIn, logout } = useContext(AuthContext);
   return (
-    <AntLayout style={{ height: "100vh" }}>
+    <AntLayout style={{ minHeight: "100vh", height: "100%" }}>
       <Header style={{ position: "fixed", zIndex: 1, width: "100%" }}>
         <div
           style={{
@@ -89,7 +89,11 @@ const Layout = (props: Props) => {
       </Header>
       <Content style={{ padding: "0 50px", marginTop: 100 }}>
         <div
-          style={{ padding: 24, minHeight: "100%", backgroundColor: "white" }}
+          style={{
+            padding: 24,
+            minHeight: "80vh",
+            backgroundColor: "white",
+          }}
         >
           {props.children}
         </div>
