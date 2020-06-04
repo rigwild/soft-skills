@@ -1,14 +1,16 @@
 # soft-skills back-end
 
 ## Requirements
- - Node.js v10+
- - Python v3+
+ - [Node.js](https://nodejs.org/) v10+
+ - [Python](https://www.python.org/) v3+
+ - [ffmpeg](https://ffmpeg.org/)
 
 ## Install
 
 ```sh
 yarn # or npm i -D
 pip3 install -r requirements.txt
+sudo apt install ffmpeg
 ```
 
 ## Build
@@ -54,7 +56,7 @@ yarn lint
 npm run lint
 ```
 
-### Database
+### Running a MongoDB instance using Docker
 
 ```sh
 docker pull mongo

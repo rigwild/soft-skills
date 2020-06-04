@@ -3,9 +3,9 @@ import { body } from 'express-validator'
 
 import { asyncMiddleware, authenticatedMiddleware, injectUserDocMiddleware } from './middlewares'
 import authController from './controllers/auth.controller'
-import analyzisController from './controllers/analyzis.controller'
+import analysisController from './controllers/analysis.controller'
 import profileController from './controllers/profile.controller'
-import type { AudioAnalyzisData } from './types'
+import type { AudioAnalysisData } from './types'
 
 const router = Router()
 
@@ -89,10 +89,10 @@ router.post(
   asyncMiddleware(authController.register)
 )
 
-router.post('/upload', authenticatedMiddleware(), asyncMiddleware(analyzisController.upload))
+router.post('/upload', authenticatedMiddleware(), asyncMiddleware(analysisController.upload))
 
 /**
- * @api {post} /uploads Upload a file for analyzis
+ * @api {post} /uploads Upload a file for analysis
  * @apiVersion 0.1.0
  * @apiName UploadFile
  * @apiGroup Uploads
@@ -126,10 +126,10 @@ router.post('/upload', authenticatedMiddleware(), asyncMiddleware(analyzisContro
  *   "message": "You need to send an audio or video file."
  * }
  */
-router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(analyzisController.upload))
+router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(analysisController.upload))
 
 /**
- * @api {get} /uploads Get the list of all files sent for analyzis
+ * @api {get} /uploads Get the list of all files sent for analysis
  * @apiVersion 0.1.0
  * @apiName UploadedFiles
  * @apiGroup Uploads
@@ -154,7 +154,7 @@ router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(analyzisContr
  *     },
  *     {
  *       "state": "finished",
- *       "analyzisId": "5ed66cc0dbaee47acd2c1063",
+ *       "analysisId": "5ed66cc0dbaee47acd2c1063",
  *       "_id": "5ed66cc0dbaee47acd2c1065",
  *       "name": "ch_662tF__NW001.mp3",
  *       "size": 339216,
@@ -163,15 +163,15 @@ router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(analyzisContr
  *   ]
  * }
  */
-router.get('/uploads', authenticatedMiddleware(), asyncMiddleware(analyzisController.getUploads))
+router.get('/uploads', authenticatedMiddleware(), asyncMiddleware(analysisController.getUploads))
 
 /**
- * @api {get} /analyzis/:analyzis Load an analyzis data
+ * @api {get} /analysis/:analysis Load an analysis data
  * @apiVersion 0.1.0
- * @apiName AnalyzisData
- * @apiGroup Analyzis
+ * @apiName AnalysisData
+ * @apiGroup Analysis
  *
- * @apiParam {String} analyzisId Analyzis id
+ * @apiParam {String} analysisId Analysis id
  *
  * @apiSuccessExample {json} Success-Response:
  * HTTP/1.1 200 OK
@@ -195,45 +195,45 @@ router.get('/uploads', authenticatedMiddleware(), asyncMiddleware(analyzisContro
  *     "size": 339216,
  *     "mimeType": "audio/mpeg",
  *     "userId": "5ece75285e8a084208e0b0c4",
- *     "analyzisDate": "2020-06-02T15:14:24.182Z"
+ *     "analysisDate": "2020-06-02T15:14:24.182Z"
  *   }
  * }
  *
- * @apiError {Error} NotFound Analyzis not found.
+ * @apiError {Error} NotFound Analysis not found.
  * @apiErrorExample {json} Error-Response:
  * HTTP/1.1 404 Not Found
  * {
- *   "message": "Analyzis not found."
+ *   "message": "Analysis not found."
  * }
  */
-router.get<{ analyzisId: string }>(
-  '/analyzis/:analyzisId',
+router.get<{ analysisId: string }>(
+  '/analysis/:analysisId',
   authenticatedMiddleware(),
   // @ts-ignore
-  asyncMiddleware(analyzisController.getAnalyzis)
+  asyncMiddleware(analysisController.getAnalysis)
 )
 
 /**
- * @api {get} /analyzis/:analyzis/:dataType Load an analyzis data file
+ * @api {get} /analysis/:analysis/:dataType Load an analysis data file
  * @apiVersion 0.1.0
- * @apiName AnalyzisData
- * @apiGroup Analyzis
+ * @apiName AnalysisData
+ * @apiGroup Analysis
  *
- * @apiParam {String} analyzisId Analyzis id
- * @apiParam {String} dataType Type of data to load - { `file` } = original analyzed file, { `amplitude` | `intensity` | `pitch` } = plot image file
+ * @apiParam {String} analysisId Analysis id
+ * @apiParam {String} dataType Type of data to load - { `file` } = original analysed file, { `amplitude` | `intensity` | `pitch` } = plot image file
  *
  * @apiExample Example-usage:
- * GET /analyzis/5ed66cc0dbaee47acd2c1063/amplitude
+ * GET /analysis/5ed66cc0dbaee47acd2c1063/amplitude
  *
  * @apiSuccessExample {File} Success-Response:
  * HTTP/1.1 200 OK
  * BinaryData
  *
- * @apiError {Error} NotFound Analyzis not found.
+ * @apiError {Error} NotFound Analysis not found.
  * @apiErrorExample {json} Error-Response:
  * HTTP/1.1 404 Not Found
  * {
- *   "message": "Analyzis not found."
+ *   "message": "Analysis not found."
  * }
  *
  * @apiError {Error} BadDataType Invalid data type
@@ -243,18 +243,18 @@ router.get<{ analyzisId: string }>(
  *   "message": "Invalid plot data type."
  * }
  *
- * @apiError {Error} DataTypeNotAvailable Data type not available for this analyzis (i.e. you ask for a video-specific analyzis data type on an audio analyzis)
+ * @apiError {Error} DataTypeNotAvailable Data type not available for this analysis (i.e. you ask for a video-specific analysis data type on an audio analysis)
  * @apiErrorExample {json} Error-Response:
  * HTTP/1.1 409 Conflict
  * {
- *   "message": "Asked data type is not available in this analyzis."
+ *   "message": "Asked data type is not available in this analysis."
  * }
  */
-router.get<{ analyzisId: string; dataType: AudioAnalyzisData | 'file' }>(
-  '/analyzis/:analyzisId/:dataType',
+router.get<{ analysisId: string; dataType: AudioAnalysisData | 'file' }>(
+  '/analysis/:analysisId/:dataType',
   authenticatedMiddleware(),
   // @ts-ignore
-  asyncMiddleware(analyzisController.getAnalyzisPlotFile)
+  asyncMiddleware(analysisController.getAnalysisPlotFile)
 )
 
 /**

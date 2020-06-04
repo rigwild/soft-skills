@@ -1,10 +1,10 @@
 import mongoose, { Schema } from 'mongoose'
 
-import type { UploadAnalyzedAudio } from '../../types'
+import type { UploadAnalysedAudio } from '../../types'
 
-export type AnalyzisDocument = UploadAnalyzedAudio & mongoose.Document
+export type AnalysisDocument = UploadAnalysedAudio & mongoose.Document
 
-export const AnalyzisSchema = new Schema({
+export const AnalysisSchema = new Schema({
   userId: { type: String, required: true },
 
   name: { type: String, required: true, unique: true },
@@ -18,10 +18,10 @@ export const AnalyzisSchema = new Schema({
   intensityPlotFile: { type: String, required: true },
   pitchPlotFile: { type: String, required: true },
 
-  analyzisDate: {
+  analysisDate: {
     type: Date,
     default: () => new Date()
   }
 })
 
-export const AnalyzisModel = mongoose.model<AnalyzisDocument>('Analyzis', AnalyzisSchema)
+export const AnalysisModel = mongoose.model<AnalysisDocument>('Analysis', AnalysisSchema)

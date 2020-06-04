@@ -7,14 +7,14 @@ import type { Express } from 'express'
 
 import { app } from '../src/server'
 import { UserModel } from '../src/database/models/User'
-import { AnalyzisModel } from '../src/database/models/Analyzis'
-import type { User, UploadAnalyzedAudio } from '../src/types'
+import { AnalysisModel } from '../src/database/models/Analysis'
+import type { User, UploadAnalysedAudio } from '../src/types'
 
 export type TestContext = {
   app: Express
   testUserData: User
   testFilePath: string
-  testAnalyzisData: UploadAnalyzedAudio & { uniqueId: string }
+  testAnalysisData: UploadAnalysedAudio & { uniqueId: string }
   token: string
 }
 export const test = _test as TestInterface<TestContext>
@@ -46,13 +46,13 @@ export const beforeEach: Implementation<TestContext> = async t => {
         mimeType: 'video/mp4',
         size: 383631,
         state: 'finished',
-        analyzisId: '5ece960cfe6ce42d24ef6bec'
+        analysisId: '5ece960cfe6ce42d24ef6bec'
       }
     ],
     joinDate: new Date('2020-06-02T12:15:04.853Z')
   }
   t.context.testFilePath = path.resolve(__dirname, '_VIDEO.mp4')
-  t.context.testAnalyzisData = {
+  t.context.testAnalysisData = {
     uniqueId: 'PtCLcgRs',
     amplitude: [[0, 0]],
     intensity: [[0, 0]],
@@ -65,7 +65,7 @@ export const beforeEach: Implementation<TestContext> = async t => {
     size: 383631,
     mimeType: 'video/mp4',
     userId: '5ece75285e8a084208e0b0c4',
-    analyzisDate: new Date('2020-06-02T12:24:04.853Z')
+    analysisDate: new Date('2020-06-02T12:24:04.853Z')
   }
   t.context.token =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZWNlOTYwY2ZlNmNlNDJkMjRlZjZiZWEiLCJlbWFpbCI6InRlc3R1c2VyXzEyMzRAZXhhbXBsZS5jb20iLCJuYW1lIjoidGVzdCIsImlhdCI6MTU5MDU5NzE1NX0.4kxSkN5z4H37X7c4SzeQnG16X_qJFe0uc_L6L-wFkgM'
@@ -74,13 +74,13 @@ export const beforeEach: Implementation<TestContext> = async t => {
     ...t.context.testUserData,
     password: await bcrypt.hash(t.context.testUserData.password, 1)
   })
-  await AnalyzisModel.create({ ...t.context.testAnalyzisData })
+  await AnalysisModel.create({ ...t.context.testAnalysisData })
 }
 
 // Clean up database after every test
 export const afterEachAlways: Implementation<TestContext> = async () => {
   await UserModel.deleteMany({})
-  await AnalyzisModel.deleteMany({})
+  await AnalysisModel.deleteMany({})
 }
 
 // Disconnect MongoDB and mongoose after all tests are done
