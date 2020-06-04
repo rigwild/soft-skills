@@ -41,7 +41,7 @@ const AnalysisContainer = (props: Props) => {
         const analysisData = res[0].data.data;
         const analysis: Analysis = {
           name: analysisData.name,
-          date: new Date(analysisData.analyzisDate).toLocaleDateString("en-CA"),
+          date: new Date(analysisData.analysisDate).toLocaleDateString("en-CA"),
           amplitude: analysisData.amplitude.flat(),
           pitch: analysisData.pitch.map((pitchData: number[]) => {
             return { x: pitchData[0], y: pitchData[1] };

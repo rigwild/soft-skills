@@ -15,13 +15,13 @@ export const getUploads = () => {
 };
 
 export const getAnalysis = (id: string) => {
-  return axiosInstance.get(`/analyzis/${id}`, {
+  return axiosInstance.get(`/analysis/${id}`, {
     headers: getAuthorizationHeaders(),
   });
 };
 
 export const getAnalysisDataFile = (id: string, dataType: string) => {
-  return axiosInstance.get(`/analyzis/${id}/${dataType}`, {
+  return axiosInstance.get(`/analysis/${id}/${dataType}`, {
     headers: getAuthorizationHeaders(),
     responseType: "blob",
   });
