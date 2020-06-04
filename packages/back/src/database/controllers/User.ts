@@ -149,23 +149,23 @@ export const UserController = {
    * @param uploadId The state of an upload
    * @param fileName Uploaded file to edit state from
    * @param newState New state of the upload
-   * @param analyzisId ID of analyzis if state = finished
+   * @param analysisId ID of analysis if state = finished
    */
   async setUploadState(
     userId: string,
     uploadId: string,
     fileName: Upload['name'],
     newState: Upload['state'],
-    analyzisId?: string
+    analysisId?: string
   ) {
     // Add the upload to the user uploads list
     const userDoc = await UserModel.findOneAndUpdate(
       { _id: userId, 'uploads._id': uploadId },
-      { 'uploads.$.state': newState, 'uploads.$.analyzisId': analyzisId },
+      { 'uploads.$.state': newState, 'uploads.$.analysisId': analysisId },
       { new: true }
     )
 
-    if (!userDoc) throw boom.internal('Unexpected error when setting analyzis state.')
+    if (!userDoc) throw boom.internal('Unexpected error when setting analysis state.')
 
     this.log(
       `Edited an upload state. user=${userDoc.email}, id=${userDoc._id}, fileName=${fileName}, newState=${newState}`

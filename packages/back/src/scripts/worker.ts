@@ -5,10 +5,10 @@ import { promises as fs } from 'fs'
 import execa from 'execa'
 
 import { UPLOADS_DIR } from '../config'
-import type { AudioAnalyzisData } from '../types'
+import type { AudioAnalysisData } from '../types'
 
 const scripts = {
-  audioAnalyzis: r(__dirname, 'audio_analyzis.py')
+  audioAnalysis: r(__dirname, 'audio_analysis.py')
 }
 
 // Repair broken blob video metadata
@@ -25,18 +25,18 @@ const py = async (script: string, ...args: string[]) =>
   (await execa('python3', [script, ...args], { timeout: 120_000 })).stdout
 const pyCsv = async (script: string, ...args: string[]) => csv(await py(script, ...args))
 
-const audioAnalyzis = async (file: string, data: AudioAnalyzisData) =>
-  pyCsv(scripts.audioAnalyzis, file, 'print_raw_data', data)
-const audioAnalyzisPlot = (file: string, outputFile: string, data: AudioAnalyzisData) =>
-  py(scripts.audioAnalyzis, file, 'generate_plot_file', data, outputFile)
+const audioAnalysis = async (file: string, data: AudioAnalysisData) =>
+  pyCsv(scripts.audioAnalysis, file, 'print_raw_data', data)
+const audioAnalysisPlot = (file: string, outputFile: string, data: AudioAnalysisData) =>
+  py(scripts.audioAnalysis, file, 'generate_plot_file', data, outputFile)
 
-const getAmplitude = (file: string) => audioAnalyzis(file, 'amplitude')
-const getIntensity = (file: string) => audioAnalyzis(file, 'intensity')
-const getPitch = (file: string) => audioAnalyzis(file, 'pitch')
+const getAmplitude = (file: string) => audioAnalysis(file, 'amplitude')
+const getIntensity = (file: string) => audioAnalysis(file, 'intensity')
+const getPitch = (file: string) => audioAnalysis(file, 'pitch')
 
-const getAmplitudePlot = (file: string, outputFile: string) => audioAnalyzisPlot(file, outputFile, 'amplitude')
-const getIntensityPlot = (file: string, outputFile: string) => audioAnalyzisPlot(file, outputFile, 'intensity')
-const getPitchPlot = (file: string, outputFile: string) => audioAnalyzisPlot(file, outputFile, 'pitch')
+const getAmplitudePlot = (file: string, outputFile: string) => audioAnalysisPlot(file, outputFile, 'amplitude')
+const getIntensityPlot = (file: string, outputFile: string) => audioAnalysisPlot(file, outputFile, 'intensity')
+const getPitchPlot = (file: string, outputFile: string) => audioAnalysisPlot(file, outputFile, 'pitch')
 
 const workerMethods = {
   ffmpegRepair,

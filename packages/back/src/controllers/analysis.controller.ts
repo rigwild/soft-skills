@@ -5,10 +5,10 @@ import { nanoid } from 'nanoid'
 
 import { UPLOADS_DIR } from '../config'
 import { UserController } from '../database/controllers/User'
-import { analyzeAudio } from '../scripts/runner'
+import { analyseAudio } from '../scripts/runner'
 import { isAllowedMimeType } from '../utils'
-import { AnalyzisController } from '../database/controllers/Analyzis'
-import type { RequestAuthed, Upload, UploadDB, AudioAnalyzisData } from '../types'
+import { AnalysisController } from '../database/controllers/Analysis'
+import type { RequestAuthed, Upload, UploadDB, AudioAnalysisData } from '../types'
 
 export class UploadController {
   public async upload(reqRaw: RequestAuthed, res: Response) {
@@ -39,25 +39,25 @@ export class UploadController {
       }
     })
 
-    // Start a background analyzis
+    // Start a background analysis
     try {
-      // TODO: Support video analyzis
+      // TODO: Support video analysis
       if (process.env.NODE_ENV !== 'test')
         console.log(
-          `${new Date().toJSON()} - Starting analyzis for file "${content.name}" from user=${req.session.email}`
+          `${new Date().toJSON()} - Starting analysis for file "${content.name}" from user=${req.session.email}`
         )
-      const analyzis = await analyzeAudio(file, uniqueId)
+      const analysis = await analyseAudio(file, uniqueId)
 
       // Convert file paths to only file names
-      analyzis.amplitudePlotFile = path.basename(analyzis.amplitudePlotFile)
-      analyzis.intensityPlotFile = path.basename(analyzis.intensityPlotFile)
-      analyzis.pitchPlotFile = path.basename(analyzis.pitchPlotFile)
+      analysis.amplitudePlotFile = path.basename(analysis.amplitudePlotFile)
+      analysis.intensityPlotFile = path.basename(analysis.intensityPlotFile)
+      analysis.pitchPlotFile = path.basename(analysis.pitchPlotFile)
 
       if (process.env.NODE_ENV !== 'test')
         console.log(
-          `${new Date().toJSON()} - Successful analyzis for file "${content.name}" from user=${req.session.email}`
+          `${new Date().toJSON()} - Successful analysis for file "${content.name}" from user=${req.session.email}`
         )
-      await AnalyzisController.addAnalyzis(req.session._id, uploadedData, analyzis)
+      await AnalysisController.addAnalysis(req.session._id, uploadedData, analysis)
     } catch (error) {
       // We catch all errors as a response was already sent
 
@@ -74,13 +74,13 @@ export class UploadController {
     res.json({ data: profile.uploads })
   }
 
-  public async getAnalyzis(req: RequestAuthed<{ analyzisId: string }>, res: Response) {
-    const analyzis = await AnalyzisController.find(req.params.analyzisId)
-    res.json({ data: analyzis.toObject({ versionKey: false }) })
+  public async getAnalysis(req: RequestAuthed<{ analysisId: string }>, res: Response) {
+    const analysis = await AnalysisController.find(req.params.analysisId)
+    res.json({ data: analysis.toObject({ versionKey: false }) })
   }
 
-  public async getAnalyzisPlotFile(
-    req: RequestAuthed<{ analyzisId: string; dataType: AudioAnalyzisData | 'file' }>,
+  public async getAnalysisPlotFile(
+    req: RequestAuthed<{ analysisId: string; dataType: AudioAnalysisData | 'file' }>,
     res: Response
   ) {
     const dataType = req.params.dataType
@@ -90,9 +90,9 @@ export class UploadController {
     if (!['file', 'amplitude', 'intensity', 'pitch'].some(x => x === dataType))
       throw boom.badRequest('Invalid plot data type.')
 
-    // Get analyzis data
-    const analyzis = await AnalyzisController.Model.findOne(
-      { _id: req.params.analyzisId, userId: req.session._id },
+    // Get analysis data
+    const analysis = await AnalysisController.Model.findOne(
+      { _id: req.params.analysisId, userId: req.session._id },
       {
         name: 1,
         amplitudePlotFile: 1,
@@ -100,23 +100,23 @@ export class UploadController {
         pitchPlotFile: 1
       }
     )
-    if (!analyzis) throw boom.notFound('Analyzis not found.')
+    if (!analysis) throw boom.notFound('Analysis not found.')
 
     if (dataType === 'file') {
       // Send the original file
-      res.sendFile(path.resolve(UPLOADS_DIR, analyzis.name))
+      res.sendFile(path.resolve(UPLOADS_DIR, analysis.name))
       return
-    } else if (!!analyzis[dataTypeKey]) {
+    } else if (!!analysis[dataTypeKey]) {
       // Send the plot image
-      res.sendFile(path.resolve(UPLOADS_DIR, analyzis[dataTypeKey]))
+      res.sendFile(path.resolve(UPLOADS_DIR, analysis[dataTypeKey]))
       return
     }
 
-    // Can be thrown if asked for a data type not available (i.e. a video data type for an audio analyzis)
-    throw boom.conflict('Asked data type is not available in this analyzis.')
+    // Can be thrown if asked for a data type not available (i.e. a video data type for an audio analysis)
+    throw boom.conflict('Asked data type is not available in this analysis.')
   }
 
-  // TODO: Add errored-out analyzis retry
+  // TODO: Add errored-out analysis retry
 }
 
 export default new UploadController()

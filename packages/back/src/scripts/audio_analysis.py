@@ -10,8 +10,8 @@ import seaborn as sns
 from moviepy.editor import *
 
 # Usage:
-#     python3 audio_analyzis.py <audio_file_path> generate_plot_file <amplitude|intensity|pitch> <output_file>
-#     python3 audio_analyzis.py <audio_file_path> print_raw_data <amplitude|intensity|pitch>
+#     python3 audio_analysis.py <audio_file_path> generate_plot_file <amplitude|intensity|pitch> <output_file>
+#     python3 audio_analysis.py <audio_file_path> print_raw_data <amplitude|intensity|pitch>
 
 
 def convert_video_to_audio(video):
@@ -114,8 +114,8 @@ def print_pitch_data():
 
 if len(sys.argv) < 2 or sys.argv[1] == '-h' or sys.argv[1] == '--help' or sys.argv[1] == 'help':
     print("""Usage:
-    python3 audio_analyzis.py <audio_file_path> generate_plot_file <amplitude|intensity|pitch> <output_file>
-    python3 audio_analyzis.py <audio_file_path> print_raw_data <amplitude|intensity|pitch>""")
+    python3 audio_analysis.py <audio_file_path> generate_plot_file <amplitude|intensity|pitch> <output_file>
+    python3 audio_analysis.py <audio_file_path> print_raw_data <amplitude|intensity|pitch>""")
 else:
     audio_file = convert_video_to_audio(sys.argv[1])
     command = sys.argv[2]
