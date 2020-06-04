@@ -1,7 +1,6 @@
 import { Alert, Button, Card, Empty, Spin, Typography } from "antd";
 import { getUploads } from "api/upload";
 import { AxiosError, AxiosResponse } from "axios";
-import CenteredWrapper from "components/centeredwrapper";
 import { getErrorMessage } from "functions/error";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -75,33 +74,29 @@ const DashboardContainer = () => {
 
   if (loading) {
     return (
-      <CenteredWrapper>
-        <Spin
-          tip="Retrieving your analyses..."
-          size="large"
-          style={{ marginTop: "25vh" }}
-        />
-      </CenteredWrapper>
+      <Spin
+        tip="Retrieving your analyses..."
+        size="large"
+        style={{ marginTop: "25vh" }}
+      />
     );
   }
 
   if (error) {
     return (
-      <CenteredWrapper>
-        <Alert
-          message="An error occurred"
-          description={error}
-          type="error"
-          showIcon
-          style={{ marginTop: "25vh" }}
-        />
-      </CenteredWrapper>
+      <Alert
+        message="An error occurred"
+        description={error}
+        type="error"
+        showIcon
+        style={{ marginTop: "25vh" }}
+      />
     );
   }
 
   if (analyses.length === 0) {
     return (
-      <CenteredWrapper>
+      <>
         <Empty description={false} style={{ marginTop: "15vh" }} />
         <Title style={{ marginTop: 15 }}>No analysis to display</Title>
         <Link to="/record">
@@ -109,7 +104,7 @@ const DashboardContainer = () => {
             Record a video
           </Button>
         </Link>
-      </CenteredWrapper>
+      </>
     );
   }
 
