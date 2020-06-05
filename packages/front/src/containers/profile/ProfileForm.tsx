@@ -3,6 +3,7 @@ import { deleteProfile, editProfile, getProfile } from "api/profile";
 import { AxiosError, AxiosResponse } from "axios";
 import ProfileForm from "components/profile";
 import { AuthContext } from "context";
+import { getErrorMessage } from "functions/error";
 import React, { useContext, useEffect, useState } from "react";
 
 type ProfileResponse = {
@@ -24,12 +25,7 @@ const ProfileContainer = () => {
   const [error, setError] = useState<string | undefined>(undefined);
 
   const handleError = (error: AxiosError) => {
-    let errorMessage: string = error.response?.data.message;
-    if (error.response?.status === 401) {
-      errorMessage = errorMessage
-        .concat(" ")
-        .concat("Please, log out and log in again.");
-    }
+    const errorMessage = getErrorMessage(error);
     setError(errorMessage);
   };
 

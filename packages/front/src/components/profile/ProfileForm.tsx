@@ -42,7 +42,7 @@ const ProfileForm = (props: Props) => {
   return (
     <>
       <div style={labelContainerStyle}>
-        <Text strong>Name :</Text>
+        <Text strong>Name:</Text>
         <Paragraph
           editable={!props.disabled && { onChange: props.setName }}
           style={{ marginLeft: 15, width: "80%" }}
@@ -51,11 +51,11 @@ const ProfileForm = (props: Props) => {
         </Paragraph>
       </div>
       <div style={labelContainerStyle}>
-        <Text strong>Email address :</Text>
+        <Text strong>Email address:</Text>
         <Paragraph style={{ marginLeft: 15 }}>{props.email}</Paragraph>
       </div>
       <div style={labelContainerStyle}>
-        <Text strong>Join date :</Text>
+        <Text strong>Join date:</Text>
         <Paragraph style={{ marginLeft: 15 }}>
           {new Date(props.joinDate).toLocaleDateString("en-CA")}
         </Paragraph>

@@ -1,5 +1,5 @@
-import { RedoOutlined, VideoCameraTwoTone } from "@ant-design/icons";
-import { Alert, Button, Spin, Statistic } from "antd";
+import { RedoOutlined, VideoCameraTwoTone, VideoCameraOutlined, ExperimentOutlined } from "@ant-design/icons";
+import { Button, Spin, Statistic } from "antd";
 import React, { MutableRefObject, RefObject, useRef, useState } from "react";
 import Webcam from "react-webcam";
 
@@ -10,7 +10,6 @@ enum RecorderState {
   READY,
   RECORDING,
   DISPLAY,
-  ERROR,
 }
 
 const FIVE_MINUTE_IN_MS = 5 * 60 * 1000;
@@ -21,13 +20,19 @@ const centeredDivStyle = {
   alignItems: "center",
 };
 
-const WebcamRecorder = () => {
+type Props = {
+  uploading: boolean;
+  setError: (error: string) => void;
+  uploadVideo: (video: Blob) => void;
+};
+
+const WebcamRecorder = (props: Props) => {
   const webcamRef: RefObject<Webcam | null> &
     RefObject<HTMLVideoElement | null> = useRef(null);
   const mediaRecorderRef: MutableRefObject<MediaRecorder | null> = useRef(null);
 
+  const [video, setVideo] = useState<Blob | undefined>(undefined);
   const [videoUrl, setVideoUrl] = useState("");
-  const [error, setError] = useState("");
   const [state, setState] = useState(RecorderState.LOADING);
 
   const handleStartRecording = () => {
@@ -50,6 +55,7 @@ const WebcamRecorder = () => {
       type: "video/webm",
     });
     const url = URL.createObjectURL(blob);
+    setVideo(blob);
     setVideoUrl(url);
     setState(RecorderState.DISPLAY);
   };
@@ -62,6 +68,7 @@ const WebcamRecorder = () => {
 
   const handleResetVideo = () => {
     window.URL.revokeObjectURL(videoUrl);
+    setVideo(undefined);
     setVideoUrl("");
     setState(RecorderState.LOADING);
   };
@@ -76,8 +83,7 @@ const WebcamRecorder = () => {
             ref={webcamRef}
             onUserMedia={() => setState(RecorderState.READY)}
             onUserMediaError={(mediaError) => {
-              setState(RecorderState.ERROR);
-              setError(mediaError.toString());
+              props.setError(`Webcam recorder ${mediaError.toString()}`);
             }}
           />
           {state === RecorderState.LOADING && (
@@ -92,8 +98,8 @@ const WebcamRecorder = () => {
     switch (state) {
       case RecorderState.READY:
         return (
-          <Button onClick={handleStartRecording} type="primary">
-            Start (5:00 maximum)
+          <Button onClick={handleStartRecording} type="primary" icon={<VideoCameraOutlined />}>
+            Start recording (5:00 maximum)
           </Button>
         );
       case RecorderState.RECORDING:
@@ -119,38 +125,29 @@ const WebcamRecorder = () => {
         return (
           <>
             <Button
-              onClick={handleResetVideo}
+              onClick={() => props.uploadVideo(video!)}
               type="primary"
               style={{ marginBottom: 15 }}
-              icon={<RedoOutlined />}
-            >
-              Delete and start again
+              icon={<ExperimentOutlined />}
+              disabled={props.uploading}
+              >
+              Send video for analysis
             </Button>
             <Button
-              onClick={() => console.log("Analysing video...")}
+              onClick={handleResetVideo}
               type="primary"
               danger
+              icon={<RedoOutlined />}
+              disabled={props.uploading}
             >
-              Send video for analysis
+              Delete and start again
             </Button>
           </>
         );
     }
   };
 
-  const displayError = () => {
-    return (
-      <Alert
-        message="An error occurred with the webcam recorder"
-        description={error}
-        type="error"
-        showIcon
-        style={{ marginTop: "25vh" }}
-      />
-    );
-  };
-
-  return state !== RecorderState.ERROR ? (
+  return (
     <>
       {displayMedia()}
       <div
@@ -163,8 +160,6 @@ const WebcamRecorder = () => {
         {displayControlButtons()}
       </div>
     </>
-  ) : (
-    displayError()
   );
 };
 

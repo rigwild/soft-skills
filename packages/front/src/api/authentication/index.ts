@@ -7,6 +7,7 @@ export const register = (name: string, email: string, password: string) => {
     password,
   });
 };
+
 export const login = (email: string, password: string) => {
   return axiosInstance.post("/login", {
     email,
