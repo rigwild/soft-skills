@@ -4,6 +4,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import { getErrorMessage } from "functions/error";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { VideoCameraAddOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;
 
@@ -69,7 +70,7 @@ const DashboardContainer = () => {
         type = "success";
         break;
     }
-    return <Alert message={`Analysis state : ${state}`} type={type} showIcon />;
+    return <Alert message={`Analysis state: ${state}`} type={type} showIcon />;
   };
 
   if (loading) {
@@ -100,7 +101,7 @@ const DashboardContainer = () => {
         <Empty description={false} style={{ marginTop: "15vh" }} />
         <Title style={{ marginTop: 15 }}>No analysis to display</Title>
         <Link to="/record">
-          <Button type="primary" style={{ marginTop: 25 }}>
+          <Button type="primary" style={{ marginTop: 25 }} icon={<VideoCameraAddOutlined />}>
             Record a video
           </Button>
         </Link>

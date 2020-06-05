@@ -1,4 +1,4 @@
-import { RedoOutlined, VideoCameraTwoTone } from "@ant-design/icons";
+import { RedoOutlined, VideoCameraTwoTone, VideoCameraOutlined, ExperimentOutlined } from "@ant-design/icons";
 import { Button, Spin, Statistic } from "antd";
 import React, { MutableRefObject, RefObject, useRef, useState } from "react";
 import Webcam from "react-webcam";
@@ -98,8 +98,8 @@ const WebcamRecorder = (props: Props) => {
     switch (state) {
       case RecorderState.READY:
         return (
-          <Button onClick={handleStartRecording} type="primary">
-            Start (5:00 maximum)
+          <Button onClick={handleStartRecording} type="primary" icon={<VideoCameraOutlined />}>
+            Start recording (5:00 maximum)
           </Button>
         );
       case RecorderState.RECORDING:
@@ -125,21 +125,22 @@ const WebcamRecorder = (props: Props) => {
         return (
           <>
             <Button
-              onClick={handleResetVideo}
+              onClick={() => props.uploadVideo(video!)}
               type="primary"
               style={{ marginBottom: 15 }}
+              icon={<ExperimentOutlined />}
+              disabled={props.uploading}
+              >
+              Send video for analysis
+            </Button>
+            <Button
+              onClick={handleResetVideo}
+              type="primary"
+              danger
               icon={<RedoOutlined />}
               disabled={props.uploading}
             >
               Delete and start again
-            </Button>
-            <Button
-              onClick={() => props.uploadVideo(video!)}
-              type="primary"
-              danger
-              disabled={props.uploading}
-            >
-              Send video for analysis
             </Button>
           </>
         );
