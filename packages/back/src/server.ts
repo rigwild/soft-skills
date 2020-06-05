@@ -1,10 +1,11 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 
-import router from './router'
-import { SERVER_PORT, UPLOADS_DIR } from './config'
-import { connectDb } from './database'
+import router from './routes'
+import { SERVER_PORT, UPLOADS_DIR, isTestEnv } from './config'
+import { connectDb } from './db'
 import { errorHandler } from './middlewares'
+import { log } from './utils'
 
 export const app = express()
 
@@ -13,7 +14,7 @@ app.use(bodyParser.json())
 
 // Log requests
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-if (process.env.NODE_ENV !== 'test') app.use(require('morgan')('combined'))
+if (!isTestEnv) app.use(require('morgan')('combined'))
 
 // Use gzip compression
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -45,14 +46,14 @@ app.use(router)
 app.use(errorHandler)
 
 export const initServer = async () => {
-  console.log('Connecting to the database...')
+  log('Connecting to the database...')
   await connectDb()
-  console.log('Database connection established.')
+  log('Database connection established.')
 
-  console.log('Starting the server...')
+  log('Starting the server...')
   new Promise(resolve =>
     app.listen(SERVER_PORT, () => {
-      console.log(`Server is listening on http://localhost:${SERVER_PORT}`)
+      log(`Server is listening on http://localhost:${SERVER_PORT}`)
       resolve(app)
     })
   )

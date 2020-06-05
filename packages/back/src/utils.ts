@@ -2,6 +2,12 @@ import { Request } from 'express'
 import boom from '@hapi/boom'
 import { validationResult, ErrorFormatter } from 'express-validator'
 
+import { isTestEnv } from './config'
+
+export const log = (data: string | object) => !isTestEnv && console.log(data)
+export const logErr = (data: string | object) => !isTestEnv && console.error(data)
+export const logDated = (data: string) => log(`${new Date().toJSON()} - ${data}`)
+
 /**
  * `express-validator` middleware error formatter
  * `Field <error-message>`

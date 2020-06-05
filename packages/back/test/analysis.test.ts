@@ -2,7 +2,7 @@ import { resolve as r } from 'path'
 import request from 'supertest'
 
 import { test, before, beforeEach, afterEachAlways, afterAlways } from './_utils'
-import { UserController } from '../src/database'
+import { UserModel, findUser } from '../src/db'
 import { User } from '../src/types'
 
 test.before(before)
@@ -48,7 +48,7 @@ test.serial('Upload an audio file for analysis', async t => {
   const { app, testUserData, testAnalysisData, testFilePath, token } = t.context
 
   // Delete pre-injected upload test data
-  await UserController.Model.findOneAndUpdate({ _id: testUserData._id }, { uploads: [] })
+  await UserModel.findOneAndUpdate({ _id: testUserData._id }, { uploads: [] })
 
   const res = await request(app)
     .post('/uploads')
@@ -57,7 +57,7 @@ test.serial('Upload an audio file for analysis', async t => {
 
   t.is(res.status, 200)
 
-  let upload = ((await UserController.find(testUserData._id)).toObject({ versionKey: false }) as User).uploads[0]
+  let upload = ((await findUser(testUserData._id)).toObject({ versionKey: false }) as User).uploads[0]
 
   t.true(upload.name.endsWith(testUserData.uploads[0].name.split('_')[2]))
   t.is(upload.mimeType, testUserData.uploads[0].mimeType)
@@ -66,13 +66,13 @@ test.serial('Upload an audio file for analysis', async t => {
 
   // Continuously check the analysis status until it is finished (test will timeout and fail if never finished)
   while (true) {
-    upload = ((await UserController.find(testUserData._id)).toObject({ versionKey: false }) as User).uploads[0]
+    upload = ((await findUser(testUserData._id)).toObject({ versionKey: false }) as User).uploads[0]
     if (upload.state === 'finished') {
       t.true(!!upload.analysisId)
       break
     }
-    // Wait 2 seconds before checking again
-    await new Promise(res => setTimeout(res, 2000))
+    // Wait 500 ms before checking again
+    await new Promise(res => setTimeout(res, 500))
   }
 
   // Check analysis data is available

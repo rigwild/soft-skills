@@ -18,4 +18,5 @@ export const connectDb = async () => {
 /** Disonnect from the MongoDB database */
 export const closeDb = () => mongoose.disconnect()
 
-export * from './controllers/User'
+export * from './user.db'
+export * from './analyses.db'
