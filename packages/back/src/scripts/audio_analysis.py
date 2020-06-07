@@ -80,19 +80,28 @@ def plot_pitch(output_path):
     plt.xlim([snd.xmin, snd.xmax])
     plt.savefig(output_path)
 
+#amplitude : pratt object 
+#number_of_points : number of points in the end (i.e. number of group formed and in which mean will 
+# be computed)
+#max_data : number of maximum original value accepted until we perform a size reduction of the data
+def reduce_size_amplitude(amplitude, number_of_points = 1000, max_data = 10000):
+    if(len(amplitude.xs()) > max_data):
+        abscisse = np.array_split(amplitude.xs(), number_of_points) 
+        ordonnee = np.array_split(list(snd.values.T), number_of_points)  
+        moyenne_abscisse = [np.mean(x) for x in abscisse] 
+        moyenne_ordonnee = [np.mean(x) for x in ordonnee]
+    
+        data = {"pitch_x": moyenne_abscisse,
+            "pitch_y": moyenne_ordonnee}
+    else:
+        data = {"pitch_x": amplitude.xs(),
+            "pitch_y": list(snd.values.T)}
+        
+    return(pd.DataFrame(data, columns=['pitch_x', 'pitch_y']))
 
-def reduce_size_amplitude(amplitude, step=1000):
-    abscisse = np.array_split(amplitude.xs(), step)
-    ordonnee = np.array_split(list(snd.values.T), step)
-    moyenne_abscisse = [np.mean(x) for x in abscisse]
-    moyenne_ordonnee = [np.mean(x) for x in ordonnee]
-    data = {"amplitude_x": moyenne_abscisse,
-            "amplitude_y": moyenne_ordonnee}
-    return(pd.DataFrame(data, columns=['amplitude_x', 'amplitude_y']))
 
-
-def print_amplitude_data():
-    dataframe = reduce_size_amplitude(snd, step=1000)
+def print_amplitude_data(number_of_points, max_data):
+    dataframe = reduce_size_amplitude(snd, number_of_points=number_of_points, max_data = max_data)
     np.savetxt(sys.stdout.buffer, dataframe, fmt='%.2f')
 
 
@@ -101,7 +110,7 @@ def print_intensity_data():
     data = {"intensity_x": intensity.xs(),
             "intensity_y": list(intensity.values.T)}
     dataframe = pd.DataFrame(data, columns=['intensity_x', 'intensity_y'])
-    np.savetxt(sys.stdout.buffer, intensity.values.T, fmt='%.2f')
+    np.savetxt(sys.stdout.buffer, dataframe, fmt='%.2f')
 
 
 def print_pitch_data():
@@ -133,7 +142,7 @@ else:
     elif command == 'print_raw_data':
         needed_data = sys.argv[3]
         if needed_data == 'amplitude':
-            print_amplitude_data()
+            print_amplitude_data(number_of_points = 1000, max_data = 10000)
         elif needed_data == 'intensity':
             print_intensity_data()
         if needed_data == 'pitch':
