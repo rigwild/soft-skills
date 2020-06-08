@@ -42,11 +42,9 @@ const AnalysisContainer = (props: Props) => {
         const analysis: Analysis = {
           name: analysisData.name,
           date: new Date(analysisData.analysisDate).toLocaleDateString("en-CA"),
-          amplitude: analysisData.amplitude.flat(),
-          pitch: analysisData.pitch.map((pitchData: number[]) => {
-            return { x: pitchData[0], y: pitchData[1] };
-          }),
-          intensity: analysisData.intensity.flat(),
+          amplitude: analysisData.amplitude,
+          pitch: analysisData.pitch,
+          intensity: analysisData.intensity,
           amplitudeGraphURL: URL.createObjectURL(res[1].data),
           pitchGraphURL: URL.createObjectURL(res[2].data),
           intensityGraphURL: URL.createObjectURL(res[3].data),
