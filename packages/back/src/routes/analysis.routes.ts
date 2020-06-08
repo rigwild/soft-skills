@@ -42,11 +42,11 @@ const router = Router()
  *   "message": "You need to send a file."
  * }
  *
- * @apiError {Error} BadMimeType You need to send an audio or video file.
+ * @apiError {Error} BadMimeType You need to send a video file.
  * @apiErrorExample {json} Error-Response:
  * HTTP/1.1 400 Bad Request
  * {
- *   "message": "You need to send an audio or video file."
+ *   "message": "You need to send a video file."
  * }
  */
 router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadRequestHandler))
