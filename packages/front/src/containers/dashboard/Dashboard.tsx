@@ -2,6 +2,7 @@ import { LoadingOutlined, VideoCameraAddOutlined } from "@ant-design/icons";
 import { Alert, Button, Card, Empty, Spin, Typography } from "antd";
 import { getUploads } from "api/upload";
 import { AxiosError, AxiosResponse } from "axios";
+import CenteredWrapper from "components/centeredwrapper";
 import { getErrorMessage } from "functions/error";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -129,15 +130,7 @@ const DashboardContainer = () => {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        flexWrap: "wrap",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
+    <CenteredWrapper row wrap>
       {analyses.map((analysis) => (
         <Card
           key={analysis._id}
@@ -148,7 +141,7 @@ const DashboardContainer = () => {
           {getContent(analysis.state)}
         </Card>
       ))}
-    </div>
+    </CenteredWrapper>
   );
 };
 

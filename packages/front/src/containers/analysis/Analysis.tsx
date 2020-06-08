@@ -1,10 +1,10 @@
 import { Alert, Collapse, Spin, Typography } from "antd";
 import { getAnalysis, getAnalysisDataFile } from "api/upload";
 import { AxiosError, AxiosResponse } from "axios";
+import CenteredWrapper from "components/centeredwrapper";
+import LineGraph from "components/graph";
 import { getErrorMessage } from "functions/error";
 import React, { useEffect, useState } from "react";
-import LineGraph from "components/graph";
-import AnalysisLayout from "components/analysislayout";
 
 const { Panel } = Collapse;
 const { Title } = Typography;
@@ -94,7 +94,7 @@ const AnalysisContainer = (props: Props) => {
       <video controls src={analysis?.videoURL} height={400} />
       <Collapse style={{ width: "100%", marginTop: 25 }}>
         <Panel header="Amplitude" key="amplitude">
-          <AnalysisLayout>
+          <CenteredWrapper row wrap>
             <img src={analysis?.amplitudeGraphURL} alt="Amplitude graph" />
             <LineGraph
               title="Amplitude values of the recording over time"
@@ -103,10 +103,10 @@ const AnalysisContainer = (props: Props) => {
               dataName="Amplitude"
               data={analysis?.amplitude as Array<number[]>}
             />
-          </AnalysisLayout>
+          </CenteredWrapper>
         </Panel>
         <Panel header="Pitch" key="pitch">
-          <AnalysisLayout>
+          <CenteredWrapper row wrap>
             <img src={analysis?.pitchGraphURL} alt="Pitch graph" />
             <LineGraph
               point
@@ -117,10 +117,10 @@ const AnalysisContainer = (props: Props) => {
               data={analysis?.pitch as Array<number[]>}
               valueSuffix="Hz"
             />
-          </AnalysisLayout>
+          </CenteredWrapper>
         </Panel>
         <Panel header="Intensity" key="intensity">
-          <AnalysisLayout>
+          <CenteredWrapper row wrap>
             <img src={analysis?.intensityGraphURL} alt="Intensity graph" />
             <LineGraph
               title="Intensity values of the recording over time"
@@ -130,7 +130,7 @@ const AnalysisContainer = (props: Props) => {
               data={analysis?.intensity as Array<number[]>}
               valueSuffix="dB"
             />
-          </AnalysisLayout>
+          </CenteredWrapper>
         </Panel>
       </Collapse>
     </>
