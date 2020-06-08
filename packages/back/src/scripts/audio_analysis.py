@@ -18,7 +18,7 @@ def convert_video_to_audio(video):
     file_path = video
     video = VideoFileClip(video)
     audio = video.audio
-    audio_file_name = file_path + ".mp3"
+    audio_file_name = file_path + ".wav"
     audio.write_audiofile(audio_file_name, verbose=False, logger=None)
     return(audio_file_name)
 
@@ -80,28 +80,29 @@ def plot_pitch(output_path):
     plt.xlim([snd.xmin, snd.xmax])
     plt.savefig(output_path)
 
-#amplitude : pratt object 
-#number_of_points : number of points in the end (i.e. number of group formed and in which mean will 
+# amplitude : pratt object
+# number_of_points : number of points in the end (i.e. number of group formed and in which mean will
 # be computed)
-#max_data : number of maximum original value accepted until we perform a size reduction of the data
-def reduce_size_amplitude(amplitude, number_of_points = 1000, max_data = 10000):
+# max_data : number of maximum original value accepted until we perform a size reduction of the data
+
+
+def reduce_size_amplitude(amplitude, number_of_points=1000, max_data=10000):
     if(len(amplitude.xs()) > max_data):
-        abscisse = np.array_split(amplitude.xs(), number_of_points) 
-        ordonnee = np.array_split(list(amplitude.values.T), number_of_points)  
-        moyenne_abscisse = [np.mean(x) for x in abscisse] 
+        abscisse = np.array_split(amplitude.xs(), number_of_points)
+        ordonnee = np.array_split(list(amplitude.values.T), number_of_points)
+        moyenne_abscisse = [np.mean(x) for x in abscisse]
         moyenne_ordonnee = [np.mean(x) for x in ordonnee]
-    
-        data = {"pitch_x": moyenne_abscisse,
-            "pitch_y": moyenne_ordonnee}
+        data = {"amplitude_x": moyenne_abscisse,
+                "amplitude_y": moyenne_ordonnee}
     else:
-        data = {"pitch_x": amplitude.xs(),
-            "pitch_y": list(amplitude.values.T)}
-        
-    return(pd.DataFrame(data, columns=['pitch_x', 'pitch_y']))
+        data = {"amplitude_x": amplitude.xs(),
+                "amplitude_y": list(amplitude.values.T)}
+    return(pd.DataFrame(data, columns=['amplitude_x', 'amplitude_y']))
 
 
 def print_amplitude_data(number_of_points, max_data):
-    dataframe = reduce_size_amplitude(snd, number_of_points=number_of_points, max_data = max_data)
+    dataframe = reduce_size_amplitude(
+        snd, number_of_points=number_of_points, max_data=max_data)
     np.savetxt(sys.stdout.buffer, dataframe, fmt='%.2f')
 
 
@@ -142,7 +143,7 @@ else:
     elif command == 'print_raw_data':
         needed_data = sys.argv[3]
         if needed_data == 'amplitude':
-            print_amplitude_data(number_of_points = 1000, max_data = 10000)
+            print_amplitude_data(number_of_points=1000, max_data=10000)
         elif needed_data == 'intensity':
             print_intensity_data()
         if needed_data == 'pitch':
