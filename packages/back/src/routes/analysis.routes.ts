@@ -28,7 +28,7 @@ const router = Router()
  *   "data": {
  *     "state": "pending",
  *     "analysisId": null,
- *     "addedTimestamp": "2020-06-08T11:49:09.080Z",
+ *     "uploadTimestamp": "2020-06-08T11:49:09.080Z",
  *     "lastStateEditTimestamp": "2020-06-08T11:49:09.080Z",
  *     "_id": "5ede25b5ee17b104bc23ba96",
  *     "videoFile": "2V4Fne8Z__VIDEO.mp4"
@@ -64,7 +64,7 @@ router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadRequest
  *     {
  *       "state": "pending",
  *       "analysisId": null,
- *       "addedTimestamp": "2020-06-08T11:49:09.080Z",
+ *       "uploadTimestamp": "2020-06-08T11:49:09.080Z",
  *       "lastStateEditTimestamp": "2020-06-08T11:49:21.683Z",
  *       "_id": "5ede25b5ee17b104bc23ba96",
  *       "videoFile": "1V4Fne8Z__VIDEO.mp4"
@@ -72,7 +72,7 @@ router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadRequest
  *     {
  *       "state": "error",
  *       "analysisId": null,
- *       "addedTimestamp": "2020-06-08T11:49:09.080Z",
+ *       "uploadTimestamp": "2020-06-08T11:49:09.080Z",
  *       "lastStateEditTimestamp": "2020-06-08T11:49:21.683Z",
  *       "_id": "5ede25b5ee17b104bc23ba96",
  *       "videoFile": "2V4Fne8Z__VIDEO.mp4"
@@ -80,7 +80,7 @@ router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadRequest
  *     {
  *       "state": "finished",
  *       "analysisId": "5ed66cc0dbaee47acd2c1063",
- *       "addedTimestamp": "2020-06-08T11:49:09.080Z",
+ *       "uploadTimestamp": "2020-06-08T11:49:09.080Z",
  *       "lastStateEditTimestamp": "2020-06-08T11:49:21.683Z",
  *       "_id": "5ede25b5ee17b104bc23ba96",
  *       "videoFile": "3V4Fne8Z__VIDEO.mp4"

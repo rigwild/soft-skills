@@ -52,7 +52,7 @@ export const addAnalysis = async (
     intensityPlotFile: analysis.intensityPlotFile,
     pitchPlotFile: analysis.pitchPlotFile,
 
-    uploadTimestamp: file.addedTimestamp
+    uploadTimestamp: file.uploadTimestamp
   })
 
   if (!analysisDoc) throw boom.internal('Unexpected error when adding analysis.')

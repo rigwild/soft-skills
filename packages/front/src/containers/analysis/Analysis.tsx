@@ -14,8 +14,10 @@ type Props = {
 };
 
 type Analysis = {
-  name: string;
-  date: string;
+  videoFile: string;
+  audioFile: string;
+  uploadTimestamp: string; // TODO: Add initial upload timestamp
+  analysisTimestamp: string;
   amplitude: Array<number[]>;
   pitch: Array<number[]>;
   intensity: Array<number[]>;
@@ -23,6 +25,7 @@ type Analysis = {
   pitchGraphURL: string;
   intensityGraphURL: string;
   videoURL: string;
+  audioURL: string;
 };
 
 const AnalysisContainer = (props: Props) => {
@@ -34,25 +37,34 @@ const AnalysisContainer = (props: Props) => {
     setLoading(true);
     Promise.all([
       getAnalysis(props.id),
-      getAnalysisDataFile(props.id, "amplitude"),
-      getAnalysisDataFile(props.id, "pitch"),
-      getAnalysisDataFile(props.id, "intensity"),
-      getAnalysisDataFile(props.id, "file"),
+      getAnalysisDataFile(props.id, "amplitudePlotFile"),
+      getAnalysisDataFile(props.id, "pitchPlotFile"),
+      getAnalysisDataFile(props.id, "intensityPlotFile"),
+      getAnalysisDataFile(props.id, "videoFile"),
+      getAnalysisDataFile(props.id, "audioFile"), // TODO: "Download audio" button
     ])
       .then((res: AxiosResponse[]) => {
         const analysisData = res[0].data.data;
         const analysis: Analysis = {
-          name: analysisData.name,
-          date: new Date(analysisData.analysisDate).toLocaleDateString("en-CA"),
-          amplitude: analysisData.amplitude,
-          pitch: analysisData.pitch.filter(
-            (pitchData: number[]) => pitchData[1] !== 0
-          ),
-          intensity: analysisData.intensity,
+          videoFile: analysisData.videoFile,
+          audioFile: analysisData.audioFile,
+          uploadTimestamp: new Date(analysisData.uploadTimestamp).toLocaleDateString("en-CA"),
+          // TODO: Missing time, maybe we should use a custom formatter (same for dashboard and profile):
+          // const dateFormat = (date: Date) => {
+          //   const t = num => ('0' + num).slice(-2)
+          //   return `${date.getFullYear()}-${t(date.getMonth() + 1)}-${t(date.getDate())} ${t(date.getHours())}:${t(date.getMinutes())}:${t(date.getSeconds())}`
+          // }
+          // => 2020-04-27 01:06:27
+
+          analysisTimestamp: new Date(analysisData.analysisTimestamp).toLocaleDateString("en-CA"),
+          amplitude: analysisData.amplitude.flat(),
+          pitch: analysisData.pitch.filter((pitchData: number[]) => pitchData[1] !== 0),
+          intensity: analysisData.intensity.flat(),
           amplitudeGraphURL: URL.createObjectURL(res[1].data),
           pitchGraphURL: URL.createObjectURL(res[2].data),
           intensityGraphURL: URL.createObjectURL(res[3].data),
           videoURL: URL.createObjectURL(res[4].data),
+          audioURL: URL.createObjectURL(res[5].data),
         };
         setAnalysis(analysis);
       })
@@ -87,9 +99,9 @@ const AnalysisContainer = (props: Props) => {
 
   return (
     <>
-      <Title style={{ margin: 0 }}>{analysis?.name}</Title>
+      <Title style={{ margin: 0 }}>{analysis?.videoFile}</Title>
       <Title level={4} style={{ marginTop: 10 }}>
-        {analysis?.date}
+        {analysis?.analysisTimestamp}
       </Title>
       <video controls src={analysis?.videoURL} height={400} />
       <Collapse style={{ width: "100%", marginTop: 25 }}>

@@ -44,7 +44,7 @@ export const beforeEach: Implementation<TestContext> = async t => {
         videoFile: 'PtCLcgRs__VIDEO.mp4',
         state: 'finished',
         analysisId: '5ece960cfe6ce42d24ef6bec',
-        addedTimestamp: new Date('2020-06-03T12:15:04.853Z'),
+        uploadTimestamp: new Date('2020-06-03T12:15:04.853Z'),
         lastStateEditTimestamp: new Date('2020-06-03T12:15:30.853Z')
       }
     ],

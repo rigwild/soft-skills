@@ -21,7 +21,7 @@ export interface Upload {
 
   state: UploadStates
 
-  addedTimestamp: Date
+  uploadTimestamp: Date
   lastStateEditTimestamp: Date
 
   analysisId?: string

@@ -18,25 +18,28 @@ enum AnalysisState {
   SUCCESS = "finished",
 }
 
-type Analysis = {
+type Upload = {
   _id: string;
-  name: string;
+  analysisId: string;
+  videoFile: string;
   state: AnalysisState;
+  uploadTimestamp: string; // TODO: Add initial upload timestamp
+  lastStateEditTimestamp: string; // TODO: Add last state edit timestamp
 };
 
 type AnalysisResponse = {
-  data: Analysis[];
+  data: Upload[];
 };
 
 const DashboardContainer = () => {
   const [loading, setLoading] = useState(false);
-  const [analyses, setAnalyses] = useState<Analysis[]>([]);
+  const [analyses, setAnalyses] = useState<Upload[]>([]);
   const [error, setError] = useState<string | undefined>(undefined);
 
   const fetchAnalyses = useCallback(() => {
     getUploads()
       .then((res: AxiosResponse<AnalysisResponse>) => {
-        const analyses: Analysis[] = res.data.data;
+        const analyses: Upload[] = res.data.data;
         const hasPending = analyses.find(
           (analysis) => analysis.state === AnalysisState.PENDING
         );
@@ -82,7 +85,7 @@ const DashboardContainer = () => {
         );
       case AnalysisState.SUCCESS:
         return (
-          <Link to={`/analysis/${analysis._id}`} style={{ marginTop: 25 }}>
+          <Link to={`/analysis/${analysis.analysisId}`} style={{ marginTop: 25 }}>
             Details
           </Link>
         );
@@ -134,7 +137,7 @@ const DashboardContainer = () => {
       {analyses.map((analysis) => (
         <Card
           key={analysis._id}
-          title={analysis.name}
+          title={analysis.videoFile}
           extra={getExtra(analysis)}
           style={{ width: 300, margin: 15 }}
         >

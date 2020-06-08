@@ -24,7 +24,7 @@ export const UserSchema = new Schema({
 
       state: { type: String, enum: ['pending', 'finished', 'error'], default: 'pending', required: true },
 
-      addedTimestamp: { type: Date, default: () => new Date() },
+      uploadTimestamp: { type: Date, default: () => new Date() },
       lastStateEditTimestamp: { type: Date, default: () => new Date() },
 
       analysisId: { type: String, required: true, default: null }
