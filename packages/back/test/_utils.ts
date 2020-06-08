@@ -6,8 +6,7 @@ import bcrypt from 'bcrypt'
 import type { Express } from 'express'
 
 import { app } from '../src/server'
-import { UserModel } from '../src/database/models/User'
-import { AnalysisModel } from '../src/database/models/Analysis'
+import { UserModel, AnalysisModel } from '../src/db'
 import type { User, UploadAnalysedAudio } from '../src/types'
 
 export type TestContext = {

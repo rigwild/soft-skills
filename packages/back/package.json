@@ -15,7 +15,7 @@
     "start:dev": "ts-node src/index.ts",
     "lint": "eslint --ext .ts ./src ./test --fix",
     "lint:no-fix": "eslint --ext .ts ./src ./test",
-    "test": "mkdir test/uploads && ava && rm -rf test/uploads",
+    "test": "mkdir -p test/uploads && ava && rm -rf test/uploads",
     "doc": "apidoc -i src -o apidoc-out && apidoc-markdown -p apidoc-out -o DOCUMENTATION.md && rm -rf apidoc-out"
   },
   "files": [

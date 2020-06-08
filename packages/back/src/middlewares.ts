@@ -2,8 +2,9 @@ import boom from '@hapi/boom'
 import jwt from 'jsonwebtoken'
 import type { RequestHandler, ErrorRequestHandler } from 'express-serve-static-core'
 
-import { UserController } from './database'
 import { JWT_SECRET } from './config'
+import { findUser } from './db'
+import { logErr } from './utils'
 import type { RequestAuthed, RequestHandlerAuthed } from './types'
 
 /**
@@ -29,7 +30,7 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   }
 
   const errPayload = err.output.payload
-  if (process.env.NODE_ENV !== 'test') console.error(err)
+  logErr(err)
 
   // Send the error to the client
   res.status(errPayload.statusCode).json({
@@ -70,7 +71,7 @@ export const injectUserDocMiddleware = (): RequestHandler => async (reqRaw, res,
     const _id = req.session?._id
     if (!_id) throw boom.unauthorized('You need to be logged in.')
 
-    const userDoc = await UserController.find(_id)
+    const userDoc = await findUser(_id)
 
     const userData = userDoc.toObject({ versionKey: false })
     ;(req as any).userDoc = userData
