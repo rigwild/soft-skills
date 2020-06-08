@@ -79,7 +79,6 @@ const DashboardContainer = () => {
         return (
           <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
         );
-        break;
       case AnalysisState.SUCCESS:
         return (
           <Link to={`/analysis/${analysis._id}`} style={{ marginTop: 25 }}>
