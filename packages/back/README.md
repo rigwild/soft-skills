@@ -28,7 +28,7 @@ You need to set environment variables to configure the project. Copy [`.env.exam
 
 | Configuration option | Description | Default value |
 | -------------------- | ----------- | ------------- |
-| `SERVER_PORT` | Server port | `3000` |
+| `SERVER_PORT` | Server port | `3100` |
 | `MONGO_URI` | MondoDB database URI | `mongodb://localhost:27017/soft-skills` |
 | `JWT_SECRET` | JWT secret | `My secret` |
 
@@ -56,7 +56,7 @@ yarn lint
 npm run lint
 ```
 
-### Running a MongoDB instance using Docker
+## Run a MongoDB instance using Docker
 
 ```sh
 docker pull mongo
