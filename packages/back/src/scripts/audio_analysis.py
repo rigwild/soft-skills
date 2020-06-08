@@ -87,7 +87,7 @@ def plot_pitch(output_path):
 def reduce_size_amplitude(amplitude, number_of_points = 1000, max_data = 10000):
     if(len(amplitude.xs()) > max_data):
         abscisse = np.array_split(amplitude.xs(), number_of_points) 
-        ordonnee = np.array_split(list(snd.values.T), number_of_points)  
+        ordonnee = np.array_split(list(amplitude.values.T), number_of_points)  
         moyenne_abscisse = [np.mean(x) for x in abscisse] 
         moyenne_ordonnee = [np.mean(x) for x in ordonnee]
     
@@ -95,7 +95,7 @@ def reduce_size_amplitude(amplitude, number_of_points = 1000, max_data = 10000):
             "pitch_y": moyenne_ordonnee}
     else:
         data = {"pitch_x": amplitude.xs(),
-            "pitch_y": list(snd.values.T)}
+            "pitch_y": list(amplitude.values.T)}
         
     return(pd.DataFrame(data, columns=['pitch_x', 'pitch_y']))
 
