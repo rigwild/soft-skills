@@ -30,6 +30,7 @@ export const analyseAudio = async (audioFile: string, uniqueId: string) => {
   await pool.completed()
 
   // Parallelized audio analysis
+  pool.queue(async ({ getAmplitude }: WorkerMethods) => (data.amplitude = await getAmplitude(audioFile)))
   pool.queue(async ({ getIntensity }: WorkerMethods) => (data.intensity = await getIntensity(audioFile)))
   pool.queue(async ({ getPitch }: WorkerMethods) => (data.pitch = await getPitch(audioFile)))
   pool.queue(async ({ getAmplitudePlot }: WorkerMethods) => getAmplitudePlot(audioFile, data.amplitudePlotFile))
