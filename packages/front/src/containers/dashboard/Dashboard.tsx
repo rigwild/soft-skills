@@ -1,10 +1,11 @@
+import { LoadingOutlined, VideoCameraAddOutlined } from "@ant-design/icons";
 import { Alert, Button, Card, Empty, Spin, Typography } from "antd";
 import { getUploads } from "api/upload";
 import { AxiosError, AxiosResponse } from "axios";
+import CenteredWrapper from "components/centeredwrapper";
 import { getErrorMessage } from "functions/error";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { VideoCameraAddOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;
 
@@ -73,6 +74,21 @@ const DashboardContainer = () => {
     return <Alert message={`Analysis state: ${state}`} type={type} showIcon />;
   };
 
+  const getExtra = (analysis: Analysis) => {
+    switch (analysis.state) {
+      case AnalysisState.PENDING:
+        return (
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
+        );
+      case AnalysisState.SUCCESS:
+        return (
+          <Link to={`/analysis/${analysis._id}`} style={{ marginTop: 25 }}>
+            Details
+          </Link>
+        );
+    }
+  };
+
   if (loading) {
     return (
       <Spin
@@ -101,7 +117,11 @@ const DashboardContainer = () => {
         <Empty description={false} style={{ marginTop: "15vh" }} />
         <Title style={{ marginTop: 15 }}>No analysis to display</Title>
         <Link to="/record">
-          <Button type="primary" style={{ marginTop: 25 }} icon={<VideoCameraAddOutlined />}>
+          <Button
+            type="primary"
+            style={{ marginTop: 25 }}
+            icon={<VideoCameraAddOutlined />}
+          >
             Record a video
           </Button>
         </Link>
@@ -110,32 +130,18 @@ const DashboardContainer = () => {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        flexWrap: "wrap",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
+    <CenteredWrapper row wrap>
       {analyses.map((analysis) => (
         <Card
           key={analysis._id}
           title={analysis.name}
-          extra={
-            analysis.state === AnalysisState.SUCCESS && (
-              <Link to={`/analysis/${analysis._id}`} style={{ marginTop: 25 }}>
-                Details
-              </Link>
-            )
-          }
+          extra={getExtra(analysis)}
           style={{ width: 300, margin: 15 }}
         >
           {getContent(analysis.state)}
         </Card>
       ))}
-    </div>
+    </CenteredWrapper>
   );
 };
 
