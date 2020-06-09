@@ -7,13 +7,13 @@ import type { Express } from 'express'
 
 import { app } from '../src/server'
 import { UserModel, AnalysisModel } from '../src/db'
-import type { User, UploadAnalysedAudio } from '../src/types'
+import type { UserDB, AnalysisDB } from '../src/types'
 
 export type TestContext = {
   app: Express
-  testUserData: User
+  testUserData: UserDB
   testFilePath: string
-  testAnalysisData: UploadAnalysedAudio & { uniqueId: string }
+  testAnalysisData: AnalysisDB
   token: string
 }
 export const test = _test as TestInterface<TestContext>
@@ -41,18 +41,17 @@ export const beforeEach: Implementation<TestContext> = async t => {
     uploads: [
       {
         _id: '5ed65e7142905c4a917be028',
-        name: 'PtCLcgRs__VIDEO.mp4',
-        mimeType: 'video/mp4',
-        size: 383631,
+        videoFile: 'PtCLcgRs__VIDEO.mp4',
         state: 'finished',
-        analysisId: '5ece960cfe6ce42d24ef6bec'
+        analysisId: '5ece960cfe6ce42d24ef6bec',
+        uploadTimestamp: new Date('2020-06-03T12:15:04.853Z'),
+        lastStateEditTimestamp: new Date('2020-06-03T12:15:30.853Z')
       }
     ],
     joinDate: new Date('2020-06-02T12:15:04.853Z')
   }
   t.context.testFilePath = path.resolve(__dirname, '_VIDEO.mp4')
   t.context.testAnalysisData = {
-    uniqueId: 'PtCLcgRs',
     amplitude: [[0, 0]],
     intensity: [[0, 0]],
     pitch: [[0, 0]],
@@ -60,11 +59,11 @@ export const beforeEach: Implementation<TestContext> = async t => {
     amplitudePlotFile: 'PtCLcgRs_amplitude.png',
     intensityPlotFile: 'PtCLcgRs_intensity.png',
     pitchPlotFile: 'PtCLcgRs_pitch.png',
-    name: 'PtCLcgRs__VIDEO.mp4',
-    size: 383631,
-    mimeType: 'video/mp4',
+    videoFile: 'PtCLcgRs__VIDEO.mp4',
+    audioFile: 'PtCLcgRs__VIDEO.mp4.wav',
     userId: '5ece75285e8a084208e0b0c4',
-    analysisDate: new Date('2020-06-02T12:24:04.853Z')
+    uploadTimestamp: new Date('2020-06-03T12:15:04.853Z'),
+    analysisTimestamp: new Date('2020-06-03T12:15:30.853Z')
   }
   t.context.token =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZWNlOTYwY2ZlNmNlNDJkMjRlZjZiZWEiLCJlbWFpbCI6InRlc3R1c2VyXzEyMzRAZXhhbXBsZS5jb20iLCJuYW1lIjoidGVzdCIsImlhdCI6MTU5MDU5NzE1NX0.4kxSkN5z4H37X7c4SzeQnG16X_qJFe0uc_L6L-wFkgM'

@@ -5,9 +5,9 @@ import {
   uploadRequestHandler,
   getUploadsRequestHandler,
   getAnalysisRequestHandler,
-  getAnalysisPlotFileRequestHandler
+  getAnalysisFileRequestHandler
 } from '../controllers/analyses.controller'
-import type { AudioAnalysisData } from '../types'
+import type { AnalysisFiles } from '../types'
 
 const router = Router()
 
@@ -26,9 +26,12 @@ const router = Router()
  * HTTP/1.1 200 OK
  * {
  *   "data": {
- *     "name": "yh_662tF__NW001.mp3",
- *     "mimeType": "audio/mpeg",
- *     "size": 339216
+ *     "state": "pending",
+ *     "analysisId": null,
+ *     "uploadTimestamp": "2020-06-08T11:49:09.080Z",
+ *     "lastStateEditTimestamp": "2020-06-08T11:49:09.080Z",
+ *     "_id": "5ede25b5ee17b104bc23ba96",
+ *     "videoFile": "2V4Fne8Z__VIDEO.mp4"
  *   }
  * }
  *
@@ -39,11 +42,11 @@ const router = Router()
  *   "message": "You need to send a file."
  * }
  *
- * @apiError {Error} BadMimeType You need to send an audio or video file.
+ * @apiError {Error} BadMimeType You need to send a video file.
  * @apiErrorExample {json} Error-Response:
  * HTTP/1.1 400 Bad Request
  * {
- *   "message": "You need to send an audio or video file."
+ *   "message": "You need to send a video file."
  * }
  */
 router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadRequestHandler))
@@ -60,25 +63,27 @@ router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadRequest
  *   "data": [
  *     {
  *       "state": "pending",
- *       "_id": "5ed66cc0dbaee47acd2c1063",
- *       "name": "ah_662tF__NW001.mp3",
- *       "size": 339216,
- *       "mimeType": "audio/mpeg"
+ *       "analysisId": null,
+ *       "uploadTimestamp": "2020-06-08T11:49:09.080Z",
+ *       "lastStateEditTimestamp": "2020-06-08T11:49:21.683Z",
+ *       "_id": "5ede25b5ee17b104bc23ba96",
+ *       "videoFile": "1V4Fne8Z__VIDEO.mp4"
  *     },
  *     {
  *       "state": "error",
- *       "_id": "5ed66cc0dbaee47acd2c1064",
- *       "name": "bh_662tF__NW001.mp3",
- *       "size": 339216,
- *       "mimeType": "audio/mpeg"
+ *       "analysisId": null,
+ *       "uploadTimestamp": "2020-06-08T11:49:09.080Z",
+ *       "lastStateEditTimestamp": "2020-06-08T11:49:21.683Z",
+ *       "_id": "5ede25b5ee17b104bc23ba96",
+ *       "videoFile": "2V4Fne8Z__VIDEO.mp4"
  *     },
  *     {
  *       "state": "finished",
  *       "analysisId": "5ed66cc0dbaee47acd2c1063",
- *       "_id": "5ed66cc0dbaee47acd2c1065",
- *       "name": "ch_662tF__NW001.mp3",
- *       "size": 339216,
- *       "mimeType": "audio/mpeg"
+ *       "uploadTimestamp": "2020-06-08T11:49:09.080Z",
+ *       "lastStateEditTimestamp": "2020-06-08T11:49:21.683Z",
+ *       "_id": "5ede25b5ee17b104bc23ba96",
+ *       "videoFile": "3V4Fne8Z__VIDEO.mp4"
  *     }
  *   ]
  * }
@@ -98,24 +103,26 @@ router.get('/uploads', authenticatedMiddleware(), asyncMiddleware(getUploadsRequ
  * {
  *   "data": {
  *     "amplitude": [
- *       [0]
+ *       [0.02, 0],
+ *       [0.03, 0]
  *     ],
  *     "intensity": [
- *       [0]
+ *       [0.02, 0],
+ *       [0.03, 0]
  *     ],
  *     "pitch": [
  *       [0.02, 0],
  *       [0.03, 0]
  *     ],
- *     "_id": "5ed66cc0dbaee47acd2c1063",
- *     "amplitudePlotFile": "yh_662tF_amplitude.png",
- *     "intensityPlotFile": "yh_662tF_intensity.png",
- *     "pitchPlotFile": "yh_662tF_pitch.png",
- *     "name": "yh_662tF__NW001.mp3",
- *     "size": 339216,
- *     "mimeType": "audio/mpeg",
- *     "userId": "5ece75285e8a084208e0b0c4",
- *     "analysisDate": "2020-06-02T15:14:24.182Z"
+ *     "_id": "5ede25c1ee17b104bc23ba97",
+ *     "userId": "5eda45b94e213d048bfa7a21",
+ *     "videoFile": "2V4Fne8Z__VIDEO.mp4",
+ *     "audioFile": "2V4Fne8Z__VIDEO.mp4.wav",
+ *     "amplitudePlotFile": "2V4Fne8Z_amplitude.png",
+ *     "intensityPlotFile": "2V4Fne8Z_intensity.png",
+ *     "pitchPlotFile": "2V4Fne8Z_pitch.png",
+ *     "uploadTimestamp": "2020-06-08T11:49:09.080Z",
+ *     "analysisTimestamp": "2020-06-08T11:49:21.577Z"
  *   }
  * }
  *
@@ -134,13 +141,13 @@ router.get<{ analysisId: string }>(
 )
 
 /**
- * @api {get} /analysis/:analysis/:dataType Load an analysis data file
+ * @api {get} /analysis/:analysis/:file Load an analysis data file
  * @apiVersion 0.1.0
  * @apiName AnalysisData
  * @apiGroup Analysis
  *
  * @apiParam {String} analysisId Analysis id
- * @apiParam {String} dataType Type of data to load - { `file` } = original analysed file, { `amplitude` | `intensity` | `pitch` } = plot image file
+ * @apiParam {String} file Type of data to load - 'videoFile' | 'audioFile' | 'amplitudePlotFile' | 'intensityPlotFile' | 'pitchPlotFile'
  *
  * @apiExample Example-usage:
  * GET /analysis/5ed66cc0dbaee47acd2c1063/amplitude
@@ -156,25 +163,18 @@ router.get<{ analysisId: string }>(
  *   "message": "Analysis not found."
  * }
  *
- * @apiError {Error} BadDataType Invalid data type
+ * @apiError {Error} InvalidFileKey Provided file key is invalid
  * @apiErrorExample {json} Error-Response:
  * HTTP/1.1 400 Bad Request
  * {
- *   "message": "Invalid plot data type."
- * }
- *
- * @apiError {Error} DataTypeNotAvailable Data type not available for this analysis (i.e. you ask for a video-specific analysis data type on an audio analysis)
- * @apiErrorExample {json} Error-Response:
- * HTTP/1.1 409 Conflict
- * {
- *   "message": "Asked data type is not available in this analysis."
+ *   "message": "Provided file key is invalid."
  * }
  */
-router.get<{ analysisId: string; dataType: AudioAnalysisData | 'file' }>(
-  '/analysis/:analysisId/:dataType',
+router.get<{ analysisId: string; file: AnalysisFiles }>(
+  '/analysis/:analysisId/:file',
   authenticatedMiddleware(),
   // @ts-ignore
-  asyncMiddleware(getAnalysisPlotFileRequestHandler)
+  asyncMiddleware(getAnalysisFileRequestHandler)
 )
 
 export default router

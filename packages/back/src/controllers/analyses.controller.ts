@@ -5,56 +5,52 @@ import { nanoid } from 'nanoid'
 
 import { UPLOADS_DIR } from '../config'
 import { addUploadToUser, setOneUploadStateFromUser, findUser, addAnalysis, findAnalysis, AnalysisModel } from '../db'
-import { analyseAudio } from '../scripts/runner'
-import { isAllowedMimeType, logDated, logErr } from '../utils'
-import type { RequestAuthed, Upload, UploadDB, AudioAnalysisData } from '../types'
+import { analyseVideo } from '../scripts/runner'
+import { isVideoMimeType, logDated, logErr } from '../utils'
+import { RequestAuthed, analysisFiles, AnalysisFiles } from '../types'
 
 export const uploadRequestHandler = async (reqRaw: RequestAuthed, res: Response) => {
   const req = reqRaw as typeof reqRaw & { files: any }
 
   // Check a file was uploaded
-  const content = req?.files?.content as Upload & { mimetype: string; mv: (path: string) => Promise<void> }
-  if (!req.files || !content) throw boom.badRequest('You need to send a file.')
-  content.mimeType = content.mimetype
+  const upload = req?.files?.content
+  if (!req.files || !upload) throw boom.badRequest('You need to send a file.')
 
   // Check file mime type
-  if (!isAllowedMimeType(content.mimeType)) throw boom.badRequest('You need to send an audio or video file.')
+  if (!isVideoMimeType(upload.mimetype)) throw boom.badRequest('You need to send a video file.')
 
   // Add a unique identifier to dodge filename collisions
   const uniqueId = nanoid(8)
+  const fileName = `${uniqueId}_${upload.name}`
+  const file = path.resolve(UPLOADS_DIR, fileName)
 
-  content.name = `${uniqueId}_${content.name}`
-  const file = path.resolve(UPLOADS_DIR, content.name)
+  // Move the downloaded file to the `uploads` directory
+  await upload.mv(file)
 
-  await content.mv(file)
-  const uploadedData = (await addUploadToUser(req.session._id, content)) as UploadDB
+  const uploadedData = await addUploadToUser(req.session._id, fileName)
 
-  res.json({
-    data: {
-      name: content.name,
-      mimeType: content.mimeType,
-      size: content.size
-    }
-  })
+  res.json({ data: uploadedData })
 
   // Start a background analysis
   try {
     // TODO: Support video analysis
-    logDated(`Starting analysis for file "${content.name}" from user=${req.session.email}`)
-    const analysis = await analyseAudio(file, uniqueId)
+    logDated(`Starting analysis for file "${fileName}" from user=${req.session.email}`)
+    const analysis = await analyseVideo(file, uniqueId)
 
     // Convert file paths to only file names
+    analysis.videoFile = path.basename(analysis.videoFile)
+    analysis.audioFile = path.basename(analysis.audioFile)
     analysis.amplitudePlotFile = path.basename(analysis.amplitudePlotFile)
     analysis.intensityPlotFile = path.basename(analysis.intensityPlotFile)
     analysis.pitchPlotFile = path.basename(analysis.pitchPlotFile)
 
-    logDated(`Successful analysis for file "${content.name}" from user=${req.session.email}`)
+    logDated(`Successful analysis for file "${fileName}" from user=${req.session.email}`)
     await addAnalysis(req.session._id, uploadedData, analysis)
   } catch (error) {
     // We catch all errors as a response was already sent
 
     // Set the file state as error in the user uploads list
-    await setOneUploadStateFromUser(req.session._id, uploadedData._id, content.name, 'error').catch(err => logErr(err))
+    await setOneUploadStateFromUser(req.session._id, uploadedData._id, fileName, 'error').catch(err => logErr(err))
     logErr(error)
   }
 }
@@ -69,41 +65,20 @@ export const getAnalysisRequestHandler = async (req: RequestAuthed<{ analysisId:
   res.json({ data: analysis.toObject({ versionKey: false }) })
 }
 
-export const getAnalysisPlotFileRequestHandler = async (
-  req: RequestAuthed<{ analysisId: string; dataType: AudioAnalysisData | 'file' }>,
+export const getAnalysisFileRequestHandler = async (
+  req: RequestAuthed<{ analysisId: string; file: AnalysisFiles }>,
   res: Response
 ) => {
-  const dataType = req.params.dataType
-  const dataTypeKey = (`${dataType}PlotFile` as any) as 'amplitudePlotFile' | 'intensityPlotFile' | 'pitchPlotFile'
+  const file = req.params.file
 
   // Check the user asked for a valid data type
-  if (!['file', 'amplitude', 'intensity', 'pitch'].some(x => x === dataType))
-    throw boom.badRequest('Invalid plot data type.')
+  if (analysisFiles.indexOf(file) === -1) throw boom.badRequest('Provided file key is invalid.')
 
   // Get analysis data
-  const analysis = await AnalysisModel.findOne(
-    { _id: req.params.analysisId, userId: req.session._id },
-    {
-      name: 1,
-      amplitudePlotFile: 1,
-      intensityPlotFile: 1,
-      pitchPlotFile: 1
-    }
-  )
+  const analysis = await AnalysisModel.findOne({ _id: req.params.analysisId, userId: req.session._id }, { [file]: 1 })
   if (!analysis) throw boom.notFound('Analysis not found.')
 
-  if (dataType === 'file') {
-    // Send the original file
-    res.sendFile(path.resolve(UPLOADS_DIR, analysis.name))
-    return
-  } else if (!!analysis[dataTypeKey]) {
-    // Send the plot image
-    res.sendFile(path.resolve(UPLOADS_DIR, analysis[dataTypeKey]))
-    return
-  }
-
-  // Can be thrown if asked for a data type not available (i.e. a video data type for an audio analysis)
-  throw boom.conflict('Asked data type is not available in this analysis.')
+  res.sendFile(path.resolve(UPLOADS_DIR, analysis[file]))
 }
 
 // TODO: Add errored-out analysis retry

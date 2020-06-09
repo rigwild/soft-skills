@@ -5,7 +5,7 @@ import boom from '@hapi/boom'
 
 import { JWT_SECRET } from '../config'
 import { log } from '../utils'
-import type { User, Upload, UploadDB } from '../types'
+import type { User, Upload, UploadDB, UserDB } from '../types'
 
 export type UserDocument = User & mongoose.Document
 
@@ -20,10 +20,13 @@ export const UserSchema = new Schema({
   },
   uploads: [
     {
-      mimeType: { type: String, required: true },
-      name: { type: String, required: true },
+      videoFile: { type: String, required: true },
+
       state: { type: String, enum: ['pending', 'finished', 'error'], default: 'pending', required: true },
-      size: { type: Number, required: true },
+
+      uploadTimestamp: { type: Date, default: () => new Date() },
+      lastStateEditTimestamp: { type: Date, default: () => new Date() },
+
       analysisId: { type: String, required: true, default: null }
     }
   ]
@@ -72,7 +75,7 @@ export const registerUser = async (email: string, password: string, name: string
  * Generate a JWT
  * @param user Logged in user
  */
-const generateToken = (user: UserDocument) => {
+const generateToken = (user: UserDB) => {
   return jwt.sign(
     {
       _id: user._id,
@@ -142,7 +145,7 @@ export const editUser = async (userId: string, _newProfileData: Partial<Pick<Use
 
   log(`A user profile was edited. id=${userDoc._id}`)
 
-  const userData = userDoc.toObject({ versionKey: false }) as User
+  const userData = userDoc.toObject({ versionKey: false }) as UserDB
   delete userData.uploads
   return userData
 }
@@ -150,22 +153,26 @@ export const editUser = async (userId: string, _newProfileData: Partial<Pick<Use
 /**
  * Link a file to a user
  * @param userId The user id of the user
- * @param file Uploaded file to link to a user
+ * @param videoFile Uploaded file to link to a user
  */
-export const addUploadToUser = async (userId: string, file: Upload) => {
+export const addUploadToUser = async (userId: string, videoFile: string) => {
   // Add the upload to the user uploads list
   const userDoc = await UserModel.findOneAndUpdate(
     { _id: userId },
     {
-      $push: { uploads: file as UploadDB }
+      $push: {
+        uploads: {
+          videoFile
+        } as UploadDB
+      }
     },
     { new: true }
   )
 
   if (!userDoc) throw boom.internal('Unexpected error when adding file.')
 
-  log(`Added a file. user=${userDoc.email}, id=${userDoc._id}, fileName=${file.name}`)
-  return (userDoc.toObject({ versionKey: false }) as User).uploads.find(x => x.name === file.name) as Upload
+  log(`Added a file. user=${userDoc.email}, id=${userDoc._id}, fileName=${videoFile}`)
+  return (userDoc.toObject({ versionKey: false }) as UserDB).uploads.find(x => x.videoFile === videoFile) as UploadDB
 }
 
 /**
@@ -179,14 +186,18 @@ export const addUploadToUser = async (userId: string, file: Upload) => {
 export const setOneUploadStateFromUser = async (
   userId: string,
   uploadId: string,
-  fileName: Upload['name'],
+  fileName: Upload['videoFile'],
   newState: Upload['state'],
   analysisId?: string
 ) => {
   // Add the upload to the user uploads list
   const userDoc = await UserModel.findOneAndUpdate(
     { _id: userId, 'uploads._id': uploadId },
-    { 'uploads.$.state': newState, 'uploads.$.analysisId': analysisId },
+    {
+      'uploads.$.state': newState,
+      'uploads.$.analysisId': analysisId,
+      $currentDate: { 'uploads.$.lastStateEditTimestamp': true }
+    },
     { new: true }
   )
 

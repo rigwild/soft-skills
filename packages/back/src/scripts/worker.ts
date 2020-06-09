@@ -5,7 +5,7 @@ import { promises as fs } from 'fs'
 import execa from 'execa'
 
 import { UPLOADS_DIR } from '../config'
-import type { AudioAnalysisData } from '../types'
+import type { AnalysisDataTypes } from '../types'
 
 const scripts = {
   audioAnalysis: r(__dirname, 'audio_analysis.py')
@@ -25,9 +25,9 @@ const py = async (script: string, ...args: string[]) =>
   (await execa('python3', [script, ...args], { timeout: 120_000 })).stdout
 const pyCsv = async (script: string, ...args: string[]) => csv(await py(script, ...args))
 
-const audioAnalysis = async (file: string, data: AudioAnalysisData) =>
+const audioAnalysis = async (file: string, data: AnalysisDataTypes) =>
   pyCsv(scripts.audioAnalysis, file, 'print_raw_data', data)
-const audioAnalysisPlot = (file: string, outputFile: string, data: AudioAnalysisData) =>
+const audioAnalysisPlot = (file: string, outputFile: string, data: AnalysisDataTypes) =>
   py(scripts.audioAnalysis, file, 'generate_plot_file', data, outputFile)
 
 const getAmplitude = (file: string) => audioAnalysis(file, 'amplitude')
