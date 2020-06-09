@@ -3,6 +3,7 @@ import {
   UserDeleteOutlined,
 } from "@ant-design/icons";
 import { Button, Modal, Typography } from "antd";
+import { dateFormat } from "functions/date";
 import React, { CSSProperties } from "react";
 
 const WIDTH = 360;
@@ -57,7 +58,7 @@ const ProfileForm = (props: Props) => {
       <div style={labelContainerStyle}>
         <Text strong>Join date:</Text>
         <Paragraph style={{ marginLeft: 15 }}>
-          {new Date(props.joinDate).toLocaleDateString("en-CA")}
+          {dateFormat(new Date(props.joinDate))}
         </Paragraph>
       </div>
       <Button
