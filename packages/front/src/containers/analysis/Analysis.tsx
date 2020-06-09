@@ -3,6 +3,7 @@ import { getAnalysis, getAnalysisDataFile } from "api/upload";
 import { AxiosError, AxiosResponse } from "axios";
 import CenteredWrapper from "components/centeredwrapper";
 import LineGraph from "components/graph";
+import { dateFormat } from "functions/date";
 import { getErrorMessage } from "functions/error";
 import React, { useEffect, useState } from "react";
 
@@ -45,21 +46,19 @@ const AnalysisContainer = (props: Props) => {
     ])
       .then((res: AxiosResponse[]) => {
         const analysisData = res[0].data.data;
+        console.log(analysisData.uploadTimestamp);
         const analysis: Analysis = {
           videoFile: analysisData.videoFile,
           audioFile: analysisData.audioFile,
-          uploadTimestamp: new Date(analysisData.uploadTimestamp).toLocaleDateString("en-CA"),
-          // TODO: Missing time, maybe we should use a custom formatter (same for dashboard and profile):
-          // const dateFormat = (date: Date) => {
-          //   const t = num => ('0' + num).slice(-2)
-          //   return `${date.getFullYear()}-${t(date.getMonth() + 1)}-${t(date.getDate())} ${t(date.getHours())}:${t(date.getMinutes())}:${t(date.getSeconds())}`
-          // }
-          // => 2020-04-27 01:06:27
-
-          analysisTimestamp: new Date(analysisData.analysisTimestamp).toLocaleDateString("en-CA"),
-          amplitude: analysisData.amplitude.flat(),
-          pitch: analysisData.pitch.filter((pitchData: number[]) => pitchData[1] !== 0),
-          intensity: analysisData.intensity.flat(),
+          uploadTimestamp: dateFormat(new Date(analysisData.uploadTimestamp)),
+          analysisTimestamp: dateFormat(
+            new Date(analysisData.analysisTimestamp)
+          ),
+          amplitude: analysisData.amplitude,
+          pitch: analysisData.pitch.filter(
+            (pitchData: number[]) => pitchData[1] !== 0
+          ),
+          intensity: analysisData.intensity,
           amplitudeGraphURL: URL.createObjectURL(res[1].data),
           pitchGraphURL: URL.createObjectURL(res[2].data),
           intensityGraphURL: URL.createObjectURL(res[3].data),
