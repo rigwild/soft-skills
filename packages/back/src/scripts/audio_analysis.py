@@ -33,7 +33,7 @@ def draw_spectrogram(spectrogram, dynamic_range=70):
     plt.ylabel("frequency [Hz]")
 
 
-def draw_intensity(intensity):
+def draw_intensity():
     plt.plot(intensity.xs(), intensity.values.T, linewidth=3, color='w')
     plt.plot(intensity.xs(), intensity.values.T, linewidth=1)
     plt.grid(False)
@@ -51,18 +51,16 @@ def plot_amplitude_graph(output_path):
 
 
 def plot_intensity_spectogram(output_path):
-    intensity = snd.to_intensity()
     spectrogram = snd.to_spectrogram()
     plt.figure()
     draw_spectrogram(spectrogram)
     plt.twinx()
-    draw_intensity(intensity)
+    draw_intensity()
     plt.xlim([snd.xmin, snd.xmax])
     plt.savefig(output_path)
 
 
 def plot_pitch(output_path):
-    pitch = snd.to_pitch()
     pre_emphasized_snd = snd.copy()
     pre_emphasized_snd.pre_emphasize()
     spectrogram = pre_emphasized_snd.to_spectrogram(
@@ -106,7 +104,6 @@ def print_amplitude_data(number_of_points, max_data):
 
 
 def print_intensity_data():
-    intensity = snd.to_intensity()
     data = {"intensity_x": intensity.xs(),
             "intensity_y": list(intensity.values.T)}
     dataframe = pd.DataFrame(data, columns=['intensity_x', 'intensity_y'])
@@ -114,12 +111,17 @@ def print_intensity_data():
 
 
 def print_pitch_data():
-    pitch = snd.to_pitch()
     data = {"pitch_x": pitch.xs(),
             "pitch_y": pitch.selected_array['frequency']}
     dataframe = pd.DataFrame(data, columns=['pitch_x', 'pitch_y'])
     np.savetxt(sys.stdout.buffer, dataframe, fmt='%.2f')
 
+def score_intensity():
+    return(np.std(intensity.values.T)/np.mean(intensity.values.T))
+
+def score_pitch():
+    pitch_values = pitch.selected_array['frequency']
+    return(np.std(pitch_values)/np.mean(pitch_values))
 
 if len(sys.argv) < 2 or sys.argv[1] == '-h' or sys.argv[1] == '--help' or sys.argv[1] == 'help':
     print("""Usage:
@@ -130,6 +132,8 @@ else:
     command = sys.argv[2]
     sns.set()  # Use seaborn's default style to make attractive graphs
     snd = parselmouth.Sound(audio_file)
+    intensity = snd.to_intensity()
+    pitch = snd.to_pitch()
     if command == 'generate_plot_file':
         needed_data = sys.argv[3]
         output_path = sys.argv[4]
