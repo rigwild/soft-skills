@@ -1,4 +1,5 @@
-import { Alert, Collapse, Spin, Typography } from "antd";
+import { DownloadOutlined } from "@ant-design/icons";
+import { Alert, Button, Collapse, Spin, Typography } from "antd";
 import { getAnalysis, getAnalysisDataFile } from "api/upload";
 import { AxiosError, AxiosResponse } from "axios";
 import CenteredWrapper from "components/centeredwrapper";
@@ -42,11 +43,10 @@ const AnalysisContainer = (props: Props) => {
       getAnalysisDataFile(props.id, "pitchPlotFile"),
       getAnalysisDataFile(props.id, "intensityPlotFile"),
       getAnalysisDataFile(props.id, "videoFile"),
-      getAnalysisDataFile(props.id, "audioFile"), // TODO: "Download audio" button
+      getAnalysisDataFile(props.id, "audioFile"),
     ])
       .then((res: AxiosResponse[]) => {
         const analysisData = res[0].data.data;
-        console.log(analysisData.uploadTimestamp);
         const analysis: Analysis = {
           videoFile: analysisData.videoFile,
           audioFile: analysisData.audioFile,
@@ -98,10 +98,26 @@ const AnalysisContainer = (props: Props) => {
 
   return (
     <>
-      <Title style={{ margin: 0 }}>{analysis?.videoFile}</Title>
-      <Title level={4} style={{ marginTop: 10 }}>
-        {analysis?.analysisTimestamp}
-      </Title>
+      <Title>{analysis?.videoFile}</Title>
+      <CenteredWrapper row wrap>
+        <div>
+          <p style={{ fontSize: 18, marginBottom: 5 }}>
+            <strong>Uploaded: </strong>
+            {analysis?.uploadTimestamp}
+          </p>
+          <p style={{ fontSize: 18 }}>
+            <strong>Analyzed:  </strong>
+            {analysis?.analysisTimestamp}
+          </p>
+        </div>
+        <div style={{ marginLeft: 115 }}>
+          <a download={analysis?.audioFile} href={analysis?.audioURL}>
+            <Button type="primary" icon={<DownloadOutlined />}>
+              Download audio
+            </Button>
+          </a>
+        </div>
+      </CenteredWrapper>
       <video controls src={analysis?.videoURL} height={400} />
       <Collapse style={{ width: "100%", marginTop: 25 }}>
         <Panel header="Amplitude" key="amplitude">
