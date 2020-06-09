@@ -78,6 +78,10 @@ const DashboardContainer = () => {
     return <Alert message={`Analysis state: ${state}`} type={type} showIcon />;
   };
 
+  const getAnalysisDate = (upload: Upload) => {
+    return upload.state === "pending" || upload.state === "error" ? '-' : dateFormat(new Date(upload.lastStateEditTimestamp));
+  };
+
   const getExtra = (upload: Upload) => {
     switch (upload.state) {
       case AnalysisState.PENDING:
@@ -134,28 +138,39 @@ const DashboardContainer = () => {
   }
 
   return (
-    <CenteredWrapper row wrap>
-      {uploads.map((upload) => (
-        <Card
-          key={upload._id}
-          title={upload.videoFile}
-          extra={getExtra(upload)}
-          style={{ width: 300, margin: 15 }}
-        >
-          {getStateContent(upload.state)}
-          <div style={{ marginTop: 15 }}>
-            <p style={{ marginBottom: 5 }}>
-              <strong>Uploaded: </strong>
-              {dateFormat(new Date(upload.uploadTimestamp))}
-            </p>
-            <p>
-              <strong>Analysed:  </strong>
-              {dateFormat(new Date(upload.lastStateEditTimestamp))}
-            </p>
-          </div>
-        </Card>
-      ))}
-    </CenteredWrapper>
+    <>
+      <CenteredWrapper row wrap>
+        {uploads.map((upload) => (
+          <Card
+            key={upload._id}
+            title={upload.videoFile}
+            extra={getExtra(upload)}
+            style={{ width: 300, margin: 15 }}
+          >
+            {getStateContent(upload.state)}
+            <div style={{ marginTop: 15 }}>
+              <p style={{ marginBottom: 5 }}>
+                <strong>Uploaded: </strong>
+                {dateFormat(new Date(upload.uploadTimestamp))}
+              </p>
+              <p>
+                <strong>Analysed:  </strong>
+                {getAnalysisDate(upload)}
+              </p>
+            </div>
+          </Card>
+        ))}
+      </CenteredWrapper>
+      <Link to="/record">
+        <Button
+          type="primary"
+          style={{ marginTop: 25 }}
+          icon={<VideoCameraAddOutlined />}
+          >
+          Record a video
+        </Button>
+      </Link>
+    </>
   );
 };
 
