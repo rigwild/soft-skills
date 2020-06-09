@@ -6,6 +6,7 @@ import CenteredWrapper from "components/centeredwrapper";
 import { getErrorMessage } from "functions/error";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { dateFormat } from "functions/date";
 
 const { Title } = Typography;
 
@@ -23,30 +24,30 @@ type Upload = {
   analysisId: string;
   videoFile: string;
   state: AnalysisState;
-  uploadTimestamp: string; // TODO: Add initial upload timestamp
-  lastStateEditTimestamp: string; // TODO: Add last state edit timestamp
+  uploadTimestamp: string;
+  lastStateEditTimestamp: string;
 };
 
-type AnalysisResponse = {
+type UploadsResponse = {
   data: Upload[];
 };
 
 const DashboardContainer = () => {
   const [loading, setLoading] = useState(false);
-  const [analyses, setAnalyses] = useState<Upload[]>([]);
+  const [uploads, setUploads] = useState<Upload[]>([]);
   const [error, setError] = useState<string | undefined>(undefined);
 
-  const fetchAnalyses = useCallback(() => {
+  const fetchUploads = useCallback(() => {
     getUploads()
-      .then((res: AxiosResponse<AnalysisResponse>) => {
-        const analyses: Upload[] = res.data.data;
-        const hasPending = analyses.find(
-          (analysis) => analysis.state === AnalysisState.PENDING
+      .then((res: AxiosResponse<UploadsResponse>) => {
+        const uploads: Upload[] = res.data.data;
+        const hasPending = uploads.find(
+          (upload) => upload.state === AnalysisState.PENDING
         );
         if (hasPending) {
-          setTimeout(() => fetchAnalyses(), POLLING_INTERVAL);
+          setTimeout(() => fetchUploads(), POLLING_INTERVAL);
         }
-        setAnalyses(analyses);
+        setUploads(uploads);
       })
       .catch((error: AxiosError) => {
         const errorMessage = getErrorMessage(error);
@@ -57,10 +58,10 @@ const DashboardContainer = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetchAnalyses();
-  }, [fetchAnalyses]);
+    fetchUploads();
+  }, [fetchUploads]);
 
-  const getContent = (state: AnalysisState) => {
+  const getStateContent = (state: AnalysisState) => {
     type AlertType = "warning" | "error" | "success" | undefined;
     let type: AlertType = undefined;
     switch (state) {
@@ -77,15 +78,15 @@ const DashboardContainer = () => {
     return <Alert message={`Analysis state: ${state}`} type={type} showIcon />;
   };
 
-  const getExtra = (analysis: Analysis) => {
-    switch (analysis.state) {
+  const getExtra = (upload: Upload) => {
+    switch (upload.state) {
       case AnalysisState.PENDING:
         return (
           <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
         );
       case AnalysisState.SUCCESS:
         return (
-          <Link to={`/analysis/${analysis.analysisId}`} style={{ marginTop: 25 }}>
+          <Link to={`/analysis/${upload.analysisId}`} style={{ marginTop: 25 }}>
             Details
           </Link>
         );
@@ -95,7 +96,7 @@ const DashboardContainer = () => {
   if (loading) {
     return (
       <Spin
-        tip="Retrieving your analyses..."
+        tip="Retrieving your uploads..."
         size="large"
         style={{ marginTop: "25vh" }}
       />
@@ -114,11 +115,11 @@ const DashboardContainer = () => {
     );
   }
 
-  if (analyses.length === 0) {
+  if (uploads.length === 0) {
     return (
       <>
         <Empty description={false} style={{ marginTop: "15vh" }} />
-        <Title style={{ marginTop: 15 }}>No analysis to display</Title>
+        <Title style={{ marginTop: 15 }}>No uploads to display</Title>
         <Link to="/record">
           <Button
             type="primary"
@@ -134,14 +135,24 @@ const DashboardContainer = () => {
 
   return (
     <CenteredWrapper row wrap>
-      {analyses.map((analysis) => (
+      {uploads.map((upload) => (
         <Card
-          key={analysis._id}
-          title={analysis.videoFile}
-          extra={getExtra(analysis)}
+          key={upload._id}
+          title={upload.videoFile}
+          extra={getExtra(upload)}
           style={{ width: 300, margin: 15 }}
         >
-          {getContent(analysis.state)}
+          {getStateContent(upload.state)}
+          <div style={{ marginTop: 15 }}>
+            <p style={{ marginBottom: 5 }}>
+              <strong>Uploaded: </strong>
+              {dateFormat(new Date(upload.uploadTimestamp))}
+            </p>
+            <p>
+              <strong>Analysed:  </strong>
+              {dateFormat(new Date(upload.lastStateEditTimestamp))}
+            </p>
+          </div>
         </Card>
       ))}
     </CenteredWrapper>
