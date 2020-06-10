@@ -53,6 +53,7 @@ router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadRequest
 
 /**
  * @api {get} /uploads Get the list of all files sent for analysis
+ * @apiDescription Files are sorted by uploadTimestamp desc.
  * @apiVersion 0.1.0
  * @apiName UploadedFiles
  * @apiGroup Uploads
@@ -62,28 +63,28 @@ router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadRequest
  * {
  *   "data": [
  *     {
- *       "state": "pending",
- *       "analysisId": null,
- *       "uploadTimestamp": "2020-06-08T11:49:09.080Z",
- *       "lastStateEditTimestamp": "2020-06-08T11:49:21.683Z",
- *       "_id": "5ede25b5ee17b104bc23ba96",
- *       "videoFile": "1V4Fne8Z__VIDEO.mp4"
+ *         "state": "pending",
+ *         "analysisId": "5edfa469b0996303bfac4054",
+ *         "uploadTimestamp": "2020-06-09T15:01:42.886Z",
+ *         "lastStateEditTimestamp": "2020-06-09T15:02:01.479Z",
+ *         "_id": "5edfa456b0996303bfac4053",
+ *         "videoFile": "3x46l715_upload.webm"
  *     },
  *     {
- *       "state": "error",
- *       "analysisId": null,
- *       "uploadTimestamp": "2020-06-08T11:49:09.080Z",
- *       "lastStateEditTimestamp": "2020-06-08T11:49:21.683Z",
- *       "_id": "5ede25b5ee17b104bc23ba96",
- *       "videoFile": "2V4Fne8Z__VIDEO.mp4"
+ *         "state": "error",
+ *         "analysisId": "5edf9fceb0996303bfac4052",
+ *         "uploadTimestamp": "2020-06-09T14:42:05.643Z",
+ *         "lastStateEditTimestamp": "2020-06-09T14:42:22.244Z",
+ *         "_id": "5edf9fbdb0996303bfac4051",
+ *         "videoFile": "2uLgBYY0_upload.webm"
  *     },
  *     {
- *       "state": "finished",
- *       "analysisId": "5ed66cc0dbaee47acd2c1063",
- *       "uploadTimestamp": "2020-06-08T11:49:09.080Z",
- *       "lastStateEditTimestamp": "2020-06-08T11:49:21.683Z",
- *       "_id": "5ede25b5ee17b104bc23ba96",
- *       "videoFile": "3V4Fne8Z__VIDEO.mp4"
+ *         "state": "finished",
+ *         "analysisId": "5edf9873b0996303bfac4050",
+ *         "uploadTimestamp": "2020-06-09T14:10:28.124Z",
+ *         "lastStateEditTimestamp": "2020-06-09T14:11:00.153Z",
+ *         "_id": "5edf9854b0996303bfac404f",
+ *         "videoFile": "1lg55iA7_upload.webm"
  *     }
  *   ]
  * }

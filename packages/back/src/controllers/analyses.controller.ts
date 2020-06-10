@@ -57,7 +57,8 @@ export const uploadRequestHandler = async (reqRaw: RequestAuthed, res: Response)
 
 export const getUploadsRequestHandler = async (req: RequestAuthed, res: Response) => {
   const profile = await findUser(req.session._id)
-  res.json({ data: profile.uploads })
+  // Sort by most recently uploaded is first
+  res.json({ data: profile.uploads.sort((a, b) => (a.uploadTimestamp < b.uploadTimestamp ? 1 : -1)) })
 }
 
 export const getAnalysisRequestHandler = async (req: RequestAuthed<{ analysisId: string }>, res: Response) => {
