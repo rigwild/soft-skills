@@ -7,14 +7,9 @@ export type UploadStates = typeof uploadStates[number]
 export const analysisDataTypes = ['amplitude', 'intensity', 'pitch'] as const
 export type AnalysisDataTypes = typeof analysisDataTypes[number]
 
-export const analysisFiles = [
-  'videoFile',
-  'audioFile',
-  'amplitudePlotFile',
-  'intensityPlotFile',
-  'pitchPlotFile'
-] as const
-export type AnalysisFiles = typeof analysisFiles[number]
+const _analysisFiles = ['videoFile', 'audioFile', 'amplitudePlotFile', 'intensityPlotFile', 'pitchPlotFile'] as const
+export const analysisFiles = new Set(_analysisFiles)
+export type AnalysisFiles = typeof _analysisFiles[number]
 
 export interface Upload {
   videoFile: string

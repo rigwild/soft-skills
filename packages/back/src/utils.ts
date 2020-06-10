@@ -41,6 +41,6 @@ export const videoMimeTypes = new Set([
   'video/x-matroska',
   'video/x-ms-wmv',
   'video/x-msvideo'
-])
+] as const)
 
-export const isVideoMimeType = (mimeType: string) => videoMimeTypes.has(mimeType.toLowerCase())
+export const isVideoMimeType = (mimeType: string) => videoMimeTypes.has(mimeType.toLowerCase() as any)

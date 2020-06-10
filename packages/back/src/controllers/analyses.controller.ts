@@ -83,7 +83,7 @@ export const getAnalysisFileRequestHandler = async (
   const file = req.params.file
 
   // Check the user asked for a valid data type
-  if (analysisFiles.indexOf(file) === -1) throw boom.badRequest('Provided file key is invalid.')
+  if (!analysisFiles.has(file)) throw boom.badRequest('Provided file key is invalid.')
 
   // Get analysis data
   const analysis = await AnalysisModel.findOne({ _id: req.params.analysisId, userId: req.session._id }, { [file]: 1 })
