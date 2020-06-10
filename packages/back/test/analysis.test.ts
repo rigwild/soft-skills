@@ -2,7 +2,7 @@ import { resolve as r } from 'path'
 import request from 'supertest'
 
 import { test, before, beforeEach, afterEachAlways, afterAlways } from './_utils'
-import { UserModel, findUser } from '../src/db'
+import { UserModel, findUser, AnalysisModel } from '../src/db'
 import type { UserDB } from '../src/types'
 
 test.before(before)
@@ -35,6 +35,16 @@ test.serial('Get an analysis raw data', async t => {
   t.deepEqual(res.body.data.pitch, testAnalysisData.pitch)
 })
 
+test.serial('Delete an analysis', async t => {
+  const { app, testUserData, testAnalysisData, token } = t.context
+  const res = await request(app).delete(`/analysis/${testAnalysisData._id}`).set('Authorization', `Bearer ${token}`)
+
+  t.is(res.status, 200)
+  // Check in database if analysis was really deleted
+  t.falsy((await UserModel.findById(testUserData._id))?.uploads.find(x => x.analysisId))
+  t.falsy(await AnalysisModel.findById(testAnalysisData._id))
+})
+
 test.serial('Upload an invalid file', async t => {
   const { app, token } = t.context
   const res = await request(app)
@@ -46,7 +56,7 @@ test.serial('Upload an invalid file', async t => {
   t.is(res.body.message, 'You need to send a video file.')
 })
 
-test.serial('Upload an audio file for analysis', async t => {
+test.serial('Upload a video file for analysis', async t => {
   const { app, testUserData, testAnalysisData, testFilePath, token } = t.context
 
   // Delete pre-injected upload test data
