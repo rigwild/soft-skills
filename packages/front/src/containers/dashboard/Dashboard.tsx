@@ -1,12 +1,18 @@
-import { LoadingOutlined, VideoCameraAddOutlined } from "@ant-design/icons";
-import { Alert, Button, Card, Empty, Spin, Typography } from "antd";
+import {
+  DeleteOutlined,
+  ExperimentOutlined,
+  LoadingOutlined,
+  RedoOutlined,
+  VideoCameraAddOutlined,
+} from "@ant-design/icons";
+import { Alert, Button, Card, Empty, Spin, Tooltip, Typography } from "antd";
 import { getUploads } from "api/upload";
 import { AxiosError, AxiosResponse } from "axios";
 import CenteredWrapper from "components/centeredwrapper";
+import { dateFormat } from "functions/date";
 import { getErrorMessage } from "functions/error";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { dateFormat } from "functions/date";
 
 const { Title } = Typography;
 
@@ -79,21 +85,52 @@ const DashboardContainer = () => {
   };
 
   const getAnalysisDate = (upload: Upload) => {
-    return upload.state === "pending" || upload.state === "error" ? '-' : dateFormat(new Date(upload.lastStateEditTimestamp));
+    return upload.state === "pending" || upload.state === "error"
+      ? "-"
+      : dateFormat(new Date(upload.lastStateEditTimestamp));
   };
 
-  const getExtra = (upload: Upload) => {
-    switch (upload.state) {
+  const getExtra = (state: AnalysisState) => {
+    switch (state) {
       case AnalysisState.PENDING:
         return (
           <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
         );
       case AnalysisState.SUCCESS:
+      case AnalysisState.ERROR:
         return (
-          <Link to={`/analysis/${upload.analysisId}`} style={{ marginTop: 25 }}>
-            Details
-          </Link>
+          <Tooltip title="Delete analysis" placement="top">
+            <Button
+              danger
+              shape="circle"
+              icon={<DeleteOutlined />}
+              style={{ marginTop: 5 }}
+            />
+          </Tooltip>
         );
+    }
+  };
+
+  const getAction = (upload: Upload) => {
+    switch (upload.state) {
+      case AnalysisState.SUCCESS:
+        return [
+          <Link to={`/analysis/${upload.analysisId}`} key="analysis">
+            <Button type="primary" icon={<ExperimentOutlined />}>
+              Show analysis
+            </Button>
+          </Link>,
+        ];
+      case AnalysisState.ERROR:
+        return [
+          <Button
+            type="primary"
+            icon={<RedoOutlined />}
+            style={{ backgroundColor: "#ffbf00", borderColor: "#ffbf00" }}
+          >
+            Retry
+          </Button>,
+        ];
     }
   };
 
@@ -139,13 +176,29 @@ const DashboardContainer = () => {
 
   return (
     <>
+      <Link to="/record">
+        <Button
+          type="primary"
+          style={{
+            marginTop: 10,
+            marginBottom: 10,
+            backgroundColor: "#f5317f",
+            borderColor: "#f5317f",
+          }}
+          icon={<VideoCameraAddOutlined />}
+          size="large"
+        >
+          Record a video
+        </Button>
+      </Link>
       <CenteredWrapper row wrap>
         {uploads.map((upload) => (
           <Card
             key={upload._id}
             title={upload.videoFile}
-            extra={getExtra(upload)}
-            style={{ width: 300, margin: 15 }}
+            extra={getExtra(upload.state)}
+            style={{ height: 290, width: 300, margin: 15 }}
+            actions={getAction(upload)}
           >
             {getStateContent(upload.state)}
             <div style={{ marginTop: 15 }}>
@@ -161,15 +214,6 @@ const DashboardContainer = () => {
           </Card>
         ))}
       </CenteredWrapper>
-      <Link to="/record">
-        <Button
-          type="primary"
-          style={{ marginTop: 25 }}
-          icon={<VideoCameraAddOutlined />}
-          >
-          Record a video
-        </Button>
-      </Link>
     </>
   );
 };
