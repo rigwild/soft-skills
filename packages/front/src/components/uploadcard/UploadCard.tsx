@@ -12,11 +12,11 @@ import { AnalysisState, Upload } from "types/dashboard";
 
 type Props = {
   upload: Upload;
-  deleteAnalysis: (id: string) => void;
+  deleteUpload: (_id: string) => void;
 };
 
 const UploadCard = (props: Props) => {
-  const { upload, deleteAnalysis } = props;
+  const { upload, deleteUpload } = props;
 
   const getStateContent = (state: AnalysisState) => {
     type AlertType = "warning" | "error" | "success" | undefined;
@@ -56,7 +56,7 @@ const UploadCard = (props: Props) => {
               shape="circle"
               icon={<DeleteOutlined />}
               style={{ marginTop: 5 }}
-              onClick={() => deleteAnalysis(upload.analysisId)}
+              onClick={() => deleteUpload(upload._id)}
             />
           </Tooltip>
         );
