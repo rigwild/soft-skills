@@ -143,13 +143,13 @@ router.get<{ analysisId: string }>(
 )
 
 /**
- * @api {delete} /analysis/:analysisId Delete an analysis
- * @apiDescription Remove the analysis data and the file in the user's uploads list
+ * @api {delete} /analysis/:analysisIdOrUploadId Delete an analysis
+ * @apiDescription Remove the analysis data and the file in the user's uploads list - Accepts analysisId or uploadId
  * @apiVersion 0.1.0
  * @apiName AnalysisDelete
  * @apiGroup Analysis
  *
- * @apiParam {String} analysisId Analysis id
+ * @apiParam {String} analysisIdOrUploadId Analysis id
  *
  * @apiSuccessExample {String} Success-Response:
  * HTTP/1.1 200 OK
@@ -161,8 +161,8 @@ router.get<{ analysisId: string }>(
  *   "message": "Analysis not found."
  * }
  */
-router.delete<{ analysisId: string }>(
-  '/analysis/:analysisId',
+router.delete<{ analysisIdOrUploadId: string }>(
+  '/analysis/:analysisIdOrUploadId',
   authenticatedMiddleware(),
   // @ts-ignore
   asyncMiddleware(deleteAnalysisRequestHandler)

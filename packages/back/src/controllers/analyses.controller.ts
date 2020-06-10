@@ -71,8 +71,11 @@ export const getAnalysisRequestHandler = async (req: RequestAuthed<{ analysisId:
   res.json({ data: await findAnalysis(req.params.analysisId) })
 }
 
-export const deleteAnalysisRequestHandler = async (req: RequestAuthed<{ analysisId: string }>, res: Response) => {
-  await deleteAnalysis(req.session._id, req.params.analysisId)
+export const deleteAnalysisRequestHandler = async (
+  req: RequestAuthed<{ analysisIdOrUploadId: string }>,
+  res: Response
+) => {
+  await deleteAnalysis(req.session._id, req.params.analysisIdOrUploadId)
   res.end()
 }
 

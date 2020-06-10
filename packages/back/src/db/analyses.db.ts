@@ -64,17 +64,30 @@ export const addAnalysis = async (
 }
 
 /**
- * Delete an analysis. Will also remove it from the `users.uploads` array
+ * Delete an analysis. Will also remove it from the `users.uploads` array. Accepts analysisId or uploadId (for failed analyses)
  * @param userId
- * @param analysisId
+ * @param analysisIdOrUploadId
  */
-export const deleteAnalysis = async (userId: string, analysisId: string) => {
+export const deleteAnalysis = async (userId: string, analysisIdOrUploadId: string) => {
   // Remove from the uploads of the user
-  await UserModel.findByIdAndUpdate(userId, { $pull: { uploads: { analysisId } } })
-  // Remove the analysis
-  await AnalysisModel.findByIdAndRemove(analysisId)
+  const userDocBeforeUpdate = await UserModel.findByIdAndUpdate(userId, {
+    $pull: {
+      uploads: {
+        $or: [{ _id: analysisIdOrUploadId }, { analysisId: analysisIdOrUploadId }]
+      } as any
+    }
+  })
+  if (!userDocBeforeUpdate) throw boom.notFound('Analysis not found.')
 
-  log(`Removed an analysis. userId=${userId}, analysisId=${analysisId}`)
+  // Find the analysisId
+  const analysisId = userDocBeforeUpdate.uploads.find(
+    x => x._id.toString() === analysisIdOrUploadId || x.analysisId === analysisIdOrUploadId
+  )?.analysisId
+
+  // If the provided id is an analysisId, we can remove the analysis document
+  if (analysisId) await AnalysisModel.findByIdAndRemove(analysisId)
+
+  log(`Removed an analysis. userId=${userId}, analysisId=${analysisIdOrUploadId}`)
 }
 
 /**
