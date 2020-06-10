@@ -2,10 +2,11 @@ import { Router } from 'express'
 
 import { asyncMiddleware, authenticatedMiddleware } from '../middlewares'
 import {
-  uploadRequestHandler,
+  uploadFileRequestHandler,
   getUploadsRequestHandler,
   getAnalysisRequestHandler,
-  getAnalysisFileRequestHandler
+  getAnalysisFileRequestHandler,
+  deleteAnalysisRequestHandler
 } from '../controllers/analyses.controller'
 import type { AnalysisFiles } from '../types'
 
@@ -49,7 +50,7 @@ const router = Router()
  *   "message": "You need to send a video file."
  * }
  */
-router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadRequestHandler))
+router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadFileRequestHandler))
 
 /**
  * @api {get} /uploads Get the list of all files sent for analysis
@@ -92,7 +93,7 @@ router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadRequest
 router.get('/uploads', authenticatedMiddleware(), asyncMiddleware(getUploadsRequestHandler))
 
 /**
- * @api {get} /analysis/:analysis Load an analysis data
+ * @api {get} /analysis/:analysisId Load an analysis data
  * @apiVersion 0.1.0
  * @apiName AnalysisData
  * @apiGroup Analysis
@@ -142,9 +143,35 @@ router.get<{ analysisId: string }>(
 )
 
 /**
+ * @api {delete} /analysis/:analysisId Delete an analysis
+ * @apiDescription Remove the analysis data and the file in the user's uploads list
+ * @apiVersion 0.1.0
+ * @apiName AnalysisDelete
+ * @apiGroup Analysis
+ *
+ * @apiParam {String} analysisId Analysis id
+ *
+ * @apiSuccessExample {String} Success-Response:
+ * HTTP/1.1 200 OK
+ *
+ * @apiError {Error} NotFound Analysis not found.
+ * @apiErrorExample {json} Error-Response:
+ * HTTP/1.1 404 Not Found
+ * {
+ *   "message": "Analysis not found."
+ * }
+ */
+router.delete<{ analysisId: string }>(
+  '/analysis/:analysisId',
+  authenticatedMiddleware(),
+  // @ts-ignore
+  asyncMiddleware(deleteAnalysisRequestHandler)
+)
+
+/**
  * @api {get} /analysis/:analysis/:file Load an analysis data file
  * @apiVersion 0.1.0
- * @apiName AnalysisData
+ * @apiName AnalysisDataFile
  * @apiGroup Analysis
  *
  * @apiParam {String} analysisId Analysis id

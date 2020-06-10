@@ -44,6 +44,30 @@ UserSchema.post('save', (error: any, doc: mongoose.Document, next: Function) => 
 export const UserModel = mongoose.model<UserDocument>('User', UserSchema)
 
 /**
+ * Find data of a registered user
+ * @param userId The user id of the user
+ * @returns The user's data
+ * @throws Could not find the user
+ */
+export const findUser = async (userId: string) => {
+  const user = await UserModel.findById(userId)
+  if (!user) throw boom.notFound('User not found.')
+  return user
+}
+
+/**
+ * Find data of a registered user
+ * @param email The email of the user
+ * @returns The user's data
+ * @throws Could not find the user
+ */
+export const findUserByEmail = async (email: string) => {
+  const user = await UserModel.findOne({ email })
+  if (!user) throw boom.notFound('User not found.')
+  return user
+}
+
+/**
  * Register a new user.
  *
  * @param email The email of the new user (unique)
@@ -151,6 +175,15 @@ export const editUser = async (userId: string, _newProfileData: Partial<Pick<Use
 }
 
 /**
+ * Load all the user uploads sorted by most recently uploaded is first
+ * @param userId The user id of the user
+ */
+export const getUserUploads = async (userId: string) => {
+  const profile = await findUser(userId)
+  return profile.uploads.sort((a, b) => (a.uploadTimestamp < b.uploadTimestamp ? 1 : -1))
+}
+
+/**
  * Link a file to a user
  * @param userId The user id of the user
  * @param videoFile Uploaded file to link to a user
@@ -204,28 +237,4 @@ export const setOneUploadStateFromUser = async (
   if (!userDoc) throw boom.internal('Unexpected error when setting analysis state.')
 
   log(`Edited an upload state. user=${userDoc.email}, id=${userDoc._id}, fileName=${fileName}, newState=${newState}`)
-}
-
-/**
- * Find data of a registered user
- * @param userId The user id of the user
- * @returns The user's data
- * @throws Could not find the user
- */
-export const findUser = async (userId: string) => {
-  const user = await UserModel.findById(userId)
-  if (!user) throw boom.notFound('User not found.')
-  return user
-}
-
-/**
- * Find data of a registered user
- * @param email The email of the user
- * @returns The user's data
- * @throws Could not find the user
- */
-export const findUserByEmail = async (email: string) => {
-  const user = await UserModel.findOne({ email })
-  if (!user) throw boom.notFound('User not found.')
-  return user
 }

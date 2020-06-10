@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose'
 import boom from '@hapi/boom'
 
-import { setOneUploadStateFromUser } from './user.db'
+import { setOneUploadStateFromUser, UserModel } from './user.db'
 import { log } from '../utils'
 import type { UploadDB, Analysis } from '../types'
 
@@ -30,6 +30,7 @@ export const AnalysisModel = mongoose.model<AnalysisDocument>('Analyses', Analys
 /**
  * Add an analysis
  * @param userId The user id of the user who requested the analysis
+ * @param file Uploaded file data from `users.uploads`
  * @param analysis Analysis data
  */
 export const addAnalysis = async (
@@ -60,6 +61,20 @@ export const addAnalysis = async (
   // Set the file state as finished in the user uploads list
   await setOneUploadStateFromUser(userId, file._id, file.videoFile, 'finished', analysisDoc._id)
   log(`Added an analysis. userId=${userId}, fileName=${file.videoFile}`)
+}
+
+/**
+ * Delete an analysis. Will also remove it from the `users.uploads` array
+ * @param userId
+ * @param analysisId
+ */
+export const deleteAnalysis = async (userId: string, analysisId: string) => {
+  // Remove from the uploads of the user
+  await UserModel.findByIdAndUpdate(userId, { $pull: { uploads: { analysisId } } })
+  // Remove the analysis
+  await AnalysisModel.findByIdAndRemove(analysisId)
+
+  log(`Removed an analysis. userId=${userId}, analysisId=${analysisId}`)
 }
 
 /**

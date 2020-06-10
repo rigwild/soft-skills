@@ -4,12 +4,20 @@ import boom from '@hapi/boom'
 import { nanoid } from 'nanoid'
 
 import { UPLOADS_DIR } from '../config'
-import { addUploadToUser, setOneUploadStateFromUser, findUser, addAnalysis, findAnalysis, AnalysisModel } from '../db'
+import {
+  addUploadToUser,
+  setOneUploadStateFromUser,
+  addAnalysis,
+  findAnalysis,
+  AnalysisModel,
+  deleteAnalysis,
+  getUserUploads
+} from '../db'
 import { analyseVideo } from '../scripts/runner'
 import { isVideoMimeType, logDated, logErr } from '../utils'
 import { RequestAuthed, analysisFiles, AnalysisFiles } from '../types'
 
-export const uploadRequestHandler = async (reqRaw: RequestAuthed, res: Response) => {
+export const uploadFileRequestHandler = async (reqRaw: RequestAuthed, res: Response) => {
   const req = reqRaw as typeof reqRaw & { files: any }
 
   // Check a file was uploaded
@@ -56,14 +64,16 @@ export const uploadRequestHandler = async (reqRaw: RequestAuthed, res: Response)
 }
 
 export const getUploadsRequestHandler = async (req: RequestAuthed, res: Response) => {
-  const profile = await findUser(req.session._id)
-  // Sort by most recently uploaded is first
-  res.json({ data: profile.uploads.sort((a, b) => (a.uploadTimestamp < b.uploadTimestamp ? 1 : -1)) })
+  res.json({ data: await getUserUploads(req.session._id) })
 }
 
 export const getAnalysisRequestHandler = async (req: RequestAuthed<{ analysisId: string }>, res: Response) => {
-  const analysis = await findAnalysis(req.params.analysisId)
-  res.json({ data: analysis.toObject({ versionKey: false }) })
+  res.json({ data: await findAnalysis(req.params.analysisId) })
+}
+
+export const deleteAnalysisRequestHandler = async (req: RequestAuthed<{ analysisId: string }>, res: Response) => {
+  await deleteAnalysis(req.session._id, req.params.analysisId)
+  res.end()
 }
 
 export const getAnalysisFileRequestHandler = async (
