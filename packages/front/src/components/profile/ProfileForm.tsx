@@ -29,7 +29,7 @@ const labelContainerStyle: CSSProperties = {
 const ProfileForm = (props: Props) => {
   const showDeleteModal = () => {
     confirm({
-      title: "Are you sure you want to delete your account ?",
+      title: "Are you sure you want to delete your account?",
       icon: <ExclamationCircleOutlined />,
       content: "This action can't be undone",
       style: { top: 330 },
