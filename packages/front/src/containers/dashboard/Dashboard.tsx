@@ -1,38 +1,22 @@
 import {
-  DeleteOutlined,
-  ExperimentOutlined,
-  LoadingOutlined,
-  RedoOutlined,
+  ExclamationCircleOutlined,
   VideoCameraAddOutlined,
 } from "@ant-design/icons";
-import { Alert, Button, Card, Empty, Spin, Tooltip, Typography } from "antd";
-import { getUploads } from "api/upload";
+import { Alert, Button, Empty, message, Modal, Spin, Typography } from "antd";
+import { deleteUpload, getUploads } from "api/upload";
 import { AxiosError, AxiosResponse } from "axios";
 import CenteredWrapper from "components/centeredwrapper";
-import { dateFormat } from "functions/date";
+import UploadCard from "components/uploadcard";
 import { getErrorMessage } from "functions/error";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { AnalysisState, Upload } from "types/dashboard";
 
+const { confirm } = Modal;
 const { Title } = Typography;
 
 // 10 seconds in ms
 const POLLING_INTERVAL = 10000;
-
-enum AnalysisState {
-  PENDING = "pending",
-  ERROR = "error",
-  SUCCESS = "finished",
-}
-
-type Upload = {
-  _id: string;
-  analysisId: string;
-  videoFile: string;
-  state: AnalysisState;
-  uploadTimestamp: string;
-  lastStateEditTimestamp: string;
-};
 
 type UploadsResponse = {
   data: Upload[];
@@ -62,77 +46,31 @@ const DashboardContainer = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  const handleDeleteUpload = (_id: string) => {
+    confirm({
+      title: "Are you sure you want to delete this upload?",
+      icon: <ExclamationCircleOutlined />,
+      content: "This action can't be undone",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      style: { top: 350 },
+      onOk() {
+        return deleteUpload(_id)
+          .then(() =>
+            setUploads(uploads.filter((upload: Upload) => upload._id !== _id))
+          )
+          .catch((error: AxiosError) =>
+            message.error(getErrorMessage(error), 4)
+          );
+      },
+    });
+  };
+
   useEffect(() => {
     setLoading(true);
     fetchUploads();
   }, [fetchUploads]);
-
-  const getStateContent = (state: AnalysisState) => {
-    type AlertType = "warning" | "error" | "success" | undefined;
-    let type: AlertType = undefined;
-    switch (state) {
-      case AnalysisState.PENDING:
-        type = "warning";
-        break;
-      case AnalysisState.ERROR:
-        type = "error";
-        break;
-      case AnalysisState.SUCCESS:
-        type = "success";
-        break;
-    }
-    return <Alert message={`Analysis state: ${state}`} type={type} showIcon />;
-  };
-
-  const getAnalysisDate = (upload: Upload) => {
-    return upload.state === "pending" || upload.state === "error"
-      ? "-"
-      : dateFormat(new Date(upload.lastStateEditTimestamp));
-  };
-
-  const getExtra = (state: AnalysisState) => {
-    switch (state) {
-      case AnalysisState.PENDING:
-        return (
-          <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
-        );
-      case AnalysisState.SUCCESS:
-      case AnalysisState.ERROR:
-        return (
-          <Tooltip title="Delete analysis" placement="top">
-            <Button
-              danger
-              shape="circle"
-              icon={<DeleteOutlined />}
-              style={{ marginTop: 5 }}
-            />
-          </Tooltip>
-        );
-    }
-  };
-
-  const getAction = (upload: Upload) => {
-    switch (upload.state) {
-      case AnalysisState.SUCCESS:
-        return [
-          <Link to={`/analysis/${upload.analysisId}`} key="analysis">
-            <Button type="primary" icon={<ExperimentOutlined />}>
-              Show analysis
-            </Button>
-          </Link>,
-        ];
-      case AnalysisState.ERROR:
-        return [
-          <Button
-            type="primary"
-            icon={<RedoOutlined />}
-            style={{ backgroundColor: "#ffbf00", borderColor: "#ffbf00" }}
-          >
-            Retry
-          </Button>,
-        ];
-    }
-  };
 
   if (loading) {
     return (
@@ -193,25 +131,11 @@ const DashboardContainer = () => {
       </Link>
       <CenteredWrapper row wrap>
         {uploads.map((upload) => (
-          <Card
+          <UploadCard
+            upload={upload}
+            deleteUpload={handleDeleteUpload}
             key={upload._id}
-            title={upload.videoFile}
-            extra={getExtra(upload.state)}
-            style={{ height: 290, width: 300, margin: 15 }}
-            actions={getAction(upload)}
-          >
-            {getStateContent(upload.state)}
-            <div style={{ marginTop: 15 }}>
-              <p style={{ marginBottom: 5 }}>
-                <strong>Uploaded: </strong>
-                {dateFormat(new Date(upload.uploadTimestamp))}
-              </p>
-              <p>
-                <strong>Analysed:  </strong>
-                {getAnalysisDate(upload)}
-              </p>
-            </div>
-          </Card>
+          />
         ))}
       </CenteredWrapper>
     </>
