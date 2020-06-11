@@ -27,8 +27,8 @@ export const getAnalysisDataFile = (id: string, dataType: string) => {
   });
 };
 
-export const deleteUpload = (_id: string) => {
-  return axiosInstance.delete(`/upload/${_id}`, {
+export const deleteUpload = (id: string) => {
+  return axiosInstance.delete(`/analysis/${id}`, {
     headers: getAuthorizationHeaders(),
   });
 };
