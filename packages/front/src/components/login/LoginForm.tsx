@@ -62,7 +62,7 @@ const LoginForm = (props: Props) => (
         }}
         disabled={props.loading}
       >
-        Login
+        Log in
       </Button>
       or <Link to="/signup">Sign up</Link>
     </Item>
