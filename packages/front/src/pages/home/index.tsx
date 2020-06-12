@@ -33,9 +33,9 @@ const cards = [
         }}
       />
     ),
-    title: "Send it for analysis",
+    title: "Analyse",
     description:
-      "Our platform will extract the essentials informations that will allow you to progress.",
+      "We analyse your recording and highlight some important data that will help you progress.",
     style: {
       marginLeft: "13vw",
       marginRight: "13vw",
@@ -45,7 +45,7 @@ const cards = [
     cover: <LineChartOutlined style={{ fontSize: 110, color: "#00a854" }} />,
     title: "View the results",
     description:
-      "All your analysis are gathered in a dashboard, the results are hilighted with beautiful charts.",
+      "Easily understand our analysis with meaningful charts and statistics.",
     style: {},
   },
 ];
@@ -56,7 +56,7 @@ const Home = () => {
     <CenteredWrapper>
       <Title>Soft skills</Title>
       <Title level={3} style={{ marginBottom: 110 }}>
-        Practice public speaking on your browser!
+        Practice speaking in your browser!
       </Title>
       <CenteredWrapper row wrap>
         <>
@@ -68,9 +68,9 @@ const Home = () => {
               style={card.style}
             >
               <Card.Meta
-                title={<Title level={2}>{card.title}</Title>}
+                title={<Title level={2} style={{ textAlign: "center" }}>{card.title}</Title>}
                 description={
-                  <div style={{ width: 250 }}>
+                  <div style={{ width: 250, textAlign: "center" }}>
                     <Text style={{ fontSize: 18 }}>{card.description}</Text>
                   </div>
                 }
