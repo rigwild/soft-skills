@@ -26,3 +26,9 @@ export const getAnalysisDataFile = (id: string, dataType: string) => {
     responseType: "blob",
   });
 };
+
+export const deleteUpload = (id: string) => {
+  return axiosInstance.delete(`/analysis/${id}`, {
+    headers: getAuthorizationHeaders(),
+  });
+};
