@@ -26,6 +26,7 @@ const DashboardContainer = () => {
   const [loading, setLoading] = useState(false);
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [error, setError] = useState<string | undefined>(undefined);
+  const [timer, setTimer] = useState<number | undefined>(undefined);
 
   const fetchUploads = useCallback(() => {
     getUploads()
@@ -35,7 +36,11 @@ const DashboardContainer = () => {
           (upload) => upload.state === AnalysisState.PENDING
         );
         if (hasPending) {
-          setTimeout(() => fetchUploads(), POLLING_INTERVAL);
+          const timer = window.setTimeout(
+            () => fetchUploads(),
+            POLLING_INTERVAL
+          );
+          setTimer(timer);
         }
         setUploads(uploads);
       })
@@ -71,6 +76,12 @@ const DashboardContainer = () => {
     setLoading(true);
     fetchUploads();
   }, [fetchUploads]);
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [timer]);
 
   if (loading) {
     return (
