@@ -43,7 +43,7 @@ export const uploadFileRequestHandler = async (reqRaw: RequestAuthed, res: Respo
   try {
     // TODO: Support video analysis
     logDated(`Starting analysis for file "${fileName}" from user=${req.session.email}`)
-    const analysis = await analyseVideo(file, uniqueId)
+    const analysis = await analyseVideo(file)
 
     // Convert file paths to only file names
     analysis.videoFile = path.basename(analysis.videoFile)

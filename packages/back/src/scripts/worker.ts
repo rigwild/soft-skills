@@ -5,7 +5,6 @@ import { promises as fs } from 'fs'
 import execa from 'execa'
 
 import { UPLOADS_DIR } from '../config'
-import type { AnalysisDataTypes } from '../types'
 
 const scripts = {
   audioAnalysis: r(__dirname, 'audio_analysis.py')
@@ -15,38 +14,27 @@ const scripts = {
 const ffmpegRepair = async (file: string) => {
   const tempFileName = r(UPLOADS_DIR, `broken_temp_${basename(file)}`)
   await fs.rename(file, tempFileName)
-  await execa('ffmpeg', ['-i', tempFileName, file], { timeout: 120_000 })
+  await execa('ffmpeg', ['-i', tempFileName, file], { timeout: 300_000 })
   await fs.unlink(tempFileName)
 }
 
-const csv = (data: string) => data.split('\n').map(x => x.split(' ').map(x => parseFloat(x)))
-
 const py = async (script: string, ...args: string[]) =>
-  (await execa('python3', [script, ...args], { timeout: 120_000 })).stdout
-const pyCsv = async (script: string, ...args: string[]) => csv(await py(script, ...args))
+  (await execa('python3', [script, ...args], { timeout: 3_600_000 })).stdout
 
-const audioAnalysis = async (file: string, data: AnalysisDataTypes) =>
-  pyCsv(scripts.audioAnalysis, file, 'print_raw_data', data)
-const audioAnalysisPlot = (file: string, outputFile: string, data: AnalysisDataTypes) =>
-  py(scripts.audioAnalysis, file, 'generate_plot_file', data, outputFile)
-
-const getAmplitude = (file: string) => audioAnalysis(file, 'amplitude')
-const getIntensity = (file: string) => audioAnalysis(file, 'intensity')
-const getPitch = (file: string) => audioAnalysis(file, 'pitch')
-
-const getAmplitudePlot = (file: string, outputFile: string) => audioAnalysisPlot(file, outputFile, 'amplitude')
-const getIntensityPlot = (file: string, outputFile: string) => audioAnalysisPlot(file, outputFile, 'intensity')
-const getPitchPlot = (file: string, outputFile: string) => audioAnalysisPlot(file, outputFile, 'pitch')
-
-const workerMethods = {
-  ffmpegRepair,
-  getAmplitude,
-  getIntensity,
-  getPitch,
-  getAmplitudePlot,
-  getIntensityPlot,
-  getPitchPlot
+const audioAnalysis = async (audioFilePath: string) => {
+  const data = await py(scripts.audioAnalysis, audioFilePath)
+  const split = data.split('\n----------\n')
+  return {
+    amplitudePlotFile: split[0],
+    intensityPlotFile: split[1],
+    pitchPlotFile: split[2],
+    amplitudeDataFile: split[3],
+    intensityDataFile: split[4],
+    pitchDataFile: split[5]
+  }
 }
+
+const workerMethods = { ffmpegRepair, audioAnalysis }
 export type WorkerMethods = typeof workerMethods
 
 // Expose as a Worker

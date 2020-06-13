@@ -98,57 +98,67 @@ def reduce_size_amplitude(amplitude, number_of_points=1000, max_data=10000):
     return(pd.DataFrame(data, columns=['amplitude_x', 'amplitude_y']))
 
 
-def print_amplitude_data(number_of_points, max_data):
+def write_amplitude_data(output_file, number_of_points=1000, max_data=10000):
     dataframe = reduce_size_amplitude(
         snd, number_of_points=number_of_points, max_data=max_data)
-    np.savetxt(sys.stdout.buffer, dataframe, fmt='%.2f')
+    np.savetxt(output_file, dataframe, fmt='%.2f')
 
 
-def print_intensity_data():
+def write_intensity_data(output_file):
     data = {"intensity_x": intensity.xs(),
             "intensity_y": list(intensity.values.T)}
     dataframe = pd.DataFrame(data, columns=['intensity_x', 'intensity_y'])
-    np.savetxt(sys.stdout.buffer, dataframe, fmt='%.2f')
+    np.savetxt(output_file, dataframe, fmt='%.2f')
 
 
-def print_pitch_data():
+def write_pitch_data(output_file):
     data = {"pitch_x": pitch.xs(),
             "pitch_y": pitch.selected_array['frequency']}
     dataframe = pd.DataFrame(data, columns=['pitch_x', 'pitch_y'])
-    np.savetxt(sys.stdout.buffer, dataframe, fmt='%.2f')
+    np.savetxt(output_file, dataframe, fmt='%.2f')
+
 
 def score_intensity():
     return(np.std(intensity.values.T)/np.mean(intensity.values.T))
+
 
 def score_pitch():
     pitch_values = pitch.selected_array['frequency']
     return(np.std(pitch_values)/np.mean(pitch_values))
 
+
 if len(sys.argv) < 2 or sys.argv[1] == '-h' or sys.argv[1] == '--help' or sys.argv[1] == 'help':
-    print("""Usage:
-    python3 audio_analysis.py <audio_file_path> generate_plot_file <amplitude|intensity|pitch> <output_file>
-    python3 audio_analysis.py <audio_file_path> print_raw_data <amplitude|intensity|pitch>""")
+    print("Usage: python3 audio_analysis.py <audio_file_path>")
 else:
     audio_file = convert_video_to_audio(sys.argv[1])
-    command = sys.argv[2]
     sns.set()  # Use seaborn's default style to make attractive graphs
     snd = parselmouth.Sound(audio_file)
     intensity = snd.to_intensity()
     pitch = snd.to_pitch()
-    if command == 'generate_plot_file':
-        needed_data = sys.argv[3]
-        output_path = sys.argv[4]
-        if needed_data == 'amplitude':
-            plot_amplitude_graph(output_path)
-        elif needed_data == 'intensity':
-            plot_intensity_spectogram(output_path)
-        elif needed_data == 'pitch':
-            plot_pitch(output_path)
-    elif command == 'print_raw_data':
-        needed_data = sys.argv[3]
-        if needed_data == 'amplitude':
-            print_amplitude_data(number_of_points=1000, max_data=10000)
-        elif needed_data == 'intensity':
-            print_intensity_data()
-        if needed_data == 'pitch':
-            print_pitch_data()
+    amplitude_plot_file = audio_file + "_amplitude.png"
+    intensity_plot_file = audio_file + "_intensity.png"
+    pitch_plot_file = audio_file + "_pitch.png"
+    amplitude_data_file = audio_file + "_amplitude.csv"
+    intensity_data_file = audio_file + "_intensity.csv"
+    pitch_data_file = audio_file + "_pitch.csv"
+    # Generate plots files
+    plot_amplitude_graph(amplitude_plot_file)
+    plot_intensity_spectogram(intensity_plot_file)
+    plot_pitch(pitch_plot_file)
+    # Generate raw data files
+    write_amplitude_data(amplitude_data_file)
+    write_intensity_data(intensity_data_file)
+    write_pitch_data(pitch_data_file)
+    # Print plot files paths
+    print(amplitude_plot_file)
+    print("----------")
+    print(intensity_plot_file)
+    print("----------")
+    print(pitch_plot_file)
+    print("----------")
+    # Print data files paths
+    print(amplitude_data_file)
+    print("----------")
+    print(intensity_data_file)
+    print("----------")
+    print(pitch_data_file)

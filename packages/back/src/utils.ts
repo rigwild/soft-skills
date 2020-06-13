@@ -44,3 +44,9 @@ export const videoMimeTypes = new Set([
 ] as const)
 
 export const isVideoMimeType = (mimeType: string) => videoMimeTypes.has(mimeType.toLowerCase() as any)
+
+export const csv = (data: string) =>
+  data
+    .trim()
+    .split('\n')
+    .map(x => x.split(' ').map(x => parseFloat(x)))
