@@ -20,3 +20,4 @@ export const closeDb = () => mongoose.disconnect()
 
 export * from './user.db'
 export * from './analyses.db'
+export * from './statistics.db'

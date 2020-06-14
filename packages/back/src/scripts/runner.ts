@@ -2,6 +2,7 @@ import { spawn, Worker, Pool } from 'threads'
 import type { WorkerMethods } from './worker'
 
 import type { Analysis, AnalysisData } from '../types'
+import { incrementStatistic } from '../db'
 
 // We set a 1 hour timeout for the worker so when under heavy multi-analysis load
 // It will eventually finish and not crash the worker process (kills the http server)
@@ -18,7 +19,12 @@ const pool = Pool(
  * @param videoFile Path to video file to analyse
  */
 export const analyseVideo = async (videoFile: string) => {
+  await incrementStatistic('analysesTotalCount')
+
   let data: Partial<AnalysisData> = {}
   await pool.queue(async ({ analyse }: WorkerMethods) => (data = await analyse(videoFile)))
+
+  await incrementStatistic('analysesSuccessCount')
+
   return data as Omit<Analysis, 'userId' | 'analysisTimestamp' | 'uploadTimestamp'>
 }

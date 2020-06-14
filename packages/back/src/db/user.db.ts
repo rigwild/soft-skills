@@ -6,6 +6,7 @@ import boom from '@hapi/boom'
 import { JWT_SECRET } from '../config'
 import { log } from '../utils'
 import type { User, Upload, UploadDB, UserDB } from '../types'
+import { incrementStatistic } from './statistics.db'
 
 export type UserDocument = User & mongoose.Document
 
@@ -84,6 +85,7 @@ export const registerUser = async (email: string, password: string, name: string
       password: hash,
       name
     })
+    await incrementStatistic('usersCount')
 
     log(`New user was created. email=${email}, name=${name}, id=${doc._id}`)
     return { email, name }
@@ -146,6 +148,8 @@ export const checkUserLogin = async (email: string, password: string) => {
 export const deleteUser = async (userId: string) => {
   const user = await UserModel.findByIdAndDelete(userId)
   if (!user) throw boom.notFound('User not found.')
+
+  await incrementStatistic('usersCount', -1)
 
   log(`A user was deleted. id=${user._id}`)
   return { _id: user._id }

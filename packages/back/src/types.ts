@@ -50,6 +50,12 @@ export interface User {
   uploads: UploadDB[]
 }
 
+export interface Statistics {
+  analysesTotalCount: number
+  analysesSuccessCount: number
+  usersCount: number
+}
+
 interface IdDB {
   _id: string
 }

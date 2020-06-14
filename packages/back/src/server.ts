@@ -3,7 +3,7 @@ import bodyParser from 'body-parser'
 
 import router from './routes'
 import { SERVER_PORT, UPLOADS_DIR, isTestEnv } from './config'
-import { connectDb } from './db'
+import { connectDb, initStatistics } from './db'
 import { errorHandler } from './middlewares'
 import { log } from './utils'
 
@@ -49,6 +49,8 @@ export const initServer = async () => {
   log('Connecting to the database...')
   await connectDb()
   log('Database connection established.')
+
+  await initStatistics()
 
   log('Starting the server...')
   new Promise(resolve =>

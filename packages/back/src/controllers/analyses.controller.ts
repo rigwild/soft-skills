@@ -41,7 +41,6 @@ export const uploadFileRequestHandler = async (reqRaw: RequestAuthed, res: Respo
 
   // Start a background analysis
   try {
-    // TODO: Support video analysis
     logDated(`Starting analysis for file "${fileName}" from user=${req.session.email}`)
     const analysis = await analyseVideo(file)
 
