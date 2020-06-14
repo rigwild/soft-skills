@@ -30,5 +30,6 @@ test.serial('Delete account', async t => {
   t.is(res.status, 200)
   t.is(res.body.data._id, testUserData._id)
 
+  // Check the amount of users statistic was decremented
   t.is((await getStatistics()).usersCount, -1)
 })

@@ -24,7 +24,7 @@ export const UserSchema = new Schema({
       videoFile: { type: String, required: true },
 
       state: { type: String, enum: ['pending', 'finished', 'error'], default: 'pending', required: true },
-      errorMessage: { type: String, required: true, default: null },
+      errorMessage: { type: String, required: false, default: null },
 
       uploadTimestamp: { type: Date, default: () => new Date() },
       lastStateEditTimestamp: { type: Date, default: () => new Date() },

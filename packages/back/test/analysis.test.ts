@@ -1,9 +1,11 @@
 import { resolve as r } from 'path'
+import { promises as fs } from 'fs'
 import request from 'supertest'
 
 import { test, before, beforeEach, afterEachAlways, afterAlways } from './_utils'
 import { UserModel, findUser, AnalysisModel, getStatistics } from '../src/db'
 import type { UserDB } from '../src/types'
+import { UPLOADS_DIR } from '../src/config'
 
 test.before(before)
 test.beforeEach(beforeEach)
@@ -56,6 +58,37 @@ test.serial('Upload an invalid file', async t => {
   t.is(res.body.message, 'You need to send a video file.')
 })
 
+test.serial.only('Retry a failed analysis', async t => {
+  const { app, testUserData, token } = t.context
+
+  // Copy the `_VIDEO.mp4` test file to the `test/uploads` directory
+  await fs.copyFile(r(UPLOADS_DIR, '..', '_VIDEO.mp4'), r(UPLOADS_DIR, 'retryTest-_VIDEO.mp4'))
+
+  // Mark an upload's analysis as failed
+  await UserModel.findOneAndUpdate(
+    { _id: testUserData._id, 'uploads._id': testUserData.uploads[0]._id },
+    {
+      'uploads.$.videoFile': 'retryTest-_VIDEO.mp4',
+      'uploads.$.state': 'error',
+      'uploads.$.analysisId': null,
+      'uploads.$.errorMessage': 'python error'
+    }
+  )
+
+  const res = await request(app)
+    .post(`/uploads/${testUserData.uploads[0]._id}/retry`)
+    .set('Authorization', `Bearer ${token}`)
+
+  t.is(res.status, 200)
+
+  // Check analyses count statistic was incremented
+  const statistics1 = await getStatistics()
+  t.is(statistics1.analysesTotalCount, 1)
+  t.is(statistics1.analysesSuccessCount, 0)
+
+  t.is(res.body.data.state, 'pending')
+})
+
 test.serial('Upload a video file for analysis', async t => {
   const { app, testUserData, testAnalysisData, testFilePath, token } = t.context
 
@@ -68,6 +101,8 @@ test.serial('Upload a video file for analysis', async t => {
     .attach('content', testFilePath)
 
   t.is(res.status, 200)
+
+  // Check analyses count statistic was incremented
   const statistics1 = await getStatistics()
   t.is(statistics1.analysesTotalCount, 1)
   t.is(statistics1.analysesSuccessCount, 0)
@@ -88,6 +123,7 @@ test.serial('Upload a video file for analysis', async t => {
     await new Promise(res => setTimeout(res, 250))
   }
 
+  // Check success analysis statistic was incremented
   const statistics2 = await getStatistics()
   t.is(statistics2.analysesTotalCount, 1)
   t.is(statistics2.analysesSuccessCount, 1)

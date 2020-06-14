@@ -73,6 +73,7 @@ test.serial('Register', async t => {
   t.is(res.body.data.email, email)
   t.is(res.body.data.name, testUserData.name)
 
+  // Check the amount of users statistic was incremented
   t.is((await getStatistics()).usersCount, 1)
 })
 
