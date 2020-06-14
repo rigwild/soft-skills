@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt'
 import type { Express } from 'express'
 
 import { app } from '../src/server'
-import { UserModel, AnalysisModel } from '../src/db'
+import { UserModel, AnalysisModel, StatisticsModel } from '../src/db'
 import type { UserDB, AnalysisDB } from '../src/types'
 
 export type TestContext = {
@@ -73,12 +73,14 @@ export const beforeEach: Implementation<TestContext> = async t => {
     password: await bcrypt.hash(t.context.testUserData.password, 1)
   })
   await AnalysisModel.create({ ...t.context.testAnalysisData })
+  await StatisticsModel.create({})
 }
 
 // Clean up database after every test
 export const afterEachAlways: Implementation<TestContext> = async () => {
   await UserModel.deleteMany({})
   await AnalysisModel.deleteMany({})
+  await StatisticsModel.deleteMany({})
 }
 
 // Disconnect MongoDB and mongoose after all tests are done

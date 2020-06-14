@@ -1,6 +1,7 @@
 import request from 'supertest'
 
 import { test, before, beforeEach, afterEachAlways, afterAlways } from './_utils'
+import { getStatistics } from '../src/db'
 
 test.before(before)
 test.beforeEach(beforeEach)
@@ -28,4 +29,6 @@ test.serial('Delete account', async t => {
   const res = await request(app).delete('/profile').set('Authorization', `Bearer ${token}`)
   t.is(res.status, 200)
   t.is(res.body.data._id, testUserData._id)
+
+  t.is((await getStatistics()).usersCount, -1)
 })

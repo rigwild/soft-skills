@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '../src/config'
 
 import { test, before, beforeEach, afterEachAlways, afterAlways } from './_utils'
+import { getStatistics } from '../src/db'
 
 test.before(before)
 test.beforeEach(beforeEach)
@@ -71,6 +72,8 @@ test.serial('Register', async t => {
   t.is(res.status, 200)
   t.is(res.body.data.email, email)
   t.is(res.body.data.name, testUserData.name)
+
+  t.is((await getStatistics()).usersCount, 1)
 })
 
 test.serial('Invalid JWT is rejected', async t => {

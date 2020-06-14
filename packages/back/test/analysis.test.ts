@@ -2,7 +2,7 @@ import { resolve as r } from 'path'
 import request from 'supertest'
 
 import { test, before, beforeEach, afterEachAlways, afterAlways } from './_utils'
-import { UserModel, findUser, AnalysisModel } from '../src/db'
+import { UserModel, findUser, AnalysisModel, getStatistics } from '../src/db'
 import type { UserDB } from '../src/types'
 
 test.before(before)
@@ -68,6 +68,9 @@ test.serial('Upload a video file for analysis', async t => {
     .attach('content', testFilePath)
 
   t.is(res.status, 200)
+  const statistics1 = await getStatistics()
+  t.is(statistics1.analysesTotalCount, 1)
+  t.is(statistics1.analysesSuccessCount, 0)
 
   let upload = ((await findUser(testUserData._id)).toObject({ versionKey: false }) as UserDB).uploads[0]
 
@@ -81,9 +84,13 @@ test.serial('Upload a video file for analysis', async t => {
       t.true(!!upload.analysisId)
       break
     }
-    // Wait 500 ms before checking again
-    await new Promise(res => setTimeout(res, 500))
+    // Wait 250 ms before checking again
+    await new Promise(res => setTimeout(res, 250))
   }
+
+  const statistics2 = await getStatistics()
+  t.is(statistics2.analysesTotalCount, 1)
+  t.is(statistics2.analysesSuccessCount, 1)
 
   // Check analysis data is available
   const res2 = await request(app).get(`/analysis/${upload.analysisId}`).set('Authorization', `Bearer ${token}`)
