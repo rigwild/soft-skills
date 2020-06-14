@@ -1,3 +1,4 @@
+import path from 'path'
 import mongoose, { Schema } from 'mongoose'
 import boom from '@hapi/boom'
 
@@ -42,16 +43,16 @@ export const addAnalysis = async (
   const analysisDoc = await AnalysisModel.create({
     userId,
 
-    videoFile: analysis.videoFile,
-    audioFile: analysis.audioFile,
+    videoFile: path.basename(analysis.videoFile),
+    audioFile: path.basename(analysis.audioFile),
 
     amplitude: analysis.amplitude,
     intensity: analysis.intensity,
     pitch: analysis.pitch,
 
-    amplitudePlotFile: analysis.amplitudePlotFile,
-    intensityPlotFile: analysis.intensityPlotFile,
-    pitchPlotFile: analysis.pitchPlotFile,
+    amplitudePlotFile: path.basename(analysis.amplitudePlotFile),
+    intensityPlotFile: path.basename(analysis.intensityPlotFile),
+    pitchPlotFile: path.basename(analysis.pitchPlotFile),
 
     uploadTimestamp: file.uploadTimestamp
   })

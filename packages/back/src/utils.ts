@@ -1,3 +1,4 @@
+import { promises as fs } from 'fs'
 import { Request } from 'express'
 import boom from '@hapi/boom'
 import { validationResult, ErrorFormatter } from 'express-validator'
@@ -50,3 +51,5 @@ export const csv = (data: string) =>
     .trim()
     .split('\n')
     .map(x => x.split(' ').map(x => parseFloat(x)))
+
+export const fileExists = async (path: string) => !!(await fs.stat(path).catch(() => false))

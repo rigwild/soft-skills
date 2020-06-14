@@ -14,8 +14,22 @@ import {
   getUserUploads
 } from '../db'
 import { analyseVideo } from '../scripts/runner'
-import { isVideoMimeType, logDated, logErr } from '../utils'
-import { RequestAuthed, analysisFiles, AnalysisFiles } from '../types'
+import { isVideoMimeType, logDated, logErr, fileExists } from '../utils'
+import { RequestAuthed, analysisFiles, AnalysisFiles, UploadDB } from '../types'
+
+const startAnalysis = async (uploadedData: UploadDB, file: string, req: RequestAuthed) => {
+  const fileName = path.basename(file)
+  try {
+    logDated(`Starting analysis for file "${fileName}" from user=${req.session.email}`)
+    const analysis = await analyseVideo(file)
+    await addAnalysis(req.session._id, uploadedData, analysis)
+    logDated(`Successful analysis for file "${fileName}" from user=${req.session.email}`)
+  } catch (error) {
+    // Set the file state as error in the user uploads list
+    await setOneUploadStateFromUser(req.session._id, uploadedData._id, fileName, 'error', undefined, error.message)
+    logErr(error)
+  }
+}
 
 export const uploadFileRequestHandler = async (reqRaw: RequestAuthed, res: Response) => {
   const req = reqRaw as typeof reqRaw & { files: any }
@@ -41,21 +55,37 @@ export const uploadFileRequestHandler = async (reqRaw: RequestAuthed, res: Respo
 
   // Start a background analysis
   try {
-    logDated(`Starting analysis for file "${fileName}" from user=${req.session.email}`)
-    const analysis = await analyseVideo(file)
-
-    // Convert file paths to only file names
-    analysis.videoFile = path.basename(analysis.videoFile)
-    analysis.audioFile = path.basename(analysis.audioFile)
-    analysis.amplitudePlotFile = path.basename(analysis.amplitudePlotFile)
-    analysis.intensityPlotFile = path.basename(analysis.intensityPlotFile)
-    analysis.pitchPlotFile = path.basename(analysis.pitchPlotFile)
-
-    logDated(`Successful analysis for file "${fileName}" from user=${req.session.email}`)
-    await addAnalysis(req.session._id, uploadedData, analysis)
+    await startAnalysis(uploadedData, file, req)
   } catch (error) {
-    // Set the file state as error in the user uploads list
-    await setOneUploadStateFromUser(req.session._id, uploadedData._id, fileName, 'error', undefined, error.message)
+    logErr(error)
+  }
+}
+
+export const retryAnalysisRequestHandler = async (req: RequestAuthed<{ uploadId: string }>, res: Response) => {
+  // Load the requested upload data
+  const uploads = await getUserUploads(req.session._id)
+  const toRetry = uploads.find(x => x._id.toString() === req.params.uploadId)
+
+  if (!toRetry) throw boom.notFound('Upload not found.')
+  if (toRetry.state !== 'error') throw boom.conflict('You can only retry failed analyses.')
+  if (!!toRetry.analysisId) throw boom.conflict('This file has already been analysed.')
+
+  const filePath = path.resolve(UPLOADS_DIR, toRetry.videoFile)
+  if (!(await fileExists(filePath)))
+    throw boom.internal(
+      'The video file was not found on the server. ' +
+        'You might want to remove this upload as the file was probably removed from the server.'
+    )
+
+  await setOneUploadStateFromUser(req.session._id, toRetry._id, toRetry.videoFile, 'pending')
+  toRetry.errorMessage = null as any
+  toRetry.state = 'pending'
+  res.json({ data: toRetry })
+
+  // Retry the analysis in the background
+  try {
+    await startAnalysis(toRetry, filePath, req)
+  } catch (error) {
     logErr(error)
   }
 }

@@ -6,7 +6,8 @@ import {
   getUploadsRequestHandler,
   getAnalysisRequestHandler,
   getAnalysisFileRequestHandler,
-  deleteAnalysisRequestHandler
+  deleteAnalysisRequestHandler,
+  retryAnalysisRequestHandler
 } from '../controllers/analyses.controller'
 import type { AnalysisFiles } from '../types'
 
@@ -73,6 +74,7 @@ router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadFileReq
  *     },
  *     {
  *         "state": "error",
+ *         "errorMessage": "Command failed with exit code 1: pytho...",
  *         "analysisId": "5edf9fceb0996303bfac4052",
  *         "uploadTimestamp": "2020-06-09T14:42:05.643Z",
  *         "lastStateEditTimestamp": "2020-06-09T14:42:22.244Z",
@@ -91,6 +93,63 @@ router.post('/uploads', authenticatedMiddleware(), asyncMiddleware(uploadFileReq
  * }
  */
 router.get('/uploads', authenticatedMiddleware(), asyncMiddleware(getUploadsRequestHandler))
+
+/**
+ * @api {post} /uploads/:uploadId/retry Retry a previously failed analysis
+ * @apiVersion 0.1.0
+ * @apiName RetryAnalysis
+ * @apiGroup Uploads
+ *
+ * @apiParam {String} uploadId Upload id which analysis' failed
+ *
+ * @apiSuccessExample {json} Success-Response:
+ * HTTP/1.1 200 OK
+ * {
+ *   "data": {
+ *     "state": "pending",
+ *     "errorMessage": null,
+ *     "analysisId": null,
+ *     "uploadTimestamp": "2020-06-08T11:49:09.080Z",
+ *     "lastStateEditTimestamp": "2020-06-08T11:49:09.080Z",
+ *     "_id": "5ede25b5ee17b104bc23ba96",
+ *     "videoFile": "2V4Fne8Z__VIDEO.mp4"
+ *   }
+ * }
+ *
+ * @apiError {Error} NotFound Upload not found.
+ * @apiErrorExample {json} Error-Response:
+ * HTTP/1.1 404 Not Found
+ * {
+ *   "message": "Upload not found."
+ * }
+ *
+ * @apiError {Error} NotAnalysisError The upload state is not `error`
+ * @apiErrorExample {json} Error-Response:
+ * HTTP/1.1 409 Conflict
+ * {
+ *   "message": "You can only retry failed analyses."
+ * }
+ *
+ * @apiError {Error} AlreadyAnalysed This upload was already analysed
+ * @apiErrorExample {json} Error-Response:
+ * HTTP/1.1 409 Conflict
+ * {
+ *   "message": "This file has already been analysed."
+ * }
+ *
+ * @apiError {Error} VideoFileRemoved The video file can't be found or has been removed from the server
+ * @apiErrorExample {json} Error-Response:
+ * HTTP/1.1 500 Internal Server Error
+ * {
+ *   "message": "The video file was not found on the server. You might want to remove this upload as the file was probably removed from the server."
+ * }
+ */
+router.post<{ uploadId: string }>(
+  '/uploads/:uploadId/retry',
+  authenticatedMiddleware(),
+  // @ts-ignore
+  asyncMiddleware(retryAnalysisRequestHandler)
+)
 
 /**
  * @api {get} /analysis/:analysisId Load an analysis data
