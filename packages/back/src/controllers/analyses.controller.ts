@@ -54,10 +54,8 @@ export const uploadFileRequestHandler = async (reqRaw: RequestAuthed, res: Respo
     logDated(`Successful analysis for file "${fileName}" from user=${req.session.email}`)
     await addAnalysis(req.session._id, uploadedData, analysis)
   } catch (error) {
-    // We catch all errors as a response was already sent
-
     // Set the file state as error in the user uploads list
-    await setOneUploadStateFromUser(req.session._id, uploadedData._id, fileName, 'error').catch(err => logErr(err))
+    await setOneUploadStateFromUser(req.session._id, uploadedData._id, fileName, 'error', undefined, error.message)
     logErr(error)
   }
 }

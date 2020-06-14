@@ -15,6 +15,7 @@ export interface Upload {
   videoFile: string
 
   state: UploadStates
+  errorMessage?: string
 
   uploadTimestamp: Date
   lastStateEditTimestamp: Date

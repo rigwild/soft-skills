@@ -5,8 +5,8 @@ import boom from '@hapi/boom'
 
 import { JWT_SECRET } from '../config'
 import { log } from '../utils'
-import type { User, Upload, UploadDB, UserDB } from '../types'
 import { incrementStatistic } from './statistics.db'
+import type { User, Upload, UploadDB, UserDB } from '../types'
 
 export type UserDocument = User & mongoose.Document
 
@@ -24,6 +24,7 @@ export const UserSchema = new Schema({
       videoFile: { type: String, required: true },
 
       state: { type: String, enum: ['pending', 'finished', 'error'], default: 'pending', required: true },
+      errorMessage: { type: String, required: true, default: null },
 
       uploadTimestamp: { type: Date, default: () => new Date() },
       lastStateEditTimestamp: { type: Date, default: () => new Date() },
@@ -140,7 +141,7 @@ export const checkUserLogin = async (email: string, password: string) => {
 }
 
 /**
- * Deleted a registered user
+ * Delete a registered user
  * @param userId The user id of the user to delete
  * @returns Id of the deleted user
  * @throws Could not find the user to delete
@@ -156,7 +157,7 @@ export const deleteUser = async (userId: string) => {
 }
 
 /**
- * Edit a registered user's profile
+ * Edit a registered user profile
  * @param userId The user id of the user to edit
  * @param newProfileData New user profile data
  * @returns New user profile
@@ -168,13 +169,12 @@ export const editUser = async (userId: string, _newProfileData: Partial<Pick<Use
 
   if (Object.keys(newProfileData).length === 0) throw boom.badRequest('No profile data to edit.')
 
-  const userDoc = await UserModel.findByIdAndUpdate(userId, newProfileData, { new: true })
+  const userDoc = await UserModel.findByIdAndUpdate(userId, newProfileData, { projection: { uploads: 0 }, new: true })
   if (!userDoc) throw boom.notFound('User not found.')
 
   log(`A user profile was edited. id=${userDoc._id}`)
 
   const userData = userDoc.toObject({ versionKey: false }) as UserDB
-  delete userData.uploads
   return userData
 }
 
@@ -219,13 +219,15 @@ export const addUploadToUser = async (userId: string, videoFile: string) => {
  * @param fileName Uploaded file to edit state from
  * @param newState New state of the upload
  * @param analysisId ID of analysis if state = finished
+ * @param errorMessage Error message if state = error
  */
 export const setOneUploadStateFromUser = async (
   userId: string,
   uploadId: string,
   fileName: Upload['videoFile'],
   newState: Upload['state'],
-  analysisId?: string
+  analysisId?: string,
+  errorMessage: string | null = null
 ) => {
   // Add the upload to the user uploads list
   const userDoc = await UserModel.findOneAndUpdate(
@@ -233,6 +235,7 @@ export const setOneUploadStateFromUser = async (
     {
       'uploads.$.state': newState,
       'uploads.$.analysisId': analysisId,
+      'uploads.$.errorMessage': errorMessage,
       $currentDate: { 'uploads.$.lastStateEditTimestamp': true }
     },
     { new: true }
