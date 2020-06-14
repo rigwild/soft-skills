@@ -22,9 +22,7 @@ export interface Upload {
   analysisId?: string
 }
 
-export interface Analysis {
-  userId: string
-
+export interface AnalysisData {
   videoFile: string
   audioFile: string
 
@@ -35,7 +33,10 @@ export interface Analysis {
   amplitudePlotFile: string
   intensityPlotFile: string
   pitchPlotFile: string
+}
 
+export interface Analysis extends AnalysisData {
+  userId: string
   uploadTimestamp: Date
   analysisTimestamp: Date
 }

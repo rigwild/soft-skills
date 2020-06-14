@@ -5,6 +5,8 @@ import { promises as fs } from 'fs'
 import execa from 'execa'
 
 import { UPLOADS_DIR } from '../config'
+import { csv } from '../utils'
+import type { AnalysisData } from '../types'
 
 const scripts = {
   audioAnalysis: r(__dirname, 'audio_analysis.py')
@@ -34,7 +36,51 @@ const audioAnalysis = async (audioFilePath: string) => {
   }
 }
 
-const workerMethods = { ffmpegRepair, audioAnalysis }
+/**
+ * Analyse a video file.
+ *
+ * Audio is analysed using `praat-parselmouth`.
+ *
+ * Generates raw data + plots as image files.
+ *
+ * @param videoFile Path to video file to analyse
+ */
+const analyse = async (videoFile: string) => {
+  const data: Partial<AnalysisData> = {
+    videoFile,
+    audioFile: `${videoFile}.wav`
+  }
+
+  // Repair video metadatas with ffmpeg to make sure it is correct
+  await ffmpegRepair(videoFile)
+
+  const res = await audioAnalysis(videoFile)
+
+  // Read CSV data files
+  const [amplitude, intensity, pitch] = await Promise.all([
+    fs.readFile(res.amplitudeDataFile, { encoding: 'utf-8' }),
+    fs.readFile(res.intensityDataFile, { encoding: 'utf-8' }),
+    fs.readFile(res.pitchDataFile, { encoding: 'utf-8' })
+  ])
+
+  data.amplitudePlotFile = res.amplitudePlotFile
+  data.intensityPlotFile = res.intensityPlotFile
+  data.pitchPlotFile = res.pitchPlotFile
+  data.amplitude = csv(amplitude)
+  data.intensity = csv(intensity)
+  data.pitch = csv(pitch)
+
+  // Remove CSV data files
+  // await Promise.all([
+  //   fs.unlink(res.amplitudeDataFile),
+  //   fs.unlink(res.intensityDataFile),
+  //   fs.unlink(res.pitchDataFile)
+  // ])
+
+  return data as AnalysisData
+}
+
+const workerMethods = { analyse }
 export type WorkerMethods = typeof workerMethods
 
 // Expose as a Worker
