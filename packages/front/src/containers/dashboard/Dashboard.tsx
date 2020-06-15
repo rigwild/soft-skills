@@ -3,7 +3,7 @@ import {
   VideoCameraAddOutlined,
 } from "@ant-design/icons";
 import { Alert, Button, Empty, message, Modal, Spin, Typography } from "antd";
-import { deleteUpload, getUploads } from "api/upload";
+import { deleteUpload, getUploads, retryAnalysis } from "api/upload";
 import { AxiosError, AxiosResponse } from "axios";
 import CenteredWrapper from "components/centeredwrapper";
 import UploadCard from "components/uploadcard";
@@ -20,6 +20,10 @@ const POLLING_INTERVAL = 10000;
 
 type UploadsResponse = {
   data: Upload[];
+};
+
+type RetryResponse = {
+  data: Upload;
 };
 
 const DashboardContainer = () => {
@@ -70,6 +74,21 @@ const DashboardContainer = () => {
           );
       },
     });
+  };
+
+  const handleRetryAnalysis = (_id: string) => {
+    retryAnalysis(_id)
+      .then((res: AxiosResponse<RetryResponse>) => {
+        const uploadRetried = res.data.data;
+        setUploads(
+          uploads.map((upload) => (upload._id === _id ? uploadRetried : upload))
+        );
+        const timer = window.setTimeout(() => fetchUploads(), POLLING_INTERVAL);
+        setTimer(timer);
+      })
+      .catch((error: AxiosError) => {
+        message.error(getErrorMessage(error), 4);
+      });
   };
 
   useEffect(() => {
@@ -144,6 +163,7 @@ const DashboardContainer = () => {
         {uploads.map((upload) => (
           <UploadCard
             upload={upload}
+            retryAnalysis={handleRetryAnalysis}
             deleteUpload={handleDeleteUpload}
             key={upload._id}
           />

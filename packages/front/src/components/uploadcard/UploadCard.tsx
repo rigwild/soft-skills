@@ -12,11 +12,12 @@ import { AnalysisState, Upload } from "types/dashboard";
 
 type Props = {
   upload: Upload;
+  retryAnalysis: (_id: string) => void;
   deleteUpload: (_id: string) => void;
 };
 
 const UploadCard = (props: Props) => {
-  const { upload, deleteUpload } = props;
+  const { upload, retryAnalysis, deleteUpload } = props;
 
   const getStateContent = (state: AnalysisState) => {
     type AlertType = "warning" | "error" | "success" | undefined;
@@ -79,6 +80,7 @@ const UploadCard = (props: Props) => {
             type="primary"
             icon={<RedoOutlined />}
             style={{ backgroundColor: "#ffbf00", borderColor: "#ffbf00" }}
+            onClick={() => retryAnalysis(upload._id)}
           >
             Retry
           </Button>,
