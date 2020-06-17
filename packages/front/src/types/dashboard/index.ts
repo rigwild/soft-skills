@@ -11,4 +11,5 @@ export type Upload = {
   state: AnalysisState;
   uploadTimestamp: string;
   lastStateEditTimestamp: string;
+  errorMessage?: string;
 };
