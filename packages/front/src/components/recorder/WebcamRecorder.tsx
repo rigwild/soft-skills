@@ -1,9 +1,16 @@
-import { RedoOutlined, VideoCameraTwoTone, VideoCameraOutlined, ExperimentOutlined } from "@ant-design/icons";
-import { Button, Spin, Statistic } from "antd";
+import {
+  ExperimentOutlined,
+  RedoOutlined,
+  UploadOutlined,
+  VideoCameraOutlined,
+  VideoCameraTwoTone,
+} from "@ant-design/icons";
+import { Button, Spin, Statistic, Typography, Upload } from "antd";
 import React, { MutableRefObject, RefObject, useRef, useState } from "react";
 import Webcam from "react-webcam";
 
 const { Countdown } = Statistic;
+const { Text } = Typography;
 
 enum RecorderState {
   LOADING,
@@ -98,9 +105,30 @@ const WebcamRecorder = (props: Props) => {
     switch (state) {
       case RecorderState.READY:
         return (
-          <Button onClick={handleStartRecording} type="primary" icon={<VideoCameraOutlined />}>
-            Start recording (5:00 maximum)
-          </Button>
+          <>
+            <Button
+              onClick={handleStartRecording}
+              type="primary"
+              icon={<VideoCameraOutlined />}
+              style={{ width: "250px" }}
+            >
+              Start recording (5:00 maximum)
+            </Button>
+            <Text style={{ fontSize: 24, marginTop: 10, marginBottom: 10 }}>
+              or
+            </Text>
+            <Upload
+              showUploadList={false}
+              beforeUpload={(file: Blob, _) => {
+                props.uploadVideo(file);
+                return false;
+              }}
+            >
+              <Button type="primary" danger style={{ width: "250px" }}>
+                <UploadOutlined /> Upload a video
+              </Button>
+            </Upload>
+          </>
         );
       case RecorderState.RECORDING:
         const deadline = Date.now() + FIVE_MINUTE_IN_MS;
@@ -130,7 +158,7 @@ const WebcamRecorder = (props: Props) => {
               style={{ marginBottom: 15 }}
               icon={<ExperimentOutlined />}
               disabled={props.uploading}
-              >
+            >
               Send video for analysis
             </Button>
             <Button
