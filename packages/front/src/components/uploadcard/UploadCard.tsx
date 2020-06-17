@@ -1,5 +1,6 @@
 import {
   DeleteOutlined,
+  EditTwoTone,
   ExperimentOutlined,
   LoadingOutlined,
   RedoOutlined,
@@ -12,11 +13,13 @@ import { AnalysisState, Upload } from "types/dashboard";
 
 type Props = {
   upload: Upload;
+  retryAnalysis: (_id: string) => void;
+  renameUpload: (upload: Upload) => void;
   deleteUpload: (_id: string) => void;
 };
 
 const UploadCard = (props: Props) => {
-  const { upload, deleteUpload } = props;
+  const { upload, retryAnalysis, renameUpload, deleteUpload } = props;
 
   const getStateContent = (state: AnalysisState) => {
     type AlertType = "warning" | "error" | "success" | undefined;
@@ -50,15 +53,25 @@ const UploadCard = (props: Props) => {
       case AnalysisState.SUCCESS:
       case AnalysisState.ERROR:
         return (
-          <Tooltip title="Delete analysis" placement="top">
-            <Button
-              danger
-              shape="circle"
-              icon={<DeleteOutlined />}
-              style={{ marginTop: 5 }}
-              onClick={() => deleteUpload(upload._id)}
-            />
-          </Tooltip>
+          <>
+            <Tooltip title="Rename analysis" placement="top">
+              <Button
+                shape="circle"
+                icon={<EditTwoTone />}
+                style={{ marginLeft: 5, marginTop: 5 }}
+                onClick={() => renameUpload(upload)}
+              />
+            </Tooltip>
+            <Tooltip title="Delete analysis" placement="top">
+              <Button
+                danger
+                shape="circle"
+                icon={<DeleteOutlined />}
+                style={{ marginLeft: 5, marginTop: 5 }}
+                onClick={() => deleteUpload(upload._id)}
+              />
+            </Tooltip>
+          </>
         );
     }
   };
@@ -79,6 +92,7 @@ const UploadCard = (props: Props) => {
             type="primary"
             icon={<RedoOutlined />}
             style={{ backgroundColor: "#ffbf00", borderColor: "#ffbf00" }}
+            onClick={() => retryAnalysis(upload._id)}
           >
             Retry
           </Button>,
@@ -88,7 +102,7 @@ const UploadCard = (props: Props) => {
 
   return (
     <Card
-      title={upload.videoFile}
+      title={upload.name}
       extra={getExtra(upload.state)}
       style={{ height: 290, width: 300, margin: 15 }}
       actions={getAction(upload)}

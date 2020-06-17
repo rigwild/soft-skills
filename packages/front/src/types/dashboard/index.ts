@@ -6,9 +6,11 @@ export enum AnalysisState {
 
 export type Upload = {
   _id: string;
+  name: string;
   analysisId: string;
   videoFile: string;
   state: AnalysisState;
   uploadTimestamp: string;
   lastStateEditTimestamp: string;
+  errorMessage?: string;
 };

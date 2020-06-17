@@ -27,6 +27,22 @@ export const getAnalysisDataFile = (id: string, dataType: string) => {
   });
 };
 
+export const retryAnalysis = (id: string) => {
+  return axiosInstance.post(`/uploads/${id}/retry`, null, {
+    headers: getAuthorizationHeaders(),
+  });
+};
+
+export const renameUpload = (id: string, name: string) => {
+  return axiosInstance.patch(
+    `/uploads/${id}`,
+    { name },
+    {
+      headers: getAuthorizationHeaders(),
+    }
+  );
+};
+
 export const deleteUpload = (id: string) => {
   return axiosInstance.delete(`/analysis/${id}`, {
     headers: getAuthorizationHeaders(),
