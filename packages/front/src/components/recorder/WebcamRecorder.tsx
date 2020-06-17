@@ -118,14 +118,15 @@ const WebcamRecorder = (props: Props) => {
               or
             </Text>
             <Upload
+              accept="application/vnd.apple.mpegurl,application/x-mpegurl,video/3gpp,video/mp2t,video/mp4,video/mpeg,video/ms-asf,video/ogg,video/quicktime,video/webm,video/x-flv,video/x-m4v,video/x-matroska,video/x-ms-wmv,video/x-msvideo"
               showUploadList={false}
               beforeUpload={(file: Blob, _) => {
                 props.uploadVideo(file);
                 return false;
               }}
             >
-              <Button type="primary" danger style={{ width: "250px" }}>
-                <UploadOutlined /> Upload a video
+              <Button type="primary" danger style={{ width: "270px" }}>
+                <UploadOutlined /> Upload a video (20 Mo maximum)
               </Button>
             </Upload>
           </>
