@@ -18,7 +18,6 @@ const RenameModal = (props: Props) => {
   const [form] = Form.useForm();
 
   const handleRenameUpload = (name: string) => {
-    // loading state => disable everything
     setLoading(true);
     apiRenameUpload(upload._id, name)
       .then(() => {
