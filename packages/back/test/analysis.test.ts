@@ -132,7 +132,11 @@ test.serial('Upload a video file for analysis', async t => {
     if (upload.state === 'finished') {
       t.true(!!upload.analysisId)
       break
+    } else if (upload.state === 'error') {
+      t.fail()
+      return
     }
+
     // Wait 250 ms before checking again
     await new Promise(res => setTimeout(res, 250))
   }
@@ -140,7 +144,9 @@ test.serial('Upload a video file for analysis', async t => {
   // Check success analysis statistic was incremented
   const statistics2 = await getStatistics()
   t.is(statistics2.analysesTotalCount, 1)
-  t.is(statistics2.analysesSuccessCount, 1)
+  // Stats are reset between every tests, except for the `retry` test which silently and asynchronously
+  // increments this statistic, so it can be 2
+  t.true(statistics2.analysesSuccessCount > 0)
 
   // Check analysis data is available
   const res2 = await request(app).get(`/analysis/${upload.analysisId}`).set('Authorization', `Bearer ${token}`)

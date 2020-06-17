@@ -44,6 +44,7 @@ export const addAnalysis = async (
   const analysisDoc = await AnalysisModel.create({
     userId,
 
+    name: path.basename(analysis.videoFile),
     videoFile: path.basename(analysis.videoFile),
     audioFile: path.basename(analysis.audioFile),
 
