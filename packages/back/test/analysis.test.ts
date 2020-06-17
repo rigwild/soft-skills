@@ -17,6 +17,7 @@ test.serial('Fetch uploads list', async t => {
   const res = await request(app).get('/uploads').set('Authorization', `Bearer ${token}`)
 
   t.is(res.status, 200)
+  t.is(res.body.data[0].name, testUserData.uploads[0].name)
   t.is(res.body.data[0].videoFile, testUserData.uploads[0].videoFile)
   t.is(res.body.data[0].state, testUserData.uploads[0].state)
   t.is(res.body.data[0].analysisId, testUserData.uploads[0].analysisId)
@@ -27,6 +28,7 @@ test.serial('Get an analysis raw data', async t => {
   const res = await request(app).get(`/analysis/${testAnalysisData._id}`).set('Authorization', `Bearer ${token}`)
 
   t.is(res.status, 200)
+  t.is(res.body.data.name, testAnalysisData.name)
   t.is(res.body.data.videoFile, testAnalysisData.videoFile)
   t.is(res.body.data.audioFile, testAnalysisData.audioFile)
   t.is(res.body.data.amplitudePlotFile, testAnalysisData.amplitudePlotFile)

@@ -4,7 +4,7 @@ import boom from '@hapi/boom'
 
 import { setOneUploadStateFromUser, UserModel } from './user.db'
 import { log } from '../utils'
-import type { UploadDB, Analysis } from '../types'
+import type { UploadDB, Analysis, AnalysisData } from '../types'
 
 export type AnalysisDocument = Analysis & mongoose.Document
 
@@ -35,16 +35,12 @@ export const AnalysisModel = mongoose.model<AnalysisDocument>('Analyses', Analys
  * @param file Uploaded file data from `users.uploads`
  * @param analysis Analysis data
  */
-export const addAnalysis = async (
-  userId: string,
-  file: UploadDB,
-  analysis: Omit<Analysis, 'userId' | 'uploadTimestamp' | 'analysisTimestamp'>
-) => {
+export const addAnalysis = async (userId: string, file: UploadDB, analysis: AnalysisData) => {
   // Add the upload to the user uploads list
   const analysisDoc = await AnalysisModel.create({
     userId,
 
-    name: path.basename(analysis.videoFile),
+    name: file.name,
     videoFile: path.basename(analysis.videoFile),
     audioFile: path.basename(analysis.audioFile),
 

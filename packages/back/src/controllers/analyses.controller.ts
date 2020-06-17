@@ -12,22 +12,27 @@ import {
   AnalysisModel,
   deleteAnalysis,
   getUserUploads,
-  editAnalysis
+  editAnalysis,
+  getUserUploadById
 } from '../db'
 import { analyseVideo } from '../scripts/runner'
 import { isVideoMimeType, logDated, logErr, fileExists, runRequestValidator } from '../utils'
-import { RequestAuthed, analysisFiles, AnalysisFiles, UploadDB, Upload } from '../types'
+import { RequestAuthed, analysisFiles, AnalysisFiles, Upload } from '../types'
 
-const startAnalysis = async (uploadedData: UploadDB, file: string, req: RequestAuthed) => {
+const startAnalysis = async (userId: string, uploadId: string, file: string) => {
   const fileName = path.basename(file)
   try {
-    logDated(`Starting analysis for file "${fileName}" from user=${req.session.email}`)
+    logDated(`Starting analysis for file "${fileName}" from user=${userId}`)
     const analysis = await analyseVideo(file)
-    await addAnalysis(req.session._id, uploadedData, analysis)
-    logDated(`Successful analysis for file "${fileName}" from user=${req.session.email}`)
+
+    // We do it there to dodge race conditions (like renaming an upload while running an analysis)
+    const uploadedData = await getUserUploadById(userId, uploadId)
+    await addAnalysis(userId, uploadedData, analysis)
+
+    logDated(`Successful analysis for file "${fileName}" from user=${userId}`)
   } catch (error) {
     // Set the file state as error in the user uploads list
-    await setOneUploadStateFromUser(req.session._id, uploadedData._id, fileName, 'error', undefined, error.message)
+    await setOneUploadStateFromUser(userId, uploadId, fileName, 'error', undefined, error.message)
     logErr(error)
   }
 }
@@ -56,7 +61,7 @@ export const uploadFileRequestHandler = async (reqRaw: RequestAuthed, res: Respo
 
   // Start a background analysis
   try {
-    await startAnalysis(uploadedData, file, req)
+    await startAnalysis(req.session._id, uploadedData._id, file)
   } catch (error) {
     logErr(error)
   }
@@ -64,8 +69,7 @@ export const uploadFileRequestHandler = async (reqRaw: RequestAuthed, res: Respo
 
 export const retryAnalysisRequestHandler = async (req: RequestAuthed<{ uploadId: string }>, res: Response) => {
   // Load the requested upload data
-  const uploads = await getUserUploads(req.session._id)
-  const toRetry = uploads.find(x => x._id.toString() === req.params.uploadId)
+  const toRetry = await getUserUploadById(req.session._id, req.params.uploadId)
 
   if (!toRetry) throw boom.notFound('Upload not found.')
   if (toRetry.state !== 'error') throw boom.conflict('You can only retry failed analyses.')
@@ -85,7 +89,7 @@ export const retryAnalysisRequestHandler = async (req: RequestAuthed<{ uploadId:
 
   // Retry the analysis in the background
   try {
-    await startAnalysis(toRetry, filePath, req)
+    await startAnalysis(req.session._id, toRetry._id, filePath)
   } catch (error) {
     logErr(error)
   }

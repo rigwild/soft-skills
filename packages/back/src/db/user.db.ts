@@ -48,7 +48,7 @@ export const UserModel = mongoose.model<UserDocument>('User', UserSchema)
 
 /**
  * Find data of a registered user
- * @param userId The user id of the user
+ * @param userId
  * @returns The user's data
  * @throws Could not find the user
  */
@@ -143,7 +143,7 @@ export const checkUserLogin = async (email: string, password: string) => {
 
 /**
  * Delete a registered user
- * @param userId The user id of the user to delete
+ * @param userId  to delete
  * @returns Id of the deleted user
  * @throws Could not find the user to delete
  */
@@ -159,7 +159,7 @@ export const deleteUser = async (userId: string) => {
 
 /**
  * Edit a registered user profile
- * @param userId The user id of the user to edit
+ * @param userId  to edit
  * @param newProfileData New user profile data
  * @returns New user profile
  * @throws Could not find the user to delete
@@ -181,7 +181,7 @@ export const editUser = async (userId: string, _newProfileData: Partial<Pick<Use
 
 /**
  * Load all the user uploads sorted by most recently uploaded is first
- * @param userId The user id of the user
+ * @param userId
  */
 export const getUserUploads = async (userId: string) => {
   const profile = await findUser(userId)
@@ -189,8 +189,20 @@ export const getUserUploads = async (userId: string) => {
 }
 
 /**
+ * Find a user upload by its upload id
+ * @param userId
+ * @param uploadId
+ */
+export const getUserUploadById = async (userId: string, uploadId: string) => {
+  const uploads = await getUserUploads(userId)
+  const anUpload = uploads.find(x => x._id.toString() === uploadId.toString())
+  if (!anUpload) throw boom.notFound('Upload not found.')
+  return anUpload
+}
+
+/**
  * Link a file to a user
- * @param userId The user id of the user
+ * @param userId
  * @param videoFile Uploaded file to link to a user
  */
 export const addUploadToUser = async (userId: string, videoFile: string) => {
@@ -216,7 +228,7 @@ export const addUploadToUser = async (userId: string, videoFile: string) => {
 
 /**
  * Edit a file upload state
- * @param userId The user id of the user to delete
+ * @param userId  to delete
  * @param uploadId The state of an upload
  * @param fileName Uploaded file to edit state from
  * @param newState New state of the upload
