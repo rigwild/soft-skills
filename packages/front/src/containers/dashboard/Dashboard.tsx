@@ -98,6 +98,14 @@ const DashboardContainer = () => {
     setModalVisible(true);
   };
 
+  const renameUpload = (_id: string, name: string) => {
+    setUploads(
+      uploads.map((upload) =>
+        upload._id === _id ? { ...upload, name } : upload
+      )
+    );
+  };
+
   const handleRetryAnalysis = (_id: string) => {
     retryAnalysis(_id)
       .then((res: AxiosResponse<RetryResponse>) => {
@@ -195,6 +203,7 @@ const DashboardContainer = () => {
       <RenameModal
         visible={modalVisible}
         upload={renamedUpload!}
+        renameUpload={renameUpload}
         closeModal={() => setModalVisible(false)}
       />
     </>
