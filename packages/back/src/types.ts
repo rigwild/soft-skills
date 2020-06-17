@@ -12,6 +12,7 @@ export const analysisFiles = new Set(_analysisFiles)
 export type AnalysisFiles = typeof _analysisFiles[number]
 
 export interface Upload {
+  name: string
   videoFile: string
 
   state: UploadStates
@@ -37,6 +38,7 @@ export interface AnalysisData {
 }
 
 export interface Analysis extends AnalysisData {
+  name: string
   userId: string
   uploadTimestamp: Date
   analysisTimestamp: Date

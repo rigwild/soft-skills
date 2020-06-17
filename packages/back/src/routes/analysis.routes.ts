@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { body } from 'express-validator'
 
 import { asyncMiddleware, authenticatedMiddleware } from '../middlewares'
 import {
@@ -7,9 +8,10 @@ import {
   getAnalysisRequestHandler,
   getAnalysisFileRequestHandler,
   deleteAnalysisRequestHandler,
-  retryAnalysisRequestHandler
+  retryAnalysisRequestHandler,
+  editAnalysisRequestHandler
 } from '../controllers/analyses.controller'
-import type { AnalysisFiles } from '../types'
+import type { AnalysisFiles, Upload } from '../types'
 
 const router = Router()
 
@@ -149,6 +151,40 @@ router.post<{ uploadId: string }>(
   authenticatedMiddleware(),
   // @ts-ignore
   asyncMiddleware(retryAnalysisRequestHandler)
+)
+
+/**
+ * @api {patch} /uploads/:uploadId Edit an upload
+ * @apiDescription Edit an upload name
+ * @apiVersion 0.1.0
+ * @apiName EditUploadName
+ * @apiGroup Uploads
+ *
+ * @apiParam (URI) {String} uploadId Upload id
+ *
+ * @apiParam (body) {String} name New upload name
+ *
+ * @apiParamExample {json} Example usage:
+ * {
+ *   "name": "Interview 1"
+ * }
+ *
+ * @apiSuccessExample {json} Success-Response:
+ * HTTP/1.1 200 OK
+ *
+ * @apiError {Error} NotFound Analysis not found.
+ * @apiErrorExample {json} Error-Response:
+ * HTTP/1.1 404 Not Found
+ * {
+ *   "message": "Analysis not found."
+ * }
+ */
+router.patch<{ uploadId: string }, any, Pick<Upload, 'name'>>(
+  '/uploads/:uploadId',
+  body(['name'], 'is missing.').exists({ checkFalsy: true }),
+  authenticatedMiddleware(),
+  // @ts-ignore
+  asyncMiddleware(editAnalysisRequestHandler)
 )
 
 /**

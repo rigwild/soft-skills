@@ -11,6 +11,7 @@ export type AnalysisDocument = Analysis & mongoose.Document
 export const AnalysisSchema = new Schema({
   userId: { type: String, required: true },
 
+  name: { type: String, required: true },
   videoFile: { type: String, required: true, unique: true },
   audioFile: { type: String, required: true },
 
@@ -62,6 +63,32 @@ export const addAnalysis = async (
   // Set the file state as finished in the user uploads list
   await setOneUploadStateFromUser(userId, file._id, file.videoFile, 'finished', analysisDoc._id)
   log(`Added an analysis. userId=${userId}, fileName=${file.videoFile}`)
+}
+
+/**
+ * Edit an analysis. Will also edit it from the `users.uploads` array.
+ * @param userId
+ * @param uploadId
+ * @param newName New analysis name
+ */
+export const editAnalysis = async (userId: string, uploadId: string, newName: string) => {
+  const userDoc = await UserModel.findOneAndUpdate(
+    {
+      _id: userId,
+      'uploads._id': uploadId
+    },
+    { 'uploads.$.name': newName },
+    { new: true }
+  )
+  if (!userDoc) throw boom.notFound('Analysis not found.')
+
+  // Find the analysisId
+  const analysisId = userDoc.uploads.find(x => x._id.toString() === uploadId || x.analysisId === uploadId)?.analysisId
+
+  // If the provided id is an analysisId, we can rename the analysis document
+  if (analysisId) await AnalysisModel.findByIdAndUpdate(analysisId, { name: newName })
+
+  log(`Edited an analysis. userId=${userId}, analysisId=${uploadId}, newName=${newName}`)
 }
 
 /**

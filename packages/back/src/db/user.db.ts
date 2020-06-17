@@ -21,6 +21,7 @@ export const UserSchema = new Schema({
   },
   uploads: [
     {
+      name: { type: String, required: true },
       videoFile: { type: String, required: true },
 
       state: { type: String, enum: ['pending', 'finished', 'error'], default: 'pending', required: true },
@@ -199,6 +200,7 @@ export const addUploadToUser = async (userId: string, videoFile: string) => {
     {
       $push: {
         uploads: {
+          name: videoFile,
           videoFile
         } as UploadDB
       }

@@ -11,11 +11,12 @@ import {
   findAnalysis,
   AnalysisModel,
   deleteAnalysis,
-  getUserUploads
+  getUserUploads,
+  editAnalysis
 } from '../db'
 import { analyseVideo } from '../scripts/runner'
-import { isVideoMimeType, logDated, logErr, fileExists } from '../utils'
-import { RequestAuthed, analysisFiles, AnalysisFiles, UploadDB } from '../types'
+import { isVideoMimeType, logDated, logErr, fileExists, runRequestValidator } from '../utils'
+import { RequestAuthed, analysisFiles, AnalysisFiles, UploadDB, Upload } from '../types'
 
 const startAnalysis = async (uploadedData: UploadDB, file: string, req: RequestAuthed) => {
   const fileName = path.basename(file)
@@ -96,6 +97,16 @@ export const getUploadsRequestHandler = async (req: RequestAuthed, res: Response
 
 export const getAnalysisRequestHandler = async (req: RequestAuthed<{ analysisId: string }>, res: Response) => {
   res.json({ data: await findAnalysis(req.params.analysisId) })
+}
+
+export const editAnalysisRequestHandler = async (
+  req: RequestAuthed<{ uploadId: string }, any, Pick<Upload, 'name'>>,
+  res: Response
+) => {
+  runRequestValidator(req)
+
+  await editAnalysis(req.session._id, req.params.uploadId, req.body.name)
+  res.end()
 }
 
 export const deleteAnalysisRequestHandler = async (

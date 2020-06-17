@@ -47,6 +47,20 @@ test.serial('Delete an analysis', async t => {
   t.falsy(await AnalysisModel.findById(testAnalysisData._id))
 })
 
+test.serial('Edit an analysis', async t => {
+  const { app, testUserData, testAnalysisData, token } = t.context
+  const newName = 'example'
+  const res = await request(app)
+    .patch(`/uploads/${testUserData.uploads[0]._id}`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({ name: newName })
+
+  t.is(res.status, 200)
+  // Check in database if analysis was really edited
+  t.is((await UserModel.findById(testUserData._id))?.uploads[0].name, newName)
+  t.is((await AnalysisModel.findById(testAnalysisData._id))?.name, newName)
+})
+
 test.serial('Upload an invalid file', async t => {
   const { app, token } = t.context
   const res = await request(app)
@@ -58,7 +72,7 @@ test.serial('Upload an invalid file', async t => {
   t.is(res.body.message, 'You need to send a video file.')
 })
 
-test.serial.only('Retry a failed analysis', async t => {
+test.serial('Retry a failed analysis', async t => {
   const { app, testUserData, token } = t.context
 
   // Copy the `_VIDEO.mp4` test file to the `test/uploads` directory
