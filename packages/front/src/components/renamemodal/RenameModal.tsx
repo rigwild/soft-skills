@@ -32,7 +32,7 @@ const RenameModal = (props: Props) => {
   return (
     <Modal
       visible={visible}
-      title={`Rename upload : ${upload?.name}`}
+      title={`Rename upload: ${upload?.name}`}
       style={{ top: 275 }}
       okText="Rename"
       cancelText="Cancel"
