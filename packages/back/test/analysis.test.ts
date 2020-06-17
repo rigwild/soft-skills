@@ -17,6 +17,7 @@ test.serial('Fetch uploads list', async t => {
   const res = await request(app).get('/uploads').set('Authorization', `Bearer ${token}`)
 
   t.is(res.status, 200)
+  t.is(res.body.data[0].name, testUserData.uploads[0].name)
   t.is(res.body.data[0].videoFile, testUserData.uploads[0].videoFile)
   t.is(res.body.data[0].state, testUserData.uploads[0].state)
   t.is(res.body.data[0].analysisId, testUserData.uploads[0].analysisId)
@@ -27,6 +28,7 @@ test.serial('Get an analysis raw data', async t => {
   const res = await request(app).get(`/analysis/${testAnalysisData._id}`).set('Authorization', `Bearer ${token}`)
 
   t.is(res.status, 200)
+  t.is(res.body.data.name, testAnalysisData.name)
   t.is(res.body.data.videoFile, testAnalysisData.videoFile)
   t.is(res.body.data.audioFile, testAnalysisData.audioFile)
   t.is(res.body.data.amplitudePlotFile, testAnalysisData.amplitudePlotFile)
@@ -47,6 +49,20 @@ test.serial('Delete an analysis', async t => {
   t.falsy(await AnalysisModel.findById(testAnalysisData._id))
 })
 
+test.serial('Edit an analysis', async t => {
+  const { app, testUserData, testAnalysisData, token } = t.context
+  const newName = 'example'
+  const res = await request(app)
+    .patch(`/uploads/${testUserData.uploads[0]._id}`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({ name: newName })
+
+  t.is(res.status, 200)
+  // Check in database if analysis was really edited
+  t.is((await UserModel.findById(testUserData._id))?.uploads[0].name, newName)
+  t.is((await AnalysisModel.findById(testAnalysisData._id))?.name, newName)
+})
+
 test.serial('Upload an invalid file', async t => {
   const { app, token } = t.context
   const res = await request(app)
@@ -58,7 +74,7 @@ test.serial('Upload an invalid file', async t => {
   t.is(res.body.message, 'You need to send a video file.')
 })
 
-test.serial.only('Retry a failed analysis', async t => {
+test.serial('Retry a failed analysis', async t => {
   const { app, testUserData, token } = t.context
 
   // Copy the `_VIDEO.mp4` test file to the `test/uploads` directory
@@ -118,7 +134,11 @@ test.serial('Upload a video file for analysis', async t => {
     if (upload.state === 'finished') {
       t.true(!!upload.analysisId)
       break
+    } else if (upload.state === 'error') {
+      t.fail()
+      return
     }
+
     // Wait 250 ms before checking again
     await new Promise(res => setTimeout(res, 250))
   }
@@ -126,7 +146,9 @@ test.serial('Upload a video file for analysis', async t => {
   // Check success analysis statistic was incremented
   const statistics2 = await getStatistics()
   t.is(statistics2.analysesTotalCount, 1)
-  t.is(statistics2.analysesSuccessCount, 1)
+  // Stats are reset between every tests, except for the `retry` test which silently and asynchronously
+  // increments this statistic, so it can be 2
+  t.true(statistics2.analysesSuccessCount > 0)
 
   // Check analysis data is available
   const res2 = await request(app).get(`/analysis/${upload.analysisId}`).set('Authorization', `Bearer ${token}`)

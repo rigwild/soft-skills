@@ -16,6 +16,7 @@ type Props = {
 };
 
 type Analysis = {
+  name: string;
   videoFile: string;
   audioFile: string;
   uploadTimestamp: string; // TODO: Add initial upload timestamp
@@ -48,6 +49,7 @@ const AnalysisContainer = (props: Props) => {
       .then((res: AxiosResponse[]) => {
         const analysisData = res[0].data.data;
         const analysis: Analysis = {
+          name: analysisData.name,
           videoFile: analysisData.videoFile,
           audioFile: analysisData.audioFile,
           uploadTimestamp: dateFormat(new Date(analysisData.uploadTimestamp)),
@@ -98,7 +100,7 @@ const AnalysisContainer = (props: Props) => {
 
   return (
     <>
-      <Title>{analysis?.videoFile}</Title>
+      <Title>{analysis?.name}</Title>
       <CenteredWrapper row wrap>
         <div>
           <p style={{ fontSize: 18, marginBottom: 5 }}>

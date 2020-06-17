@@ -26,5 +26,5 @@ export const analyseVideo = async (videoFile: string) => {
 
   await incrementStatistic('analysesSuccessCount')
 
-  return data as Omit<Analysis, 'userId' | 'analysisTimestamp' | 'uploadTimestamp'>
+  return data as AnalysisData
 }

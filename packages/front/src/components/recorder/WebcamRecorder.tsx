@@ -126,7 +126,7 @@ const WebcamRecorder = (props: Props) => {
               }}
             >
               <Button type="primary" danger style={{ width: "270px" }}>
-                <UploadOutlined /> Upload a video (20 Mo maximum)
+                <UploadOutlined /> Upload a video (20 MB maximum)
               </Button>
             </Upload>
           </>

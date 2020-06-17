@@ -41,6 +41,7 @@ export const beforeEach: Implementation<TestContext> = async t => {
     uploads: [
       {
         _id: '5ed65e7142905c4a917be028',
+        name: 'PtCLcgRs__VIDEO.mp4',
         videoFile: 'PtCLcgRs__VIDEO.mp4',
         state: 'finished',
         analysisId: '5ece960cfe6ce42d24ef6bec',
@@ -56,6 +57,7 @@ export const beforeEach: Implementation<TestContext> = async t => {
     intensity: [[0, 0]],
     pitch: [[0, 0]],
     _id: '5ece960cfe6ce42d24ef6bec',
+    name: 'PtCLcgRs__VIDEO.mp4',
     amplitudePlotFile: 'PtCLcgRs_amplitude.png',
     intensityPlotFile: 'PtCLcgRs_intensity.png',
     pitchPlotFile: 'PtCLcgRs_pitch.png',
