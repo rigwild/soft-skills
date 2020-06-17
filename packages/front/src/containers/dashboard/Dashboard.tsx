@@ -32,6 +32,17 @@ const DashboardContainer = () => {
   const [error, setError] = useState<string | undefined>(undefined);
   const [timer, setTimer] = useState<number | undefined>(undefined);
 
+  const logErrors = (uploads: Upload[]) => {
+    console.clear();
+    const errorMessages = uploads
+      .map((upload) => upload.errorMessage)
+      .filter((errorMessage) => errorMessage != null);
+    if (errorMessages.length > 0) {
+      console.info("Uploaded files errors:");
+      errorMessages.forEach((errorMessage) => console.error(errorMessage));
+    }
+  };
+
   const fetchUploads = useCallback(() => {
     getUploads()
       .then((res: AxiosResponse<UploadsResponse>) => {
@@ -46,6 +57,7 @@ const DashboardContainer = () => {
           );
           setTimer(timer);
         }
+        logErrors(uploads);
         setUploads(uploads);
       })
       .catch((error: AxiosError) => {
