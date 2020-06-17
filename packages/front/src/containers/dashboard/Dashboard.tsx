@@ -6,6 +6,7 @@ import { Alert, Button, Empty, message, Modal, Spin, Typography } from "antd";
 import { deleteUpload, getUploads, retryAnalysis } from "api/upload";
 import { AxiosError, AxiosResponse } from "axios";
 import CenteredWrapper from "components/centeredwrapper";
+import RenameModal from "components/renamemodal";
 import UploadCard from "components/uploadcard";
 import { getErrorMessage } from "functions/error";
 import React, { useCallback, useEffect, useState } from "react";
@@ -31,6 +32,10 @@ const DashboardContainer = () => {
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [error, setError] = useState<string | undefined>(undefined);
   const [timer, setTimer] = useState<number | undefined>(undefined);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [renamedUpload, setRenamedUpload] = useState<Upload | undefined>(
+    undefined
+  );
 
   const logErrors = (uploads: Upload[]) => {
     console.clear();
@@ -86,6 +91,11 @@ const DashboardContainer = () => {
           );
       },
     });
+  };
+
+  const handleOpenModal = (upload: Upload) => {
+    setRenamedUpload(upload);
+    setModalVisible(true);
   };
 
   const handleRetryAnalysis = (_id: string) => {
@@ -176,11 +186,17 @@ const DashboardContainer = () => {
           <UploadCard
             upload={upload}
             retryAnalysis={handleRetryAnalysis}
+            renameUpload={handleOpenModal}
             deleteUpload={handleDeleteUpload}
             key={upload._id}
           />
         ))}
       </CenteredWrapper>
+      <RenameModal
+        visible={modalVisible}
+        upload={renamedUpload!}
+        closeModal={() => setModalVisible(false)}
+      />
     </>
   );
 };
