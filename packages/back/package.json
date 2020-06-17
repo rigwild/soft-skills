@@ -69,7 +69,7 @@
   },
   "ava": {
     "verbose": true,
-    "timeout": "90000",
+    "timeout": "180000",
     "extensions": [
       "ts"
     ],
