@@ -2,12 +2,14 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Architecture
 
+This project use the container/component react pattern : https://reactpatterns.com/#container-component.
+
 Source files are in the `src` folder:
 
-`src/api`: methods used for data fetching, can be tested or mocked with jest.  
+`src/api`: methods used for data fetching with axios.  
 `src/components`: simple components that render a view, with its own state management.  
-`src/containers`: containers do the data fetching and then render data by passing it to a component.  
-`src/functions`: functions used to process data, must be tested.  
+`src/containers`: containers do the data fetching, render loading/empty/error state or render data by passing it to a component.  
+`src/functions`: helpers used to process data.
 `src/pages`: pages of the app corresponding to a url endpoint.  
 `src/types`: typescript types used in the app.
 
@@ -18,6 +20,10 @@ Absolute imports are used to avoid the `../../../` hell.
 ## Available Scripts
 
 In the project directory, you can run:
+
+### `yarn install`
+
+Install dependencies.
 
 ### `yarn start`
 
